@@ -1,0 +1,39 @@
+---
+description: Always use Bun package manager instead of npm
+alwaysApply: true
+---
+
+# Use Bun Package Manager
+
+**Always use Bun instead of npm for package management.**
+
+## Commands
+
+- ✅ Use `bun install` instead of `npm install`
+- ✅ Use `bun add <package>` instead of `npm install <package>`
+- ✅ Use `bun run <script>` instead of `npm run <script>`
+- ✅ Use `bunx` instead of `npx` when available
+- ❌ Never use `npm install`, `npm run`, or `npx` directly
+
+## Portability
+
+The project should remain portable and work with npm if needed:
+- Package.json scripts should work with both `bun run` and `npm run`
+- Lock files: Use `bun.lockb` as primary, but ensure `package.json` is compatible
+- When suggesting commands, always show the Bun version first
+
+## Examples
+
+```bash
+# ✅ CORRECT
+bun install
+bun add react
+bun run dev
+bunx create-vite
+
+# ❌ INCORRECT
+npm install
+npm install react
+npm run dev
+npx create-vite
+```
