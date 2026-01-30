@@ -172,10 +172,12 @@ function validateRule(
     }
 
     case 'custom':
-      // Custom validation would need to be implemented per validator type
-      // For now, we'll skip it
       console.warn('Custom validation not yet implemented:', rule.validator);
-      break;
+      return {
+        completed: false,
+        message: `Custom validation not implemented: ${rule.validator}`,
+        hints: rule.hints ?? [],
+      };
 
     default: {
       const invalidType = (rule as { type: unknown }).type;

@@ -36,6 +36,12 @@ async function cleanupOrphanedTempDirs(): Promise<void> {
 const BUILD_TIMEOUT_MS = 15_000;
 const RUN_TIMEOUT_MS = 10_000;
 
+/** When set to "docker", run cargo inside a hardened container (no network, limits, non-root). */
+const SANDBOX = process.env.EXECUTION_SANDBOX === "docker";
+const RUST_IMAGE = process.env.EXECUTION_SANDBOX_IMAGE ?? "rust:1-slim";
+const SANDBOX_MEMORY_MB = process.env.EXECUTION_SANDBOX_MEMORY_MB ?? "512";
+const SANDBOX_CPUS = process.env.EXECUTION_SANDBOX_CPUS ?? "1";
+
 const CARGO_TOML = `[package]
 name = "user"
 version = "0.1.0"
@@ -125,14 +131,58 @@ export async function createTempProject(code: string): Promise<string> {
 }
 
 /**
- * Run cargo build. Returns success, stderr, and exit code.
+ * Build docker run args for sandboxed execution: ephemeral container, no network,
+ * non-root, dropped caps, memory/cpu limits. Project dir is mounted at /workspace.
+ */
+function sandboxRunArgs(dir: string, cargoArgs: string[], memoryMb: string): string[] {
+  return [
+    "run",
+    "--rm",
+    "-v",
+    `${dir}:/workspace`,
+    "-w",
+    "/workspace",
+    "--network=none",
+    "--user",
+    "1000:1000",
+    "--memory",
+    `${memoryMb}m`,
+    "--cpus",
+    SANDBOX_CPUS,
+    "--cap-drop",
+    "ALL",
+    "--security-opt",
+    "no-new-privileges",
+    RUST_IMAGE,
+    ...cargoArgs,
+  ];
+}
+
+/**
+ * Run cargo build. When EXECUTION_SANDBOX=docker, runs inside a hardened container.
  */
 export async function cargoBuild(dir: string): Promise<BuildResult> {
-  const { stdout, stderr, exitCode } = await runWithTimeout(
-    ["cargo", "build", "--quiet"],
-    dir,
-    BUILD_TIMEOUT_MS
-  );
+  let stdout: string;
+  let stderr: string;
+  let exitCode: number;
+
+  if (SANDBOX) {
+    const cmd = sandboxRunArgs(dir, ["cargo", "build", "--quiet"], "768");
+    const result = await runWithTimeout(["docker", ...cmd], process.cwd(), BUILD_TIMEOUT_MS);
+    stdout = result.stdout;
+    stderr = result.stderr;
+    exitCode = result.exitCode;
+  } else {
+    const result = await runWithTimeout(
+      ["cargo", "build", "--quiet"],
+      dir,
+      BUILD_TIMEOUT_MS
+    );
+    stdout = result.stdout;
+    stderr = result.stderr;
+    exitCode = result.exitCode;
+  }
+
   return {
     success: exitCode === 0,
     stderr: stderr || stdout,
@@ -141,11 +191,27 @@ export async function cargoBuild(dir: string): Promise<BuildResult> {
 }
 
 /**
- * Run cargo run with optional args. Returns stdout, stderr, exit code.
+ * Run cargo run with optional args. When EXECUTION_SANDBOX=docker, runs inside a hardened container.
  */
 export async function cargoRun(dir: string, args: string[] = []): Promise<RunResult> {
-  const cmd = ["cargo", "run", "--quiet", "--", ...args];
-  const { stdout, stderr, exitCode } = await runWithTimeout(cmd, dir, RUN_TIMEOUT_MS);
+  const cargoCmd = ["cargo", "run", "--quiet", "--", ...args];
+  let stdout: string;
+  let stderr: string;
+  let exitCode: number;
+
+  if (SANDBOX) {
+    const cmd = sandboxRunArgs(dir, cargoCmd, SANDBOX_MEMORY_MB);
+    const result = await runWithTimeout(["docker", ...cmd], process.cwd(), RUN_TIMEOUT_MS);
+    stdout = result.stdout;
+    stderr = result.stderr;
+    exitCode = result.exitCode;
+  } else {
+    const result = await runWithTimeout(cargoCmd, dir, RUN_TIMEOUT_MS);
+    stdout = result.stdout;
+    stderr = result.stderr;
+    exitCode = result.exitCode;
+  }
+
   return {
     success: exitCode === 0,
     stdout,
