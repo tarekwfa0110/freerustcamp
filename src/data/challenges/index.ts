@@ -12,6 +12,10 @@ export const sections: Section[] = [
   // More sections will be added as we build them out
 ];
 
+/**
+ * Returns the section that contains the challenge with the given id (not the challenge itself).
+ * Public API for section/curriculum lookups.
+ */
 export function getChallengeById(id: string): Section | null {
   for (const section of sections) {
     const challenge = section.challenges.find((c) => c.id === id);
@@ -32,6 +36,7 @@ export function getChallenge(id: string) {
   return null;
 }
 
+/** Public API: flat list of all challenges with their section. Used for curriculum listing / search. */
 export function getAllChallenges() {
   return sections.flatMap((section) =>
     section.challenges.map((challenge) => ({ challenge, section }))
@@ -42,6 +47,7 @@ export function getSectionById(id: number) {
   return sections.find((s) => s.id === id);
 }
 
+/** Public API: first challenge in a section (e.g. for "Start Section" links). */
 export function getFirstChallengeForSection(sectionId: number) {
   const section = getSectionById(sectionId);
   return section && section.challenges.length > 0 ? section.challenges[0] : null;

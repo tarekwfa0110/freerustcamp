@@ -5,6 +5,8 @@ export interface ChallengeProgress {
   timeSpent: number; // in seconds
   completedAt?: string; // ISO date string
   code?: string; // Last submitted code
+  completedSteps?: number[]; // Array of completed step numbers
+  terminalCommands?: Record<number, string[]>; // Terminal commands per step: step number -> commands array
 }
 
 export interface SectionProgress {
@@ -24,4 +26,5 @@ export interface UserProgress {
   streakDays: number;
   lastActivity: string; // ISO date string
   challengeProgress: Record<string, ChallengeProgress>;
+  previewSeen?: Record<string, boolean>; // Track which challenge previews have been seen: challengeId -> true
 }

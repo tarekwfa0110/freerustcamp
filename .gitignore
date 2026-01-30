@@ -25,3 +25,10 @@ dist-ssr
 
 # Bun
 bun.lockb
+
+# TanStack Router
+.tanstack/tmp/
+
+# Vite
+vite.config.ts.timestamp*
+*.timestamp*.mjs

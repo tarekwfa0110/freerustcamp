@@ -1,0 +1,11 @@
+{
+  "sections": [
+    {
+      "id": 1,
+      "title": "Fundamentals & CLI Tools",
+      "description": "Master Rust syntax, ownership, and build practical command-line applications.",
+      "estimated_hours": "80-100",
+      "challenges_file": "section1.json"
+    }
+  ]
+}
