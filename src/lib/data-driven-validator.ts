@@ -46,13 +46,13 @@ export function validateStepWithConfig(
     if (!result.completed) {
       return {
         completed: false,
-        message: config.message || result.message,
-        hints: result.hints || rule.hints || [],
+        message: result.message ?? 'Validation failed',
+        hints: result.hints ?? rule.hints ?? [],
       };
     }
   }
 
-  return { completed: true };
+  return { completed: true, ...(config.message && { message: config.message }) };
 }
 
 function validateRule(
@@ -129,10 +129,11 @@ function validateRule(
     }
 
     case 'code_compiles':
-      // This would require actually compiling the code
-      // For now, we'll assume it compiles if it passes other checks
-      // In production, this could call rustc or cargo check
-      break;
+      return {
+        completed: false,
+        message: 'code_compiles not implemented',
+        hints: rule.hints ?? [],
+      };
 
     case 'function_exists': {
       const functionPattern = new RegExp(`fn\\s+${escapeRegExp(rule.functionName)}\\s*\\(`, 'i');
