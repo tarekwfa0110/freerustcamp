@@ -1,5 +1,6 @@
 // Test runner for Rust code
-// This will compile and run Rust code, then check test results
+// Uses real execution when VITE_EXECUTION_API_URL is set; otherwise mock.
+// See docs/architecture/REAL_RUST_EXECUTION.md for backend design.
 
 export interface TestResult {
   name: string;
@@ -15,33 +16,70 @@ export interface TestRunResult {
   executionError?: string;
 }
 
-// This is a placeholder - in a real implementation, this would:
-// 1. Save code to a temporary file
-// 2. Run `cargo check` to verify compilation
-// 3. Run `cargo test` or custom test runner
-// 4. Parse results and return structured data
-// 
-// For now, we'll create a mock implementation that can be replaced
-// with actual Rust compilation/testing later
+/** Test definition shape (matches Test from types/challenge plus optional fields for API). */
+export interface TestDefinition {
+  name: string;
+  type: string;
+  description: string;
+  command?: string;
+  expectedOutput?: string;
+  expectedExitCode?: number;
+  check?: string;
+  hidden?: boolean;
+}
 
-export async function runTests(
+const EXECUTION_API_URL = import.meta.env.VITE_EXECUTION_API_URL as string | undefined;
+
+/**
+ * Call the execution backend to compile and run code, then evaluate tests.
+ * Backend must implement POST /api/test with body { code, tests } and return TestRunResult.
+ */
+async function runTestsReal(
   code: string,
-  tests: Array<{ name: string; type: string; description: string }>
+  tests: TestDefinition[],
+  signal?: AbortSignal
 ): Promise<TestRunResult> {
-  // TODO: Implement actual Rust compilation and testing
-  // This would involve:
-  // - Creating a temporary Cargo project
-  // - Writing the user's code to src/main.rs
-  // - Writing test code based on test definitions
-  // - Running cargo test
-  // - Parsing output
+  const base = EXECUTION_API_URL?.replace(/\/$/, '');
+  if (!base) {
+    throw new Error('VITE_EXECUTION_API_URL is not set');
+  }
+  const res = await fetch(`${base}/api/test`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code, tests }),
+    signal,
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    return {
+      success: false,
+      results: [],
+      executionError: `Execution service error (${res.status}): ${text || res.statusText}`,
+    };
+  }
+  const data = (await res.json()) as TestRunResult;
+  return data;
+}
 
-  // Mock implementation for now
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Simulate test execution
+/** Mock implementation used when no execution API is configured. */
+function runTestsMock(
+  code: string,
+  tests: TestDefinition[],
+  signal?: AbortSignal
+): Promise<TestRunResult> {
+  return new Promise((resolve, reject) => {
+    // Check if already aborted
+    if (signal?.aborted) {
+      reject(new DOMException('Test execution was cancelled', 'AbortError'));
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      if (signal?.aborted) {
+        reject(new DOMException('Test execution was cancelled', 'AbortError'));
+        return;
+      }
       const results: TestResult[] = tests.map((test) => {
-        // Simple mock: check if code compiles (basic check)
         if (test.type === 'compilation') {
           const compiles = !code.includes('// This won\'t compile!');
           return {
@@ -50,22 +88,51 @@ export async function runTests(
             error: compiles ? undefined : 'Compilation failed',
           };
         }
-
-        // For functional tests, we'd need to actually run the code
-        // This is a placeholder
+        if (test.type === 'code_quality' && test.check) {
+          const passed = checkCodeQuality(code, test.check);
+          return { name: test.name, passed, error: passed ? undefined : 'Code quality check failed' };
+        }
         return {
           name: test.name,
           passed: false,
-          error: 'Test execution not yet implemented',
+          error: 'Test execution not yet implemented (configure VITE_EXECUTION_API_URL for real runs)',
         };
       });
-
-      resolve({
-        success: results.every((r) => r.passed),
-        results,
-      });
+      resolve({ success: results.every((r) => r.passed), results });
     }, 500);
+
+    signal?.addEventListener('abort', () => {
+      clearTimeout(timeoutId);
+      reject(new DOMException('Test execution was cancelled', 'AbortError'));
+    });
   });
+}
+
+/**
+ * Run certification tests: uses real execution API when VITE_EXECUTION_API_URL is set,
+ * otherwise uses the mock (compilation + code_quality only; functional tests show "not yet implemented").
+ */
+export async function runTests(
+  code: string,
+  tests: TestDefinition[],
+  signal?: AbortSignal
+): Promise<TestRunResult> {
+  if (signal?.aborted) {
+    throw new DOMException('Test execution was cancelled', 'AbortError');
+  }
+  if (EXECUTION_API_URL) {
+    try {
+      return await runTestsReal(code, tests, signal);
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') throw err;
+      return {
+        success: false,
+        results: [],
+        executionError: err instanceof Error ? err.message : 'Execution request failed',
+      };
+    }
+  }
+  return runTestsMock(code, tests, signal);
 }
 
 // Helper to check if code contains specific patterns (for code quality tests)

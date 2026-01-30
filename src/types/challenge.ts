@@ -1,4 +1,4 @@
-export type ChallengeType = 'micro' | 'practice' | 'certification';
+export type ChallengeType = 'practice' | 'certification';
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced' | 'expert';
 export type TestType = 'compilation' | 'functional' | 'code_quality' | 'performance' | 'architecture';
 
@@ -13,25 +13,25 @@ export interface Test {
   hidden?: boolean;
 }
 
-export interface Hint {
-  text: string;
-  order: number;
+import type { StepValidationConfig } from './validation';
+
+export interface ProjectStep {
+  step: number;
+  title: string;
+  instruction: string;
+  explanation?: string; // Educational explanation of concepts
+  task?: string; // Fun, experimental task related to the step
+  starterCode?: string; // Code that should appear in editor for this step (like FCC's --seed--)
+  test: string[]; // Test descriptions
+  what_you_learned: string; // Summary of what was learned
+  validation?: StepValidationConfig; // Data-driven validation rules (replaces hardcoded logic)
 }
 
-export interface MicroChallenge {
-  id: string;
-  title: string;
-  section: number;
-  subsection: string;
-  estimated_time: number; // in minutes
-  difficulty: Difficulty;
-  concepts: string[];
-  explanation: string;
-  task: string;
-  starter_code: string;
-  tests: Test[];
-  hints?: Hint[];
-  solution: string;
+export interface ProjectPreview {
+  mode: 'onLoad' | 'onClick'; // Whether to auto-show before step 1
+  title: string; // e.g., "Temperature Converter"
+  description?: string; // Brief explanation of what the project does
+  example_output?: string; // For CLI projects: terminal session transcript showing actual execution
 }
 
 export interface PracticeProject {
@@ -41,14 +41,14 @@ export interface PracticeProject {
   type: 'practice';
   estimated_time: number; // in minutes
   difficulty: Difficulty;
-  concepts: string[];
-  description: string;
-  user_stories: string[];
-  milestones: string[];
-  starter_code: string;
-  tests: Test[];
-  hints: Hint[];
-  reference_solution: string;
+  concepts_taught: string[];
+  project_overview: string;
+  why_this_project: string;
+  prerequisites: string[];
+  steps: ProjectStep[];
+  completion_message: string;
+  extensions?: string;
+  preview?: ProjectPreview; // Project preview shown before step 1
 }
 
 export interface CertificationProject {
@@ -63,18 +63,15 @@ export interface CertificationProject {
   requirements: {
     functional: string[];
     technical: string[];
+    quality?: string[];
   };
-  test_suite: {
-    compilation: string[];
-    functional: string[];
-    code_quality?: string[];
-    performance?: string[];
-    architecture?: string[];
-  };
-  // No hints or solution for certification projects
+  example_output?: string;
+  tests: Test[]; // Comprehensive test suite
+  evaluation: string[]; // Evaluation criteria
+  // No steps, hints, or solution for certification projects
 }
 
-export type Challenge = MicroChallenge | PracticeProject | CertificationProject;
+export type Challenge = PracticeProject | CertificationProject;
 
 export interface Section {
   id: number;

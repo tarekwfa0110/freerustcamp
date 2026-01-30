@@ -1,0 +1,65 @@
+{
+  "section_id": 1,
+  "challenges": [
+    {
+      "id": "project-001",
+      "order": 1,
+      "content_file": "project-001-temp-converter.md"
+    },
+    {
+      "id": "project-002",
+      "order": 2,
+      "content_file": "project-002-calculator.md"
+    },
+    {
+      "id": "project-003",
+      "order": 3,
+      "content_file": "project-003-text-adventure.md"
+    },
+    {
+      "id": "project-004",
+      "order": 4,
+      "content_file": "project-004-student-manager.md"
+    },
+    {
+      "id": "project-005",
+      "order": 5,
+      "content_file": "project-005-traffic-light.md"
+    },
+    {
+      "id": "project-006",
+      "order": 6,
+      "content_file": "project-006-file-processor.md"
+    },
+    {
+      "id": "project-007",
+      "order": 7,
+      "content_file": "project-007-contact-manager.md"
+    },
+    {
+      "id": "cert-001",
+      "order": 8,
+      "content_file": "cert-001-word-frequency-counter.md"
+    },
+    {
+      "id": "cert-002",
+      "order": 9,
+      "content_file": "cert-002-log-analyzer.md"
+    },
+    {
+      "id": "cert-003",
+      "order": 10,
+      "content_file": "cert-003-config-parser.md"
+    },
+    {
+      "id": "cert-004",
+      "order": 11,
+      "content_file": "cert-004-file-backup.md"
+    },
+    {
+      "id": "cert-005",
+      "order": 12,
+      "content_file": "cert-005-task-manager.md"
+    }
+  ]
+}

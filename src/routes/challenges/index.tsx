@@ -1,67 +1,161 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { sections } from '@/data/challenges';
-import { CheckCircle, Circle, Clock } from 'lucide-react';
 import { loadProgress } from '@/lib/progress';
+import { ChallengeCard } from '@/components/ChallengeCard';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { ChevronDown, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { useState } from 'react';
+import { cn } from '@/lib/utils';
 
-// @ts-expect-error - TanStack Router file-based routing types
 export const Route = createFileRoute('/challenges/')({
   component: ChallengesIndex,
 });
 
 function ChallengesIndex() {
   const progress = loadProgress();
+  const [expandedSections, setExpandedSections] = useState<Set<number>>(new Set([1]));
+
+  const toggleSection = (sectionId: number) => {
+    const newExpanded = new Set(expandedSections);
+    if (newExpanded.has(sectionId)) {
+      newExpanded.delete(sectionId);
+    } else {
+      newExpanded.add(sectionId);
+    }
+    setExpandedSections(newExpanded);
+  };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-8">All Challenges</h1>
-      <div className="space-y-8">
-        {sections.map((section) => (
-          <div key={section.id} className="bg-gray-800 rounded-lg p-6">
-            <h2 className="text-2xl font-semibold mb-4">
-              Section {section.id}: {section.title}
-            </h2>
-            <p className="text-gray-400 mb-6">{section.description}</p>
-            <div className="space-y-2">
-              {section.challenges.map((challenge) => {
-                const isCompleted = progress.completedChallenges.includes(challenge.id);
-                const isProject = 'type' in challenge && (challenge.type === 'practice' || challenge.type === 'certification');
-                return (
-                  <a
-                    key={challenge.id}
-                    href={`/challenges/${challenge.id}`}
-                    className={`flex items-center gap-4 p-4 rounded hover:bg-gray-750 transition ${
-                      isProject ? 'bg-gray-900 border-l-4 border-orange-500' : 'bg-gray-900'
-                    }`}
-                  >
-                    {isCompleted ? (
-                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                    ) : (
-                      <Circle className="w-5 h-5 text-gray-500 flex-shrink-0" />
-                    )}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold">{challenge.title}</h3>
-                        {isProject && (
-                          <span className="px-2 py-0.5 bg-orange-500/20 text-orange-400 text-xs rounded">
-                            {challenge.type === 'practice' ? 'Practice' : 'Certification'}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-4 h-4" />
-                          {challenge.estimated_time} min
-                        </span>
-                        <span className="capitalize">{challenge.difficulty}</span>
-                      </div>
-                    </div>
-                  </a>
-                );
-              })}
-            </div>
+    <div className="min-h-screen bg-background">
+      <main className="container mx-auto px-4 pb-16 pt-24">
+        {/* Header */}
+        <div className="mb-8 flex items-start gap-3">
+          <img src="/rustacean-flat-noshadow.svg" alt="" className="h-10 w-10 shrink-0 object-contain mt-0.5" aria-hidden />
+          <div>
+            <h1 className="font-display text-3xl font-bold text-foreground">
+              Rust <span className="text-gradient-rust">Curriculum</span>
+            </h1>
+            <p className="mt-2 font-body text-lg text-muted-foreground">
+              410+ hours of content across 5 comprehensive sections
+            </p>
           </div>
-        ))}
-      </div>
+        </div>
+
+
+        {/* Sections */}
+        <div className="space-y-4">
+          {sections.map((section) => {
+            const sectionCompleted = section.challenges.filter((c) =>
+              progress.completedChallenges.includes(c.id)
+            ).length;
+            const sectionProgress =
+              section.challenges.length > 0
+                ? Math.round((sectionCompleted / section.challenges.length) * 100)
+                : 0;
+            const isExpanded = expandedSections.has(section.id);
+
+            return (
+              <div
+                key={section.id}
+                className={cn(
+                  'overflow-hidden rounded-xl border transition-all duration-300',
+                  'border-metal-600 bg-gradient-card hover:border-rust-500/30'
+                )}
+              >
+                {/* Header */}
+                <button
+                  onClick={() => toggleSection(section.id)}
+                  className="flex w-full items-center gap-4 p-5 text-left transition-colors hover:bg-muted/30"
+                >
+                  {/* Expand/Collapse Icon */}
+                  <div className="flex-shrink-0">
+                    {isExpanded ? (
+                      <ChevronDown className="h-5 w-5 text-rust-300" />
+                    ) : (
+                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-1">
+                      <h3 className="font-display text-lg font-bold text-foreground">
+                        Section {section.id}: {section.title}
+                      </h3>
+                      {sectionProgress === 100 && (
+                        <CheckCircle2 className="h-5 w-5 text-success" />
+                      )}
+                    </div>
+                    <p className="font-body text-sm text-muted-foreground">
+                      {section.description}
+                    </p>
+                  </div>
+
+                  {/* Progress */}
+                  <div className="flex-shrink-0 text-right">
+                    <div className="mb-2 flex items-center gap-3">
+                      <span className="font-body text-sm text-muted-foreground">
+                        {sectionCompleted}/{section.challenges.length}
+                      </span>
+                      <Badge
+                        variant={
+                          sectionProgress === 100
+                            ? 'completed'
+                            : sectionProgress > 0
+                            ? 'in-progress'
+                            : 'secondary'
+                        }
+                      >
+                        {sectionProgress}%
+                      </Badge>
+                    </div>
+                    <Progress value={sectionProgress} variant="rust" className="h-2 w-32" />
+                  </div>
+                </button>
+
+                {/* Expanded Content */}
+                {isExpanded && (
+                  <div className="border-t border-metal-600 p-5">
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {section.challenges.map((challenge) => {
+                          const isCompleted = progress.completedChallenges.includes(challenge.id);
+                          const challengeProgress = progress.challengeProgress[challenge.id];
+                          const status = isCompleted
+                            ? 'completed'
+                            : challengeProgress && challengeProgress.attempts > 0
+                            ? 'in-progress'
+                            : 'not-started';
+
+                          return (
+                            <ChallengeCard
+                              key={challenge.id}
+                              id={challenge.id}
+                              title={challenge.title}
+                              difficulty="beginner"
+                              estimatedTime={0}
+                              status={status}
+                              progress={
+                                challengeProgress && challengeProgress.attempts > 0 ? 50 : undefined
+                              }
+                              type={
+                                'type' in challenge
+                                  ? challenge.type === 'practice'
+                                    ? 'practice'
+                                    : 'certification'
+                                  : 'practice'
+                              }
+                            />
+                          );
+                        })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </main>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { UserProgress, ChallengeProgress } from '@/types/progress';
+import { getChallenge } from '@/data/challenges';
 
 const STORAGE_KEY = 'freerustcamp-progress';
 
@@ -12,13 +13,44 @@ export function loadProgress(): UserProgress {
     return getDefaultProgress();
   }
 
+  let progress: UserProgress;
   try {
-    return JSON.parse(stored);
+    progress = JSON.parse(stored);
   } catch {
     return getDefaultProgress();
   }
+
+  if (progress.challengeProgress == null) {
+    progress.challengeProgress = {};
+  } else if (typeof progress.challengeProgress !== 'object' || Array.isArray(progress.challengeProgress)) {
+    return getDefaultProgress();
+  }
+
+  // Migrate legacy terminalCommands (string[]) to step-based Record<number, string[]> once per load
+  let changed = false;
+  for (const challengeId of Object.keys(progress.challengeProgress)) {
+    const existing = progress.challengeProgress[challengeId];
+    const tc = existing?.terminalCommands;
+    if (Array.isArray(tc)) {
+      progress.challengeProgress[challengeId] = {
+        ...existing,
+        challengeId,
+        terminalCommands: { 1: [...tc] },
+      };
+      changed = true;
+    }
+  }
+  if (changed) {
+    progress.lastActivity = new Date().toISOString();
+    saveProgress(progress);
+  }
+  return progress;
 }
 
+/**
+ * Persist progress to localStorage. Swallows storage errors (e.g. quota exceeded)
+ * so callers never crash; progress is simply not persisted when storage fails.
+ */
 export function saveProgress(progress: UserProgress): void {
   if (typeof window === 'undefined') return;
 
@@ -26,6 +58,10 @@ export function saveProgress(progress: UserProgress): void {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
   } catch (error) {
     console.error('Failed to save progress:', error);
+    if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+      console.warn('LocalStorage quota exceeded. Progress may not be saved.');
+    }
+    // Do not rethrow: avoid crashing callers; progress just won't persist
   }
 }
 
@@ -39,6 +75,19 @@ export function getDefaultProgress(): UserProgress {
     streakDays: 0,
     lastActivity: new Date().toISOString(),
     challengeProgress: {},
+    previewSeen: {},
+  };
+}
+
+/** Default ChallengeProgress so required fields are never undefined when existing is falsy. */
+function defaultChallengeProgress(challengeId: string): ChallengeProgress {
+  return {
+    challengeId,
+    completed: false,
+    attempts: 0,
+    timeSpent: 0,
+    completedSteps: [],
+    terminalCommands: {},
   };
 }
 
@@ -74,12 +123,13 @@ export function updateChallengeAttempt(challengeId: string, code: string): void 
 
   const existing = progress.challengeProgress[challengeId];
   const challengeProgress: ChallengeProgress = {
+    ...defaultChallengeProgress(challengeId),
+    ...existing,
     challengeId,
-    completed: existing?.completed || false,
-    attempts: (existing?.attempts || 0) + 1,
-    timeSpent: existing?.timeSpent || 0,
-    completedAt: existing?.completedAt,
+    attempts: (existing?.attempts ?? 0) + 1,
     code,
+    completedSteps: existing?.completedSteps ?? [],
+    terminalCommands: existing?.terminalCommands ?? {},
   };
 
   progress.challengeProgress[challengeId] = challengeProgress;
@@ -88,10 +138,96 @@ export function updateChallengeAttempt(challengeId: string, code: string): void 
   saveProgress(progress);
 }
 
+export function saveChallengeCode(challengeId: string, code: string): void {
+  const progress = loadProgress();
+  const existing = progress.challengeProgress[challengeId];
+
+  const challengeProgress: ChallengeProgress = {
+    ...defaultChallengeProgress(challengeId),
+    ...existing,
+    challengeId,
+    code,
+    completedSteps: existing?.completedSteps ?? [],
+    terminalCommands: existing?.terminalCommands ?? {},
+  };
+
+  progress.challengeProgress[challengeId] = challengeProgress;
+  progress.lastActivity = new Date().toISOString();
+
+  saveProgress(progress);
+}
+
+export function markStepComplete(challengeId: string, stepNumber: number): void {
+  const progress = loadProgress();
+  const existing = progress.challengeProgress[challengeId];
+
+  const completedSteps = existing?.completedSteps ?? [];
+  const nextSteps = completedSteps.includes(stepNumber) ? completedSteps : [...completedSteps, stepNumber];
+
+  const challengeProgress: ChallengeProgress = {
+    ...defaultChallengeProgress(challengeId),
+    ...existing,
+    challengeId,
+    completedSteps: nextSteps,
+    terminalCommands: existing?.terminalCommands ?? {},
+  };
+
+  progress.challengeProgress[challengeId] = challengeProgress;
+  progress.lastActivity = new Date().toISOString();
+
+  saveProgress(progress);
+}
+
+export function addTerminalCommand(challengeId: string, stepNumber: number, command: string): void {
+  const progress = loadProgress();
+  const existing = progress.challengeProgress[challengeId];
+
+  const terminalCommands = { ...(existing?.terminalCommands ?? {}) };
+  const stepCommands = terminalCommands[stepNumber] ?? [];
+  if (!stepCommands.includes(command)) {
+    terminalCommands[stepNumber] = [...stepCommands, command];
+  }
+
+  const challengeProgress: ChallengeProgress = {
+    ...defaultChallengeProgress(challengeId),
+    ...existing,
+    challengeId,
+    terminalCommands,
+    completedSteps: existing?.completedSteps ?? [],
+  };
+
+  progress.challengeProgress[challengeId] = challengeProgress;
+  progress.lastActivity = new Date().toISOString();
+
+  saveProgress(progress);
+}
+
+export function getTerminalCommandsForStep(challengeId: string, stepNumber: number): string[] {
+  const progress = loadProgress();
+  const existing = progress.challengeProgress[challengeId];
+  const terminalCommands = existing?.terminalCommands;
+
+  // Already migrated: step-based shape
+  if (terminalCommands && typeof terminalCommands === 'object' && !Array.isArray(terminalCommands)) {
+    return terminalCommands[stepNumber] || [];
+  }
+
+  // Legacy array format: in-memory conversion only for return value (no mutation, no save)
+  if (Array.isArray(terminalCommands)) {
+    return stepNumber === 1 ? [...terminalCommands] : [];
+  }
+
+  return [];
+}
+
 export function updateSectionProgress(sectionId: number, total: number): void {
   const progress = loadProgress();
 
-  const completed = progress.completedChallenges.length;
+  // Count only completed challenges in this specific section
+  const completed = progress.completedChallenges.filter(id => {
+    const result = getChallenge(id);
+    return result && result.section.id === sectionId;
+  }).length;
 
   progress.sectionProgress[sectionId] = {
     sectionId,
@@ -101,4 +237,68 @@ export function updateSectionProgress(sectionId: number, total: number): void {
   };
 
   saveProgress(progress);
+}
+
+export function resetChallengeProgress(challengeId: string): void {
+  const progress = loadProgress();
+
+  const result = getChallenge(challengeId);
+  const sectionId = result?.section.id;
+
+  progress.completedChallenges = progress.completedChallenges.filter(id => id !== challengeId);
+  delete progress.challengeProgress[challengeId];
+  progress.lastActivity = new Date().toISOString();
+
+  saveProgress(progress);
+
+  if (sectionId && result) {
+    const total = result.section.challenges.length;
+    updateSectionProgress(sectionId, total);
+  }
+}
+
+/**
+ * Check if a step is accessible (all previous steps are completed)
+ * @param challenge - The challenge/project
+ * @param stepIndex - The step index (0-based) to check
+ * @param completedSteps - Array of completed step numbers
+ * @returns true if step is accessible, false if locked
+ */
+export function isStepAccessible(
+  challenge: { steps: Array<{ step: number }> },
+  stepIndex: number,
+  completedSteps: number[]
+): boolean {
+  // First step is always accessible
+  if (stepIndex === 0) return true;
+  
+  // Check if ALL previous steps (by index) are completed
+  for (let i = 0; i < stepIndex; i++) {
+    const prevStep = challenge.steps[i];
+    if (!completedSteps.includes(prevStep.step)) {
+      return false; // Found an incomplete previous step
+    }
+  }
+  
+  return true; // All previous steps are completed
+}
+
+/**
+ * Mark a challenge preview as seen
+ */
+export function markPreviewSeen(challengeId: string): void {
+  const progress = loadProgress();
+  if (!progress.previewSeen) {
+    progress.previewSeen = {};
+  }
+  progress.previewSeen[challengeId] = true;
+  saveProgress(progress);
+}
+
+/**
+ * Check if a challenge preview has been seen
+ */
+export function hasPreviewBeenSeen(challengeId: string): boolean {
+  const progress = loadProgress();
+  return progress.previewSeen?.[challengeId] === true;
 }

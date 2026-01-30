@@ -1,9 +1,21 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { loadProgress } from '@/lib/progress';
 import { sections } from '@/data/challenges';
-import { CheckCircle, Clock, TrendingUp } from 'lucide-react';
+import { StatCard } from '@/components/StatCard';
+import { CircularProgress } from '@/components/CircularProgress';
+import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import { ChallengeCard } from '@/components/ChallengeCard';
+import {
+  Flame,
+  Clock,
+  CheckCircle2,
+  Trophy,
+  ArrowRight,
+  BookOpen,
+  Code2,
+} from 'lucide-react';
 
-// @ts-expect-error - TanStack Router file-based routing types
 export const Route = createFileRoute('/progress')({
   component: ProgressPage,
 });
@@ -24,79 +36,197 @@ function ProgressPage() {
     return `${minutes}m`;
   };
 
+  // Get recent challenges
+  const recentChallenges = sections
+    .flatMap((s) => s.challenges)
+    .filter((c) => {
+      const challengeProgress = progress.challengeProgress[c.id];
+      return challengeProgress && challengeProgress.attempts > 0;
+    })
+    .slice(0, 3)
+    .map((challenge) => {
+      const challengeProgress = progress.challengeProgress[challenge.id];
+      const isCompleted = progress.completedChallenges.includes(challenge.id);
+      return {
+        id: challenge.id,
+        title: challenge.title,
+        difficulty: challenge.difficulty,
+        estimatedTime: challenge.estimated_time,
+        status: isCompleted
+          ? ('completed' as const)
+          : challengeProgress && challengeProgress.attempts > 0
+          ? ('in-progress' as const)
+          : ('not-started' as const),
+        progress: challengeProgress ? 50 : undefined,
+        type:
+          'type' in challenge
+            ? challenge.type === 'practice'
+              ? ('practice' as const)
+              : ('certification' as const)
+            : ('micro' as const),
+      };
+    });
+
+  const sectionProgress = sections.map((section) => {
+    const sectionCompleted = section.challenges.filter((c) =>
+      progress.completedChallenges.includes(c.id)
+    ).length;
+    const sectionPercentage =
+      section.challenges.length > 0
+        ? Math.round((sectionCompleted / section.challenges.length) * 100)
+        : 0;
+    return {
+      name: section.title,
+      progress: sectionPercentage,
+      completed: sectionCompleted,
+      total: section.challenges.length,
+    };
+  });
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-8">Your Progress</h1>
-
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-gray-800 p-6 rounded-lg">
-          <div className="flex items-center gap-3 mb-2">
-            <CheckCircle className="w-8 h-8 text-green-500" />
-            <div>
-              <div className="text-3xl font-bold">{completedCount}</div>
-              <div className="text-gray-400 text-sm">Challenges Completed</div>
-            </div>
+    <div className="min-h-screen bg-background">
+      <main className="container mx-auto px-4 pb-16 pt-24">
+        {/* Welcome Header */}
+        <div className="mb-8 flex items-start gap-3">
+          <img src="/rustacean-flat-happy.svg" alt="" className="h-10 w-10 shrink-0 object-contain mt-0.5" aria-hidden />
+          <div>
+            <h1 className="font-display text-3xl font-bold text-foreground">
+              Welcome back, <span className="text-gradient-rust">Learner</span>
+            </h1>
+            <p className="mt-2 font-body text-lg text-muted-foreground">
+              Continue your Rust journey where you left off.
+            </p>
           </div>
         </div>
 
-        <div className="bg-gray-800 p-6 rounded-lg">
-          <div className="flex items-center gap-3 mb-2">
-            <TrendingUp className="w-8 h-8 text-orange-500" />
-            <div>
-              <div className="text-3xl font-bold">{completionPercentage.toFixed(1)}%</div>
-              <div className="text-gray-400 text-sm">Overall Progress</div>
-            </div>
-          </div>
+        {/* Stats Grid */}
+        <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            icon={Flame}
+            label="Day Streak"
+            value={progress.streakDays}
+            subtitle="Keep it going!"
+          />
+          <StatCard
+            icon={Clock}
+            label="Time Invested"
+            value={formatTime(progress.totalTimeSpent)}
+            subtitle="Total time"
+          />
+          <StatCard
+            icon={CheckCircle2}
+            label="Challenges Done"
+            value={completedCount}
+            subtitle={`${totalChallenges - completedCount} remaining`}
+          />
+          <StatCard
+            icon={Trophy}
+            label="Overall Progress"
+            value={`${Math.round(completionPercentage)}%`}
+            subtitle="Curriculum completion"
+          />
         </div>
 
-        <div className="bg-gray-800 p-6 rounded-lg">
-          <div className="flex items-center gap-3 mb-2">
-            <Clock className="w-8 h-8 text-blue-500" />
-            <div>
-              <div className="text-3xl font-bold">{formatTime(progress.totalTimeSpent)}</div>
-              <div className="text-gray-400 text-sm">Time Spent</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="space-y-6">
-        <h2 className="text-2xl font-semibold">Section Progress</h2>
-        {sections.map((section) => {
-          const sectionCompleted = section.challenges.filter((c) =>
-            progress.completedChallenges.includes(c.id)
-          ).length;
-          const sectionPercentage =
-            section.challenges.length > 0
-              ? (sectionCompleted / section.challenges.length) * 100
-              : 0;
-
-          return (
-            <div key={section.id} className="bg-gray-800 p-6 rounded-lg">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-xl font-semibold">
-                    Section {section.id}: {section.title}
-                  </h3>
-                  <p className="text-gray-400 text-sm mt-1">{section.description}</p>
+        <div className="grid gap-8 lg:grid-cols-3">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Continue Learning */}
+            {recentChallenges.length > 0 && (
+              <section className="rounded-xl border border-metal-600 bg-gradient-card p-6">
+                <div className="mb-6 flex items-center justify-between">
+                  <h2 className="font-display text-xl font-bold text-foreground">
+                    Continue Learning
+                  </h2>
+                  <Link to="/challenges">
+                    <Button variant="ghost" size="sm">
+                      View All
+                      <ArrowRight className="ml-1 h-4 w-4" />
+                    </Button>
+                  </Link>
                 </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold">
-                    {sectionCompleted} / {section.challenges.length}
+
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {recentChallenges.map((challenge) => (
+                    <ChallengeCard
+                      key={challenge.id}
+                      id={challenge.id}
+                      title={challenge.title}
+                      difficulty="beginner"
+                      estimatedTime={0}
+                      status={challenge.status}
+                      progress={challenge.progress}
+                      type={challenge.type}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Section Progress */}
+            <section className="rounded-xl border border-metal-600 bg-gradient-card p-6">
+              <h2 className="mb-6 font-display text-xl font-bold text-foreground">
+                Curriculum Progress
+              </h2>
+
+              <div className="space-y-4">
+                {sectionProgress.map((section, index) => (
+                  <div key={section.name} className="group">
+                    <div className="mb-2 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-6 w-6 items-center justify-center rounded bg-metal-600 font-display text-xs font-bold text-metal-200">
+                          {index + 1}
+                        </span>
+                        <span className="font-body text-sm text-foreground">
+                          {section.name}
+                        </span>
+                      </div>
+                      <span className="font-body text-xs text-muted-foreground">
+                        {section.completed}/{section.total} completed
+                      </span>
+                    </div>
+                    <Progress value={section.progress} variant="rust" className="h-2" />
                   </div>
-                  <div className="text-gray-400 text-sm">{sectionPercentage.toFixed(1)}%</div>
-                </div>
+                ))}
               </div>
-              <div className="w-full bg-gray-700 rounded-full h-3">
-                <div
-                  className="bg-orange-500 h-3 rounded-full transition-all"
-                  style={{ width: `${sectionPercentage}%` }}
-                />
+            </section>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Overall Progress */}
+            <div className="rounded-xl border border-metal-600 bg-gradient-card p-6 text-center">
+              <h3 className="mb-4 font-display text-lg font-bold text-foreground">
+                Overall Progress
+              </h3>
+              <CircularProgress value={completionPercentage} size={140} label="Complete" />
+              <p className="mt-4 font-body text-sm text-muted-foreground">
+                {completedCount} of {totalChallenges} challenges completed
+              </p>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="rounded-xl border border-metal-600 bg-gradient-card p-6">
+              <h3 className="mb-4 font-display text-lg font-bold text-foreground">
+                Quick Actions
+              </h3>
+              <div className="space-y-3">
+                <Link to="/challenges" className="block">
+                  <Button variant="outline" className="w-full justify-start">
+                    <Code2 className="mr-2 h-4 w-4" />
+                    Browse Challenges
+                  </Button>
+                </Link>
+                <Link to="/challenges" className="block">
+                  <Button variant="outline" className="w-full justify-start">
+                    <BookOpen className="mr-2 h-4 w-4" />
+                    View Curriculum
+                  </Button>
+                </Link>
               </div>
             </div>
-          );
-        })}
-      </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
