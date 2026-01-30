@@ -4,11 +4,12 @@ import { getChallenge, getSectionById } from '@/data/challenges';
 import { ChallengeView } from '@/components/ChallengeView';
 import { StepGrid } from '@/components/StepGrid';
 import { SectionPreview } from '@/components/SectionPreview';
+import { ProjectPreviewModal } from '@/components/ProjectPreviewModal';
 import { PracticeProject } from '@/types/challenge';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { cn } from '@/lib/utils';
-import { loadProgress, isStepAccessible } from '@/lib/progress';
+import { loadProgress, isStepAccessible, hasPreviewBeenSeen, markPreviewSeen } from '@/lib/progress';
 
 // @ts-expect-error - TanStack Router file-based routing types
 export const Route = createFileRoute('/challenges/$challengeId')({
@@ -26,7 +27,13 @@ function ChallengePage() {
   const navigate = useNavigate();
   const result = getChallenge(challengeId);
   const [startedChallenge, setStartedChallenge] = useState(false);
-  
+  const [previewDismissed, setPreviewDismissed] = useState(false);
+
+  // Reset preview dismissed when navigating to a different challenge so preview can show again
+  useEffect(() => {
+    setPreviewDismissed(false);
+  }, [challengeId]);
+
   // Validate step from URL - allow URL navigation even if locked (for direct links)
   // Returns the step number if it exists, regardless of lock status
   const getValidatedStep = (stepNumber: number | undefined): number | undefined => {
@@ -102,8 +109,31 @@ function ChallengePage() {
 
   const challenge = result.challenge;
 
-  // If it's a practice project and we haven't started, show the step grid
+  // If it's a practice project and we haven't started, show project preview (step 1) then step grid
   if (challenge.type === 'practice' && !startedChallenge) {
+    const practiceChallenge = challenge as PracticeProject;
+    const showProjectPreview =
+      practiceChallenge.preview?.mode === 'onLoad' &&
+      !hasPreviewBeenSeen(challenge.id);
+
+    const showPreviewModal = showProjectPreview && !previewDismissed;
+
+    const handlePreviewClose = () => {
+      markPreviewSeen(challenge.id);
+      setPreviewDismissed(true);
+    };
+
+    // Show project preview modal first when landing on challenge (step 1)
+    if (showPreviewModal && practiceChallenge.preview) {
+      return (
+        <ProjectPreviewModal
+          preview={practiceChallenge.preview}
+          open={true}
+          onClose={handlePreviewClose}
+        />
+      );
+    }
+
     // Load progress for StepGrid
     const progress = loadProgress();
     const challengeProgress = progress.challengeProgress[challenge.id];

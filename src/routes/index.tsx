@@ -40,7 +40,7 @@ function Index() {
         <div className="absolute inset-0 bg-gradient-hero" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(18_82%_45%/0.1),transparent_50%)]" />
 
-        <div className="relative container mx-auto px-4 py-10 lg:py-14">
+        <div className="relative container mx-auto px-4 py-24 lg:py-32">
           <div className="mx-auto max-w-4xl text-center">
             {/* Hero mascot */}
             <img
@@ -146,7 +146,7 @@ function Index() {
                       <Icon className="h-6 w-6 text-rust-300" />
                     </div>
                     <h3 className="mb-2 font-display text-lg font-bold text-foreground">
-                      Section {section.id}: {section.title}
+                      {section.title}
                     </h3>
                     <p className="mb-4 font-body text-sm text-muted-foreground">
                       {section.description}
@@ -160,14 +160,6 @@ function Index() {
                         <Code2 className="h-3 w-3" />
                         {section.challenges.length} challenges
                       </span>
-                    </div>
-                    <div className="mt-4">
-                      <Link to="/challenges/$challengeId" params={{ challengeId: String(section.id) }} search={{ step: undefined }}>
-                        <Button variant="outline" size="sm" className="w-full">
-                          Start Section
-                          <ArrowRight className="ml-2 h-3 w-3" />
-                        </Button>
-                      </Link>
                     </div>
                   </div>
                 </div>

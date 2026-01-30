@@ -456,7 +456,9 @@ println!("The temperature is {} degrees", temp);
 
 The formula to convert Fahrenheit to Celsius is: \`C = (F - 32) * 5/9\`
 
-Inside an \`if\` statement checking for "F", convert the temperature and print the result using string formatting.`,
+Inside an \`if\` statement checking for "F", convert the temperature and print the result using string formatting.
+
+**Common mistakes:** Use \`println!\` (with the \`!\` — it's a macro). Use the numeric variable \`temp\` in the formula, not \`temp_str\`. Use float literals (\`32.0\`, \`5.0\`, \`9.0\`) so \`5/9\` doesn't become integer 0.`,
         validation: {
           rules: [
             {
@@ -464,9 +466,9 @@ Inside an \`if\` statement checking for "F", convert the temperature and print t
               patterns: ['- 32', 'println!', '{}'],
               allRequired: true,
               hints: [
-                'Use the formula: (temp - 32.0) * 5.0 / 9.0 for Celsius',
-                'Add println! with {} placeholders for the values',
-                'Example: println!("{}°F is {}°C", temp, celsius);',
+                'Use the formula: (temp - 32.0) * 5.0 / 9.0 for Celsius (use temp, not temp_str)',
+                'Use println! (with !) and {} placeholders — e.g. println!("{}°F is {}°C", temp, celsius);',
+                'Use float literals: 32.0, 5.0, 9.0 so division is not integer division',
               ],
             },
           ],

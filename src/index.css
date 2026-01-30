@@ -1,31 +1,236 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@layer base {
+  :root {
+    /* Core rust palette */
+    --rust-50: 25 100% 95%;
+    --rust-100: 25 95% 85%;
+    --rust-200: 22 90% 70%;
+    --rust-300: 20 85% 55%;
+    --rust-400: 18 82% 45%;
+    --rust-500: 15 85% 38%;
+    --rust-600: 12 88% 32%;
+    --rust-700: 10 90% 26%;
+    --rust-800: 8 85% 20%;
+    --rust-900: 6 80% 15%;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+    /* Metallic grays */
+    --metal-50: 0 0% 95%;
+    --metal-100: 0 0% 85%;
+    --metal-200: 0 0% 70%;
+    --metal-300: 0 0% 55%;
+    --metal-400: 0 0% 40%;
+    --metal-500: 0 0% 29%;
+    --metal-600: 0 0% 23%;
+    --metal-700: 0 0% 17%;
+    --metal-800: 0 0% 10%;
+    --metal-900: 0 0% 6%;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    /* Semantic tokens - Dark theme */
+    --background: 0 0% 8%;
+    --foreground: 30 15% 92%;
+
+    --card: 0 0% 11%;
+    --card-foreground: 30 15% 92%;
+
+    --popover: 0 0% 11%;
+    --popover-foreground: 30 15% 92%;
+
+    --primary: 18 82% 45%;
+    --primary-foreground: 30 15% 95%;
+
+    --secondary: 0 0% 17%;
+    --secondary-foreground: 30 15% 85%;
+
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 55%;
+
+    --accent: 22 90% 50%;
+    --accent-foreground: 30 15% 95%;
+
+    --destructive: 0 72% 35%;
+    --destructive-foreground: 30 15% 95%;
+
+    --success: 80 45% 40%;
+    --success-foreground: 30 15% 95%;
+
+    --warning: 35 90% 50%;
+    --warning-foreground: 0 0% 10%;
+
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 18 82% 45%;
+
+    --radius: 0.5rem;
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 9%;
+    --sidebar-foreground: 30 15% 85%;
+    --sidebar-primary: 18 82% 45%;
+    --sidebar-primary-foreground: 30 15% 95%;
+    --sidebar-accent: 0 0% 14%;
+    --sidebar-accent-foreground: 30 15% 92%;
+    --sidebar-border: 0 0% 16%;
+    --sidebar-ring: 18 82% 45%;
+
+    /* Code editor */
+    --editor-bg: 0 0% 7%;
+    --editor-line: 0 0% 12%;
+    --editor-selection: 18 50% 25%;
+    --editor-gutter: 0 0% 35%;
+
+    /* Gradients */
+    --gradient-rust: linear-gradient(135deg, hsl(18 82% 45%) 0%, hsl(25 85% 55%) 50%, hsl(15 85% 38%) 100%);
+    --gradient-metal: linear-gradient(180deg, hsl(0 0% 17%) 0%, hsl(0 0% 11%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 8%) 0%, hsl(15 30% 12%) 50%, hsl(0 0% 8%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 13%) 0%, hsl(0 0% 10%) 100%);
+    --gradient-glow: radial-gradient(ellipse at center, hsl(18 82% 45% / 0.15) 0%, transparent 70%);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px hsl(0 0% 0% / 0.3);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.4), 0 2px 4px -2px hsl(0 0% 0% / 0.3);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.5), 0 4px 6px -4px hsl(0 0% 0% / 0.4);
+    --shadow-glow: 0 0 20px hsl(18 82% 45% / 0.3);
+    --shadow-rust: 0 4px 14px hsl(18 82% 45% / 0.25);
+
+    /* Typography */
+    --font-display: 'Orbitron', sans-serif;
+    --font-body: 'Rajdhani', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: var(--font-body);
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: 0.025em;
+  }
+
+  code, pre, .font-mono {
+    font-family: var(--font-mono);
+  }
+
+  #root {
+    width: 100%;
+    min-height: 100vh;
+  }
 }
 
-#root {
-  width: 100%;
-  min-height: 100vh;
+@layer utilities {
+  .text-gradient-rust {
+    background: var(--gradient-rust);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-gradient-rust {
+    background: var(--gradient-rust);
+  }
+
+  .bg-gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  .bg-gradient-card {
+    background: var(--gradient-card);
+  }
+
+  .bg-gradient-metal {
+    background: var(--gradient-metal);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .shadow-rust {
+    box-shadow: var(--shadow-rust);
+  }
+
+  .border-rust {
+    border-color: hsl(var(--primary) / 0.5);
+  }
+
+  /* Industrial texture overlay */
+  .texture-noise {
+    position: relative;
+  }
+  
+  .texture-noise::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.5);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.7);
+  }
+
+  /* Animation utilities */
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 10px hsl(var(--primary) / 0.3);
+    }
+    to {
+      box-shadow: 0 0 20px hsl(var(--primary) / 0.5);
+    }
+  }
+
+  .animate-pulse-rust {
+    animation: pulse-rust 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse-rust {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
 }

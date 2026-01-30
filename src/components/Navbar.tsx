@@ -8,6 +8,7 @@ import {
   LayoutDashboard, 
   User, 
   Award,
+  Cog
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -60,12 +61,16 @@ export function Navbar() {
 
           {/* User Menu */}
           <div className="hidden md:flex md:items-center md:gap-3">
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <User className="h-5 w-5" />
-            </Button>
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-rust text-sm font-bold text-primary-foreground">
-              L
-            </div>
+            <Link to="/profile">
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <User className="h-5 w-5" />
+              </Button>
+            </Link>
+            <Link to="/profile">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-rust text-sm font-bold text-primary-foreground">
+                L
+              </div>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -104,6 +109,15 @@ export function Navbar() {
                   </Link>
                 );
               })}
+              <hr className="my-2 border-border" />
+              <Link
+                to="/profile"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 rounded-md px-4 py-3 font-body text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+              >
+                <Cog className="h-5 w-5" />
+                Profile & Settings
+              </Link>
             </div>
           </div>
         </div>

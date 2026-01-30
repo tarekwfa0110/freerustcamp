@@ -63,16 +63,16 @@ export function StepGrid({ challenge, currentStep, onStepClick, className, progr
               className={cn(
                 'aspect-square flex items-center justify-center relative',
                 'border transition-all duration-200',
-                'font-sans font-semibold text-white',
+                'font-sans font-semibold text-foreground',
                 'hover:scale-105 active:scale-95',
-                // Status-based styling - matching the image style
+                // Status-based styling - design system colors
                 isCompleted
-                  ? 'border-green-500/50 bg-green-500/10 hover:bg-green-500/20'
+                  ? 'border-green-500/50 bg-green-500/20 hover:bg-green-500/30'
                   : isActive
-                  ? 'border-rust-500 bg-rust-500/20 hover:bg-rust-500/30 ring-2 ring-rust-500/30'
+                  ? 'border-primary bg-primary/20 hover:bg-primary/30 ring-2 ring-primary/30'
                   : isLocked
-                  ? 'border-metal-600/30 bg-metal-800/30 cursor-not-allowed opacity-40'
-                  : 'border-dotted border-metal-500/50 bg-metal-900/30 hover:border-metal-400/70 hover:bg-metal-800/40',
+                  ? 'border-border bg-muted cursor-not-allowed opacity-40'
+                  : 'border-dotted border-border bg-muted/50 hover:border-metal-400/70 hover:bg-muted',
                 // Ensure dotted border style
                 !isCompleted && !isActive && !isLocked && 'border-dotted'
               )}
@@ -90,7 +90,7 @@ export function StepGrid({ challenge, currentStep, onStepClick, className, progr
                 <CheckCircle2 className="absolute top-1 right-1 h-3 w-3 text-green-400" />
               )}
               {isLocked && (
-                <Lock className="absolute top-1 right-1 h-3 w-3 text-metal-500" />
+                <Lock className="absolute top-1 right-1 h-3 w-3 text-muted-foreground" />
               )}
             </button>
           );
