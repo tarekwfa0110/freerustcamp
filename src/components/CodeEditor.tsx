@@ -13,9 +13,10 @@ interface CodeEditorProps {
   onNextStep?: () => void; // For practice projects: advance to next step (used by Next button)
   canGoNext?: boolean;
   canFocus?: boolean;
+  onFormat?: () => void;
 }
 
-export function CodeEditor({ code, onChange, language, onRun, onReset, onSubmitStep, onNextStep, canGoNext, canFocus = true }: CodeEditorProps) {
+export function CodeEditor({ code, onChange, language, onRun, onReset, onSubmitStep, onNextStep, canGoNext, canFocus = true, onFormat }: CodeEditorProps) {
   // Refs so the keyboard command always calls the latest handlers/state (avoids stale closure)
   const submitRef = useRef(onSubmitStep);
   const nextRef = useRef(onNextStep);
@@ -95,10 +96,12 @@ export function CodeEditor({ code, onChange, language, onRun, onReset, onSubmitS
               Reset
             </Button>
           )}
-          <Button variant="ghost" size="sm" className="text-metal-300 hover:text-foreground">
-            <Wand2 className="h-4 w-4" />
-            Format
-          </Button>
+          {onFormat && (
+            <Button variant="ghost" size="sm" className="text-metal-300 hover:text-foreground" onClick={onFormat}>
+              <Wand2 className="h-4 w-4" />
+              Format
+            </Button>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <span className="font-mono text-xs text-metal-400">main.rs</span>

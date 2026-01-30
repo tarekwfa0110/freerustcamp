@@ -10,6 +10,11 @@ import { StepValidationResult } from './step-validator';
 /** Max regex pattern length to mitigate ReDoS (catastrophic backtracking). */
 const MAX_REGEX_LENGTH = 2048;
 
+/** Escape regex metacharacters so the string is matched literally. */
+function escapeRegExp(s: string): string {
+  return s.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
+}
+
 /**
  * Validates a regex pattern before use (length limit to mitigate ReDoS) and
  * constructs the RegExp. Returns the RegExp if valid, or throws if invalid.
@@ -130,7 +135,7 @@ function validateRule(
       break;
 
     case 'function_exists': {
-      const functionPattern = new RegExp(`fn\\s+${rule.functionName}\\s*\\(`, 'i');
+      const functionPattern = new RegExp(`fn\\s+${escapeRegExp(rule.functionName)}\\s*\\(`, 'i');
       if (!functionPattern.test(code)) {
         return {
           completed: false,
@@ -142,7 +147,7 @@ function validateRule(
     }
 
     case 'struct_exists': {
-      const structPattern = new RegExp(`struct\\s+${rule.structName}\\s*\\{`, 'i');
+      const structPattern = new RegExp(`struct\\s+${escapeRegExp(rule.structName)}\\s*\\{`, 'i');
       if (!structPattern.test(code)) {
         return {
           completed: false,
@@ -171,6 +176,16 @@ function validateRule(
       // For now, we'll skip it
       console.warn('Custom validation not yet implemented:', rule.validator);
       break;
+
+    default: {
+      const invalidType = (rule as { type: unknown }).type;
+      console.warn('Unrecognized validation rule type:', invalidType);
+      return {
+        completed: false,
+        message: `Invalid validation rule type: "${String(invalidType)}". Check step config.`,
+        hints: rule.hints,
+      };
+    }
   }
 
   return { completed: true };

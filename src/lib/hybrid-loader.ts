@@ -59,7 +59,9 @@ export async function getSectionById(id: number): Promise<Section | null> {
           challenges.sort((a, b) => {
             const aIndex = orderedIds.indexOf(a.id);
             const bIndex = orderedIds.indexOf(b.id);
-            return aIndex - bIndex;
+            const aPos = aIndex === -1 ? orderedIds.length : aIndex;
+            const bPos = bIndex === -1 ? orderedIds.length : bIndex;
+            return aPos - bPos;
           });
           
           return {

@@ -20,6 +20,12 @@ export function loadProgress(): UserProgress {
     return getDefaultProgress();
   }
 
+  if (progress.challengeProgress == null) {
+    progress.challengeProgress = {};
+  } else if (typeof progress.challengeProgress !== 'object' || Array.isArray(progress.challengeProgress)) {
+    return getDefaultProgress();
+  }
+
   // Migrate legacy terminalCommands (string[]) to step-based Record<number, string[]> once per load
   let changed = false;
   for (const challengeId of Object.keys(progress.challengeProgress)) {
@@ -73,6 +79,18 @@ export function getDefaultProgress(): UserProgress {
   };
 }
 
+/** Default ChallengeProgress so required fields are never undefined when existing is falsy. */
+function defaultChallengeProgress(challengeId: string): ChallengeProgress {
+  return {
+    challengeId,
+    completed: false,
+    attempts: 0,
+    timeSpent: 0,
+    completedSteps: [],
+    terminalCommands: {},
+  };
+}
+
 export function markChallengeComplete(
   challengeId: string,
   code: string,
@@ -105,14 +123,13 @@ export function updateChallengeAttempt(challengeId: string, code: string): void 
 
   const existing = progress.challengeProgress[challengeId];
   const challengeProgress: ChallengeProgress = {
+    ...defaultChallengeProgress(challengeId),
+    ...existing,
     challengeId,
-    completed: existing?.completed || false,
-    attempts: (existing?.attempts || 0) + 1,
-    timeSpent: existing?.timeSpent || 0,
-    completedAt: existing?.completedAt,
+    attempts: (existing?.attempts ?? 0) + 1,
     code,
-    completedSteps: existing?.completedSteps || [],
-    terminalCommands: existing?.terminalCommands || {},
+    completedSteps: existing?.completedSteps ?? [],
+    terminalCommands: existing?.terminalCommands ?? {},
   };
 
   progress.challengeProgress[challengeId] = challengeProgress;
@@ -124,13 +141,14 @@ export function updateChallengeAttempt(challengeId: string, code: string): void 
 export function saveChallengeCode(challengeId: string, code: string): void {
   const progress = loadProgress();
   const existing = progress.challengeProgress[challengeId];
-  
+
   const challengeProgress: ChallengeProgress = {
+    ...defaultChallengeProgress(challengeId),
     ...existing,
     challengeId,
     code,
-    completedSteps: existing?.completedSteps || [],
-    terminalCommands: existing?.terminalCommands || {},
+    completedSteps: existing?.completedSteps ?? [],
+    terminalCommands: existing?.terminalCommands ?? {},
   };
 
   progress.challengeProgress[challengeId] = challengeProgress;
@@ -142,17 +160,16 @@ export function saveChallengeCode(challengeId: string, code: string): void {
 export function markStepComplete(challengeId: string, stepNumber: number): void {
   const progress = loadProgress();
   const existing = progress.challengeProgress[challengeId];
-  
-  const completedSteps = existing?.completedSteps || [];
-  if (!completedSteps.includes(stepNumber)) {
-    completedSteps.push(stepNumber);
-  }
+
+  const completedSteps = existing?.completedSteps ?? [];
+  const nextSteps = completedSteps.includes(stepNumber) ? completedSteps : [...completedSteps, stepNumber];
 
   const challengeProgress: ChallengeProgress = {
+    ...defaultChallengeProgress(challengeId),
     ...existing,
     challengeId,
-    completedSteps,
-    terminalCommands: existing?.terminalCommands || {},
+    completedSteps: nextSteps,
+    terminalCommands: existing?.terminalCommands ?? {},
   };
 
   progress.challengeProgress[challengeId] = challengeProgress;
@@ -164,21 +181,19 @@ export function markStepComplete(challengeId: string, stepNumber: number): void 
 export function addTerminalCommand(challengeId: string, stepNumber: number, command: string): void {
   const progress = loadProgress();
   const existing = progress.challengeProgress[challengeId];
-  
-  const terminalCommands = existing?.terminalCommands || {};
-  const stepCommands = terminalCommands[stepNumber] || [];
-  
-  // Add command if not already present for this step
+
+  const terminalCommands = { ...(existing?.terminalCommands ?? {}) };
+  const stepCommands = terminalCommands[stepNumber] ?? [];
   if (!stepCommands.includes(command)) {
-    stepCommands.push(command);
-    terminalCommands[stepNumber] = stepCommands;
+    terminalCommands[stepNumber] = [...stepCommands, command];
   }
 
   const challengeProgress: ChallengeProgress = {
+    ...defaultChallengeProgress(challengeId),
     ...existing,
     challengeId,
     terminalCommands,
-    completedSteps: existing?.completedSteps || [],
+    completedSteps: existing?.completedSteps ?? [],
   };
 
   progress.challengeProgress[challengeId] = challengeProgress;
@@ -227,25 +242,19 @@ export function updateSectionProgress(sectionId: number, total: number): void {
 export function resetChallengeProgress(challengeId: string): void {
   const progress = loadProgress();
 
-  // Get the challenge to find its section before deleting
   const result = getChallenge(challengeId);
   const sectionId = result?.section.id;
 
-  // Remove from completed challenges if present
   progress.completedChallenges = progress.completedChallenges.filter(id => id !== challengeId);
-  
-  // Remove challenge progress entirely
   delete progress.challengeProgress[challengeId];
+  progress.lastActivity = new Date().toISOString();
 
-  // Update section progress if we found the section
+  saveProgress(progress);
+
   if (sectionId && result) {
-    // Get total challenges in this section
     const total = result.section.challenges.length;
     updateSectionProgress(sectionId, total);
   }
-
-  progress.lastActivity = new Date().toISOString();
-  saveProgress(progress);
 }
 
 /**

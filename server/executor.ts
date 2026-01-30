@@ -70,8 +70,9 @@ async function runWithTimeout(
     stdin: "ignore",
   });
 
+  let timerId: ReturnType<typeof setTimeout>;
   const timeout = new Promise<{ stdout: string; stderr: string; exitCode: number }>((_, reject) => {
-    setTimeout(() => {
+    timerId = setTimeout(() => {
       proc.kill();
       reject(new Error(`Timeout after ${timeoutMs}ms`));
     }, timeoutMs);
@@ -97,6 +98,8 @@ async function runWithTimeout(
       };
     }
     throw err;
+  } finally {
+    clearTimeout(timerId!);
   }
 }
 
