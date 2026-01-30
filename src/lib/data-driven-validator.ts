@@ -7,6 +7,23 @@ import type { ProjectStep } from '@/types/challenge';
 import type { StepValidationConfig } from '@/types/validation';
 import { StepValidationResult } from './step-validator';
 
+/** Max regex pattern length to mitigate ReDoS (catastrophic backtracking). */
+const MAX_REGEX_LENGTH = 2048;
+
+/**
+ * Validates a regex pattern before use (length limit to mitigate ReDoS) and
+ * constructs the RegExp. Returns the RegExp if valid, or throws if invalid.
+ */
+function validateRegexPattern(pattern: string, flags?: string): RegExp {
+  if (typeof pattern !== 'string' || pattern.length === 0) {
+    throw new Error('Regex pattern must be a non-empty string');
+  }
+  if (pattern.length > MAX_REGEX_LENGTH) {
+    throw new Error(`Regex pattern exceeds max length (${MAX_REGEX_LENGTH})`);
+  }
+  return new RegExp(pattern, flags || '');
+}
+
 export function validateStepWithConfig(
   step: ProjectStep,
   code: string,
@@ -87,7 +104,7 @@ function validateRule(
 
     case 'code_matches': {
       try {
-        const regex = new RegExp(rule.regex, rule.flags || '');
+        const regex = validateRegexPattern(rule.regex, rule.flags);
         if (!regex.test(code)) {
           return {
             completed: false,
@@ -96,8 +113,12 @@ function validateRule(
           };
         }
       } catch (error) {
-        console.error('Invalid regex pattern:', rule.regex, error);
-        return { completed: true }; // Skip invalid regex
+        const details = error instanceof Error ? error.message : String(error);
+        console.error('Invalid regex pattern:', rule.regex, details, error);
+        return {
+          completed: false,
+          message: `Invalid regex: ${rule.regex}`,
+        };
       }
       break;
     }

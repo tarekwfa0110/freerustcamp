@@ -71,7 +71,7 @@ Naming: practice = “Learn X by Building Y”; certification = “Build a X Pro
 - **Section 4:** Advanced systems & performance (80–100 h)  
 - **Section 5:** Specialization paths (30–60 h)  
 
-Full breakdowns, learning objectives, and project lists: **docs/curriculum/CURRICULUM.md**.
+Full breakdowns, learning objectives, and project lists: **docs/curriculum.md**.
 
 ## Implemented so far
 

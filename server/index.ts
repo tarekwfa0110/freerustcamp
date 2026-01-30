@@ -14,6 +14,8 @@ import {
 } from "./executor";
 
 const PORT = parseInt(process.env.EXECUTION_PORT ?? "3847", 10);
+/** In production set CORS_ORIGIN to your app origin (e.g. https://app.example.com). Unset = "*" for dev. */
+const CORS_ORIGIN = process.env.CORS_ORIGIN ?? "*";
 
 interface TestDefinition {
   name: string;
@@ -86,7 +88,7 @@ Bun.serve({
       return new Response(null, {
         status: 204,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": CORS_ORIGIN,
           "Access-Control-Allow-Methods": "POST, OPTIONS",
           "Access-Control-Allow-Headers": "Content-Type",
           "Access-Control-Max-Age": "86400",
@@ -114,7 +116,7 @@ function jsonResponse(body: object, status = 200): Response {
     status,
     headers: {
       "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": CORS_ORIGIN,
     },
   });
 }
@@ -201,77 +203,79 @@ async function handleTest(req: Request): Promise<Response> {
     });
   }
 
-  for (const test of tests) {
-    if (test.type === "compilation") {
-      results.push({
-        name: test.name,
-        passed: buildSucceeded,
-        error: buildSucceeded ? undefined : compilationError,
-      });
-      continue;
-    }
-
-    if (test.type === "code_quality") {
-      const passed = checkCodeQuality(code, test.check);
-      results.push({
-        name: test.name,
-        passed,
-        error: passed ? undefined : "Code quality check failed",
-      });
-      continue;
-    }
-
-    if (test.type === "functional") {
-      if (!buildSucceeded) {
+  try {
+    for (const test of tests) {
+      if (test.type === "compilation") {
         results.push({
           name: test.name,
-          passed: false,
-          error: compilationError ?? "Code did not compile",
+          passed: buildSucceeded,
+          error: buildSucceeded ? undefined : compilationError,
         });
         continue;
       }
-      const args = argsFromCommand(test.command);
-      try {
-        const run = await cargoRun(dir!, args);
-        const expectedExit = test.expectedExitCode ?? 0;
-        const exitOk = run.exitCode === expectedExit;
-        const outputOk = outputMatches(run.stdout, test.expectedOutput);
-        const passed = exitOk && outputOk;
+
+      if (test.type === "code_quality") {
+        const passed = checkCodeQuality(code, test.check);
         results.push({
           name: test.name,
           passed,
-          output: run.stdout.trim() || undefined,
-          error: passed
-            ? undefined
-            : [
-                !exitOk ? `Expected exit code ${expectedExit}, got ${run.exitCode ?? "?"}` : null,
-                !outputOk ? "Output did not match expected" : null,
-              ]
-                .filter(Boolean)
-                .join(". ") || (run.stderr.trim() || undefined),
+          error: passed ? undefined : "Code quality check failed",
         });
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Run failed";
-        results.push({ name: test.name, passed: false, error: message });
+        continue;
       }
-      continue;
+
+      if (test.type === "functional") {
+        if (!buildSucceeded) {
+          results.push({
+            name: test.name,
+            passed: false,
+            error: compilationError ?? "Code did not compile",
+          });
+          continue;
+        }
+        const args = argsFromCommand(test.command);
+        try {
+          const run = await cargoRun(dir!, args);
+          const expectedExit = test.expectedExitCode ?? 0;
+          const exitOk = run.exitCode === expectedExit;
+          const outputOk = outputMatches(run.stdout, test.expectedOutput);
+          const passed = exitOk && outputOk;
+          results.push({
+            name: test.name,
+            passed,
+            output: run.stdout.trim() || undefined,
+            error: passed
+              ? undefined
+              : [
+                  !exitOk ? `Expected exit code ${expectedExit}, got ${run.exitCode ?? "?"}` : null,
+                  !outputOk ? "Output did not match expected" : null,
+                ]
+                  .filter(Boolean)
+                  .join(". ") || (run.stderr.trim() || undefined),
+          });
+        } catch (err) {
+          const message = err instanceof Error ? err.message : "Run failed";
+          results.push({ name: test.name, passed: false, error: message });
+        }
+        continue;
+      }
+
+      results.push({
+        name: test.name,
+        passed: false,
+        error: `Unknown test type: ${test.type}`,
+      });
     }
 
-    results.push({
-      name: test.name,
-      passed: false,
-      error: `Unknown test type: ${test.type}`,
-    });
+    const result: TestRunResult = {
+      success: results.every((r) => r.passed),
+      results,
+      compilationError: compilationError && !buildSucceeded ? compilationError : undefined,
+    };
+    return jsonResponse(result);
+  } finally {
+    if (dir) await cleanup(dir);
   }
-
-  if (dir) await cleanup(dir);
-
-  const result: TestRunResult = {
-    success: results.every((r) => r.passed),
-    results,
-    compilationError: compilationError && !buildSucceeded ? compilationError : undefined,
-  };
-  return jsonResponse(result);
 }
 
 console.log(`Execution API listening on http://localhost:${PORT}`);

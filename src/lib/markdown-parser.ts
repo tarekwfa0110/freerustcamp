@@ -12,9 +12,25 @@ interface StepSection {
   whatYouLearned?: string;
 }
 
+const REQUIRED_FRONTMATTER_FIELDS = ['id', 'title', 'section', 'estimated_time', 'difficulty'] as const;
+
+function validateFrontmatter(frontmatter: Record<string, unknown>, context?: string): void {
+  for (const field of REQUIRED_FRONTMATTER_FIELDS) {
+    const value = frontmatter[field];
+    if (value === undefined || value === null || value === '') {
+      const snippet = context ?? JSON.stringify(frontmatter, null, 2);
+      throw new Error(
+        `Markdown challenge frontmatter missing required field "${field}". ` +
+        `Frontmatter: ${snippet}`
+      );
+    }
+  }
+}
+
 export function parseMarkdownChallenge(markdown: string): Challenge {
   const { data: frontmatter, content } = matter(markdown);
-  
+  validateFrontmatter(frontmatter as Record<string, unknown>, JSON.stringify(frontmatter, null, 2));
+
   // Handle certification projects
   if (frontmatter.type === 'certification') {
     return {

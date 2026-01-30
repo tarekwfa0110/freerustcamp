@@ -13,30 +13,35 @@ const USE_MARKDOWN = false; // Start with TS, migrate gradually
 
 export async function getChallenge(id: string): Promise<{ challenge: Challenge; section: Section } | null> {
   if (USE_MARKDOWN) {
-    // Try markdown first
     try {
-      // Determine section from structure
       const sectionsMeta = await loadSectionsMetadata();
       for (const sectionMeta of sectionsMeta) {
         const structure = await loadSectionStructure(sectionMeta.id);
-        if (structure?.challenges.find(c => c.id === id)) {
-          const challenge = await loadMDChallenge(sectionMeta.id, id.replace(/\.md$/, ''));
-          const section: Section = {
-            id: sectionMeta.id,
-            title: sectionMeta.title,
-            description: sectionMeta.description,
-            estimated_hours: sectionMeta.estimated_hours,
-            challenges: [], // Will be loaded separately if needed
-          };
-          return { challenge, section };
+        const matched = structure?.challenges.find(
+          c => c.id === id || c.id.replace(/\.md$/, '') === id.replace(/\.md$/, '')
+        );
+        if (matched) {
+          const loadId = matched.id.replace(/\.md$/, '');
+          const challenge = await loadMDChallenge(sectionMeta.id, loadId);
+          if (challenge) {
+            const section: Section = {
+              id: sectionMeta.id,
+              title: sectionMeta.title,
+              description: sectionMeta.description,
+              estimated_hours: sectionMeta.estimated_hours,
+              challenges: [],
+            };
+            return { challenge, section };
+          }
+          // loadMDChallenge returned null, continue searching other sections
         }
       }
+      // No non-null challenge from markdown, fall back to TypeScript
     } catch (error) {
       console.warn(`Failed to load challenge ${id} from markdown, falling back to TS:`, error);
     }
   }
-  
-  // Fallback to TypeScript
+
   return getTSChallenge(id);
 }
 

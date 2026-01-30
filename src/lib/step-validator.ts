@@ -446,13 +446,8 @@ export function validateStep(
     }
   }
   
-  // If we get here and there are no specific requirements, don't auto-complete
-  // Steps should have explicit validation or at least require meaningful code
-  return {
-    completed: false,
-    message: 'Validation not configured for this step',
-    hints: ['Add a validation config to this step so learners can pass when they follow the instructions'],
-  };
+  // No validation config: allow progress for backward compatibility
+  return { completed: true };
 }
 
 /**

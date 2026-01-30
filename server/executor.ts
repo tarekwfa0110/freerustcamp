@@ -3,9 +3,35 @@
  * Used by the execution API (see index.ts).
  */
 
-import { mkdtemp, rm, writeFile, mkdir } from "fs/promises";
+import { mkdtemp, rm, writeFile, mkdir, readdir, stat } from "fs/promises";
 import { join } from "path";
 import { tmpdir } from "os";
+
+const TEMP_PREFIX = "frc-";
+const ORPHAN_AGE_MS = 60 * 60 * 1000; // 1 hour
+
+/** Remove orphaned frc-* temp dirs (e.g. from crashed runs). Call at startup. */
+async function cleanupOrphanedTempDirs(): Promise<void> {
+  const base = tmpdir();
+  let entries: string[];
+  try {
+    entries = await readdir(base);
+  } catch {
+    return;
+  }
+  const now = Date.now();
+  for (const name of entries) {
+    if (!name.startsWith(TEMP_PREFIX)) continue;
+    const path = join(base, name);
+    try {
+      const st = await stat(path);
+      if (!st.isDirectory()) continue;
+      if (now - st.mtimeMs > ORPHAN_AGE_MS) await rm(path, { recursive: true, force: true });
+    } catch {
+      // ignore per-dir errors
+    }
+  }
+}
 
 const BUILD_TIMEOUT_MS = 15_000;
 const RUN_TIMEOUT_MS = 10_000;
@@ -74,12 +100,21 @@ async function runWithTimeout(
   }
 }
 
+/** Run orphan cleanup once at module load. */
+let orphanCleanupDone = false;
+function maybeCleanupOrphans(): void {
+  if (orphanCleanupDone) return;
+  orphanCleanupDone = true;
+  cleanupOrphanedTempDirs().catch(() => {});
+}
+
 /**
  * Create a temp directory with a Cargo project and user code in src/main.rs.
  * Returns the temp dir path (caller must call cleanup when done).
  */
 export async function createTempProject(code: string): Promise<string> {
-  const dir = await mkdtemp(join(tmpdir(), "frc-"));
+  maybeCleanupOrphans();
+  const dir = await mkdtemp(join(tmpdir(), TEMP_PREFIX));
   await writeFile(join(dir, "Cargo.toml"), CARGO_TOML);
   await mkdir(join(dir, "src"), { recursive: true });
   await writeFile(join(dir, "src", "main.rs"), code);

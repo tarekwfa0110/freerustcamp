@@ -1,7 +1,7 @@
 import { Editor } from '@monaco-editor/react';
 import { Button } from '@/components/ui/button';
 import { Play, RotateCcw, Send, Wand2 } from 'lucide-react';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 interface CodeEditorProps {
   code: string;
@@ -16,6 +16,16 @@ interface CodeEditorProps {
 }
 
 export function CodeEditor({ code, onChange, language, onRun, onReset, onSubmitStep, onNextStep, canGoNext, canFocus = true }: CodeEditorProps) {
+  // Refs so the keyboard command always calls the latest handlers/state (avoids stale closure)
+  const submitRef = useRef(onSubmitStep);
+  const nextRef = useRef(onNextStep);
+  const canGoNextRef = useRef(canGoNext);
+  useEffect(() => {
+    submitRef.current = onSubmitStep;
+    nextRef.current = onNextStep;
+    canGoNextRef.current = canGoNext;
+  }, [onSubmitStep, onNextStep, canGoNext]);
+
   // Memoize editor options to prevent re-creation on every render
   const editorOptions = useMemo(() => ({
     minimap: { enabled: false },
@@ -39,11 +49,14 @@ export function CodeEditor({ code, onChange, language, onRun, onReset, onSubmitS
   ) => {
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
       // For practice projects: Ctrl+Enter submits/checks step (shows hints or advances)
-      if (onSubmitStep) {
-        onSubmitStep();
-      } else if (onNextStep && canGoNext) {
+      const onSubmit = submitRef.current;
+      const onNext = nextRef.current;
+      const canNext = canGoNextRef.current;
+      if (onSubmit) {
+        onSubmit();
+      } else if (onNext && canNext) {
         // Fallback for certification projects or if onSubmitStep not provided
-        onNextStep();
+        onNext();
       }
     });
   };

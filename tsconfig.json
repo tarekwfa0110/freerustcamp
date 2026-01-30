@@ -27,6 +27,7 @@
     }
   },
   "include": ["src"],
+  /* Exclude test files from main build; bun test compiles and runs them separately */
   "exclude": ["src/**/*.test.ts", "src/**/*.spec.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

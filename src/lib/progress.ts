@@ -13,16 +13,37 @@ export function loadProgress(): UserProgress {
     return getDefaultProgress();
   }
 
+  let progress: UserProgress;
   try {
-    return JSON.parse(stored);
+    progress = JSON.parse(stored);
   } catch {
     return getDefaultProgress();
   }
+
+  // Migrate legacy terminalCommands (string[]) to step-based Record<number, string[]> once per load
+  let changed = false;
+  for (const challengeId of Object.keys(progress.challengeProgress)) {
+    const existing = progress.challengeProgress[challengeId];
+    const tc = existing?.terminalCommands;
+    if (Array.isArray(tc)) {
+      progress.challengeProgress[challengeId] = {
+        ...existing,
+        challengeId,
+        terminalCommands: { 1: [...tc] },
+      };
+      changed = true;
+    }
+  }
+  if (changed) {
+    progress.lastActivity = new Date().toISOString();
+    saveProgress(progress);
+  }
+  return progress;
 }
 
 /**
- * Persist progress to localStorage. May throw on quota exceeded or other storage errors;
- * callers that need to handle failures should wrap in try/catch.
+ * Persist progress to localStorage. Swallows storage errors (e.g. quota exceeded)
+ * so callers never crash; progress is simply not persisted when storage fails.
  */
 export function saveProgress(progress: UserProgress): void {
   if (typeof window === 'undefined') return;
@@ -34,7 +55,7 @@ export function saveProgress(progress: UserProgress): void {
     if (error instanceof DOMException && error.name === 'QuotaExceededError') {
       console.warn('LocalStorage quota exceeded. Progress may not be saved.');
     }
-    throw error;
+    // Do not rethrow: avoid crashing callers; progress just won't persist
   }
 }
 
@@ -170,29 +191,17 @@ export function getTerminalCommandsForStep(challengeId: string, stepNumber: numb
   const progress = loadProgress();
   const existing = progress.challengeProgress[challengeId];
   const terminalCommands = existing?.terminalCommands;
-  
-  // Handle migration: if terminalCommands is an array (old format), convert it
-  if (Array.isArray(terminalCommands)) {
-    // Migrate old array format to new step-based format
-    // Put all commands in step 1 (since we don't know which step they belonged to)
-    const migrated: Record<number, string[]> = { 1: [...terminalCommands] };
-    const challengeProgress: ChallengeProgress = {
-      ...existing,
-      challengeId,
-      terminalCommands: migrated,
-    };
-    progress.challengeProgress[challengeId] = challengeProgress;
-    saveProgress(progress);
-    // Return commands for step 1 if that's what we're asking for, otherwise empty
-    // Use migrated format, not the old array
-    return stepNumber === 1 ? migrated[1] : [];
-  }
-  
-  // New format: step-based
+
+  // Already migrated: step-based shape
   if (terminalCommands && typeof terminalCommands === 'object' && !Array.isArray(terminalCommands)) {
     return terminalCommands[stepNumber] || [];
   }
-  
+
+  // Legacy array format: in-memory conversion only for return value (no mutation, no save)
+  if (Array.isArray(terminalCommands)) {
+    return stepNumber === 1 ? [...terminalCommands] : [];
+  }
+
   return [];
 }
 
