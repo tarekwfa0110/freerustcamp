@@ -37,8 +37,8 @@ Example: temp_converter 32 F`,
     steps: [
       {
         step: 1,
-        title: 'Create the project',
-        instruction: `Cargo is Rust's build tool and package manager. It helps you create new projects with the right structure.
+        title: 'Initialize your project',
+        instruction: `Cargo is Rust's build tool and package manager. It automates tasks like creating projects, downloading libraries, and building your code.
 
 Here is an example of creating a new project:
 
@@ -46,9 +46,7 @@ Here is an example of creating a new project:
 cargo new my_project
 \`\`\`
 
-This command creates a new directory with a basic Rust project structure, including a \`Cargo.toml\` file and a \`src\` directory with a \`main.rs\` file.
-
-Create a new Rust project called \`temp_converter\`.`,
+Create a new Rust project called \`temp_converter\` to get started.`,
         validation: {
           rules: [
             {
@@ -56,24 +54,23 @@ Create a new Rust project called \`temp_converter\`.`,
               command: 'cargo new',
               projectSpecific: 'temp_converter',
               hints: [
+                'Open the terminal below',
                 'Type: cargo new temp_converter',
                 'Press Enter to execute',
               ],
             },
           ],
-          message: 'Run `cargo new temp_converter`',
+          message: 'Run `cargo new temp_converter` in the terminal',
         },
-        test: [
-          'Project directory exists',
-        ],
-        what_you_learned: `Cargo is Rust's build tool and package manager, and it automatically sets up the standard project structure for you.`,
+        test: ['Project directory created'],
+        what_you_learned: `Cargo automatically sets up a standard directory structure and a "Hello, world!" program for you.`,
       },
       {
         step: 2,
-        title: 'Navigate to the project',
-        instruction: `The \`cd\` command (change directory) moves you into a different folder. After creating a project, you need to move into its directory to work with the files.
+        title: 'Enter the project folder',
+        instruction: `The \`cd\` command (change directory) moves your terminal into a specific folder. You must be inside the project folder to run or build your code.
 
-Move into the \`temp_converter\` project directory.`,
+Move into the \`temp_converter\` directory you just created.`,
         validation: {
           rules: [
             {
@@ -81,549 +78,747 @@ Move into the \`temp_converter\` project directory.`,
               command: 'cd temp_converter',
               hints: [
                 'Type: cd temp_converter',
-                'Press Enter to execute',
+                'Press Enter to navigate into the folder',
               ],
             },
           ],
           message: 'Run `cd temp_converter`',
         },
-        test: [
-          'Changed to project directory',
-        ],
-        what_you_learned: `How to navigate directories using the \`cd\` command.`,
+        test: ['Terminal in temp_converter directory'],
+        what_you_learned: `Navigating to the project root allows Cargo to find the \`Cargo.toml\` file it needs for building.`,
       },
       {
         step: 3,
-        title: 'Understand the main function',
-        instruction: `Open \`src/main.rs\` in the code editor. Cargo created a basic Rust program for you.
+        title: 'Locate the entry point',
+        instruction: `Every Rust program starts at a specific function called \`main\`. Cargo created this for you in \`src/main.rs\`.
 
-Every Rust program must have exactly one \`main\` function. This is where execution starts when you run the program.
-
-Here is the structure of a \`main\` function:
+Here is a basic function structure:
 
 \`\`\`rust
-fn main() {
-    // Your code goes here
+fn say_hello() {
+    // code here
 }
 \`\`\`
 
-- \`fn\` - keyword to define a function
-- \`main\` - the function name (must be exactly "main")
-- \`()\` - empty parentheses mean this function takes no parameters
-- \`{ }\` - curly braces contain the function body
-
-Run \`cargo run\` to execute your program and see how Rust automatically calls the \`main\` function.`,
+Open \`src/main.rs\` and identify the \`main\` function. It's the entry point where your program will begin execution.`,
         starterCode: 'fn main() {\n    println!("Hello, world!");\n}',
         validation: {
           rules: [
             {
-              type: 'terminal_command',
-              command: 'cargo run',
-              hints: [
-                'Type: cargo run',
-                'Press Enter to execute',
-              ],
+              type: 'code_contains',
+              patterns: ['fn main()'],
+              allRequired: true,
+              hints: ['Ensure your code has a main function: fn main() { ... }'],
             },
           ],
-          message: 'Run `cargo run`',
+          message: 'Verify your main function exists',
         },
-        test: [
-          'Code has main function',
-        ],
-        what_you_learned: `Every Rust program must have a \`main\` function, which is the entry point where execution begins.`,
+        test: ['main function exists'],
+        what_you_learned: `The \`main\` function is the starting point for every executable Rust program.`,
       },
       {
         step: 4,
-        title: 'Understand println! macro',
-        instruction: `\`println!\` is a macro (indicated by the \`!\`) that prints text to the console and adds a newline. The \`!\` indicates this is a macro, not a regular function.
+        title: 'Run your first program',
+        instruction: `The \`cargo run\` command compiles your code and immediately executes the resulting program. It's the fastest way to test your changes.
 
-Here is an example of using \`println!\`:
-
-\`\`\`rust
-println!("Welcome to Rust!");
-println!("This is another message");
-\`\`\`
-
-Text in quotes like \`"Welcome to Rust!"\` is called a string literal. This is the actual text that will be printed.
-
-Add a second \`println!\` statement with a different message to your program. Run \`cargo run\` to see how each \`println!\` creates a new line.`,
-        starterCode: 'fn main() {\n    println!("Hello, world!");\n}',
+Run \`cargo run\` in the terminal to see the default "Hello, world!" message.`,
         validation: {
           rules: [
-            {
-              type: 'code_contains',
-              patterns: ['fn main()', 'println!'],
-              allRequired: true,
-              hints: [
-                'You need at least 2 complete `println!` statements',
-                'Example: println!("Hello, world!");',
-                'Then add: println!("Another message");',
-              ],
-            },
             {
               type: 'terminal_command',
               command: 'cargo run',
               hints: [
                 'Type: cargo run',
-                'Press Enter to execute',
+                'Ensure you are still in the temp_converter folder',
               ],
             },
           ],
-          message: 'Add a second `println!` statement with a different message',
+          message: 'Run the program using cargo',
         },
-        test: [
-          'Code uses println! macro',
-        ],
-        what_you_learned: `The \`println!\` macro prints text to the console. The \`!\` indicates it's a macro, not a regular function.`,
+        test: ['Program executed successfully'],
+        what_you_learned: `\`cargo run\` combines compiling and running into a single convenient command.`,
       },
       {
         step: 5,
-        title: 'Change the message',
-        instruction: `You can modify string literals in your code. String literals are the text values inside quotes.
+        title: 'Introduction to macros',
+        instruction: `In Rust, \`println!\` is a **macro**, not a regular function. The exclamation mark (\`!\`) tells you it's a macro. Macros are like powerful code generators.
 
-Here is an example of a \`println!\` statement with a custom message:
+Example of printing a message:
 
 \`\`\`rust
-println!("Welcome to Rust!");
+println!("Rust is fun!");
 \`\`\`
 
-Change the message from \`"Hello, world!"\` to \`"Temperature Converter"\`.`,
+The text between double quotes is called a **string literal**. It's the exact text you want to display.
+
+Add a second \`println!\` statement below the first one with any message you like.`,
+        highlightLine: 3, // Highlight line 3 where user should add the new println!
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['fn main()', 'println!', 'Temperature Converter'],
+              patterns: ['println!', 'println!'],
               allRequired: true,
-              hints: [
-                'Find: println!("Hello, world!")',
-                'Change it to: println!("Temperature Converter")',
-                'Make sure quotes and spelling are correct',
-              ],
+              hints: ['Add another println!("Your message here"); line'],
             },
           ],
-          message: 'Change the message to "Temperature Converter"',
+          message: 'Add a second println! macro call',
         },
-        test: [
-          'Code compiles',
-          'Prints "Temperature Converter" when run',
-        ],
-        what_you_learned: `How to modify string literals in Rust code.`,
+        test: ['Two println! macros detected'],
+        what_you_learned: `Macros like \`println!\` provide powerful shortcuts for complex tasks like formatting output.`,
       },
       {
         step: 6,
-        title: 'Import std::env',
-        instruction: `The \`use\` keyword brings items from other modules into scope so you can use them without typing the full path.
+        title: 'The importance of semicolons',
+        instruction: `Rust is an expression-based language, and semicolons (\`;\`) are used to separate statements. Missing a semicolon is a very common compiler error.
 
-\`std::env\` is a module in Rust's standard library that provides functions for working with environment variables and command-line arguments.
+Notice that your \`println!\` statements end with \`;\`. This tells Rust the action is finished.
 
-Here is an example of importing a module:
-
-\`\`\`rust
-use std::collections::HashMap;
-\`\`\`
-
-Add \`use std::env;\` at the top of your file, before \`fn main()\`. This import will allow you to use \`env::args()\` in the next step.`,
+Run \`cargo run\` again to see both of your messages appear on separate lines.`,
         validation: {
           rules: [
             {
-              type: 'code_contains',
-              patterns: ['use std::env'],
-              allRequired: true,
-              hints: ['Add: use std::env; at the top of the file'],
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Run: cargo run to confirm the output'],
             },
           ],
-          message: 'Add use std::env; at the top of your file',
+          message: 'Confirm the output in the terminal',
         },
-        test: [
-          'Code has use std::env;',
-        ],
-        what_you_learned: `How to import modules using the \`use\` keyword.`,
+        test: ['Successfully printed multiple lines'],
+        what_you_learned: `Each \`println!\` appends a newline character, putting subsequent text on a new line.`,
       },
       {
         step: 7,
-        title: 'Get command-line arguments',
-        instruction: `When you run a program from the terminal, you can pass information to it as command-line arguments. For example: \`cargo run -- 32 F\` passes "32" and "F" as arguments.
+        title: 'Set the program title',
+        instruction: `Now we'll start molding this into a temperature converter. Let's change our first message to be a proper header.
 
-The \`env::args()\` function returns an iterator over the command-line arguments. You can collect this iterator into a vector.
-
-Here is an example of collecting arguments into a vector:
-
-\`\`\`rust
-let items: Vec<String> = some_iterator.collect();
-\`\`\`
-
-- \`.collect()\` - collects the iterator into a vector
-- \`: Vec<String>\` - type annotation telling Rust what type to collect into (a vector of strings)
-
-The first item (index 0) is always the name of your program. Actual user arguments start at index 1.
-
-Add code inside your \`main\` function to collect command-line arguments using \`env::args()\` into a vector called \`args\`.`,
+Update the first \`println!\` message literal to say \`"Temperature Converter"\`. Remove the second \`println!\` you added in the previous step.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['env::args()', 'Vec<String>', '.collect()'],
+              patterns: ['println!("Temperature Converter");'],
               allRequired: true,
-              hints: ['Add: let args: Vec<String> = env::args().collect();'],
+              hints: ['Change the first message to exactly: "Temperature Converter"'],
+            },
+            {
+              type: 'code_reject_patterns',
+              patterns: ['Hello, world!'],
+              hints: ['Remove or replace the "Hello, world!" message'],
             },
           ],
-          message: 'Collect command-line arguments into args using env::args().collect()',
+          message: 'Change the header message',
         },
-        test: [
-          'Code uses env::args()',
-          'Collects arguments into Vec<String>',
-        ],
-        what_you_learned: `How to get command-line arguments using \`std::env::args()\` and collect them into a vector.`,
+        test: ['Prints "Temperature Converter"'],
+        what_you_learned: `Modifying string literals directly changes what your program displays to the user.`,
       },
       {
         step: 8,
-        title: 'Get the temperature argument',
-        instruction: `You can access specific elements in a vector using square brackets with an index. Here's an example of accessing a vector element:
+        title: 'Accessing the system',
+        instruction: `To handle inputs, we need to talk to the operating system. Rust's standard library provides a module for this called \`env\` (short for environment).
 
-\`\`\`rust
-let first_item = &my_vec[0];
-\`\`\`
+The full path to this module is \`std::env\`. Modules group related functionality together.
 
-The \`&\` creates a reference to the element, which is often needed when working with vectors.
-
-Index 0 is the program name, so index 1 is the first user argument. Extract the temperature from the first user argument (index 1) and store it in a variable called \`temp_str\`.`,
+Add \`use std::env;\` at the very top of your file, before the \`main\` function.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['args[1]', 'temp_str'],
+              patterns: ['use std::env;'],
               allRequired: true,
-              hints: ['Add: let temp_str = &args[1];', 'Use args[1] for first user argument'],
+              hints: ['Add: use std::env; at line 1'],
             },
           ],
-          message: 'Get the argument at index 1 and store it in temp_str',
+          message: 'Add the module import',
         },
-        test: [
-          'Code gets argument at index 1',
-        ],
-        what_you_learned: `How to access specific items in a vector using indexing.`,
+        test: ['std::env is imported'],
+        what_you_learned: `The \`use\` keyword brings external definitions into your current scope.`,
       },
       {
         step: 9,
-        title: 'Get the unit argument',
-        instruction: `The second user argument (index 2) is the unit ("F" for Fahrenheit or "C" for Celsius).
+        title: 'Reading arguments',
+        instruction: `When you run a program, you can pass it "arguments" (like \`cargo run -- 32 F\`). Rust provides these through a tool called an **iterator**.
 
-Extract the unit from the second user argument (index 2) and store it in a variable called \`unit_str\`.`,
+We access the arguments iterator by calling \`env::args()\`.
+
+Inside \`main\`, call \`env::args()\` and store it in a variable named \`args\`. You must also "collect" the iterator into a concrete list.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['args[2]', 'unit_str'],
+              patterns: ['env::args()'],
               allRequired: true,
-              hints: [
-                'Add: let unit_str = &args[2];',
-                'Use square brackets to access index 2: args[2]',
-                'Store the result in a variable named unit_str',
-              ],
+              hints: ['Inside main, add: env::args()'],
             },
           ],
-          message: 'Get the argument at index 2 and store it in unit_str',
+          message: 'Call env::args()',
         },
-        test: [
-          'Code gets argument at index 2',
-        ],
-        what_you_learned: `How to access multiple arguments from a vector using different indices.`,
+        test: ['args() function called'],
+        what_you_learned: `Iterators are a core Rust concept for processing sequences of data.`,
       },
       {
         step: 10,
-        title: 'Parse string to number',
-        instruction: `You can convert strings to numbers using the \`.parse()\` method. Here's an example:
+        title: 'Introducing Vectors',
+        instruction: `To easily access arguments by number, we "collect" the iterator into a **Vector** (\`Vec\`). A Vector is a flexible list of items that can grow or shrink.
+
+Example of collecting an iterator:
 
 \`\`\`rust
-let number: i32 = "42".parse().expect("Not a number");
+let items: Vec<String> = iterator.collect();
 \`\`\`
 
-- \`.parse()\` - converts string to number
-- \`: i32\` or \`: f64\` - type annotation telling Rust what number type to parse into
-- \`.expect()\` - handles errors (we'll learn better ways later)
+The \`: Vec<String>\` is a **type annotation** telling Rust exactly what kind of list we want.
 
-The \`f64\` type is a 64-bit floating-point number that supports decimals.
-
-Convert the temperature string (\`temp_str\`) to a number and store it in a variable called \`temp\` with type \`f64\`. Use an appropriate error message in \`.expect()\`.`,
+Complete your \`args\` variable by adding the \`: Vec<String>\` type and calling \`.collect()\` on the iterator.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['.parse()', 'f64', 'temp'],
+              patterns: ['let args: Vec<String> = env::args().collect();'],
               allRequired: true,
-              hints: [
-                'Use temp_str.parse() to convert the string to a number',
-                'Add type annotation: let temp: f64 = ...',
-                'Store the result in a variable named temp',
-              ],
+              hints: ['Use the exact syntax: let args: Vec<String> = env::args().collect();'],
             },
           ],
-          message: 'Parse temp_str to f64 and store in temp',
+          message: 'Collect arguments into a Vec<String>',
         },
-        test: [
-          'Code parses string to f64',
-        ],
-        what_you_learned: `How to parse strings into numbers using \`.parse()\` and the \`f64\` type for decimal numbers.`,
+        test: ['Arguments collected into a Vector of Strings'],
+        what_you_learned: `Vectors are one of the most common data structures in Rust for storing lists of items.`,
       },
       {
         step: 11,
-        title: 'Convert unit to uppercase',
-        instruction: `Rust strings have methods for common transformations. The \`.to_uppercase()\` method creates a new string with all letters converted to uppercase.
+        title: 'Understanding argument order',
+        instruction: `Argument lists (Vectors) start at index **0**. Interestingly, the very first argument is always the name of the program itself.
 
-Here is an example:
+Example of accessing the first item:
 
 \`\`\`rust
-let text = "hello";
-let upper = text.to_uppercase(); // "HELLO"
+let program_name = &args[0];
 \`\`\`
 
-Rust strings are immutable, so string methods return new strings rather than modifying the original.
+We use \`&\` to **borrow** the value from the list without taking ownership.
 
-Convert the unit (\`unit_str\`) to uppercase so your program can handle both "f" and "F" inputs. Store the result in a variable called \`unit\`.`,
+Use \`println!\` with a placeholder \`{}\` to print the program name found at \`args[0]\`.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['to_uppercase()', 'unit'],
+              patterns: ['&args[0]', '{}'],
               allRequired: true,
-              hints: [
-                'Call unit_str.to_uppercase() to get the uppercase string',
-                'Store the result in a variable named unit',
-                'Example: let unit = unit_str.to_uppercase();',
-              ],
+              hints: ['Add: println!("Running {}", &args[0]);'],
             },
           ],
-          message: 'Convert unit_str to uppercase and store in unit',
+          message: 'Access and print the program name',
         },
-        test: [
-          'Code converts unit to uppercase',
-        ],
-        what_you_learned: `The \`.to_uppercase()\` string method and that Rust strings are immutable.`,
+        test: ['Index 0 accessed correctly'],
+        what_you_learned: `Indices are 0-based in Rust, and the program name is always the first entry in your arguments.`,
       },
       {
         step: 12,
-        title: 'Understand if statements',
-        instruction: `An \`if\` statement lets you execute code only when a condition is true. The code inside the braces only runs if the condition evaluates to true.
+        title: 'Defensive programming',
+        instruction: `If your program expects arguments but doesn't get any, it will crash (panic) when it tries to access an index that doesn't exist. We should check the length first.
 
-Here is an example of an \`if\` statement:
+The \`.len()\` method returns the number of items in a Vector.
+
+Example of checking length:
 
 \`\`\`rust
-let number = 5;
-if number > 3 {
-    println!("Number is greater than 3");
+if items.len() < 2 {
+    // do something
 }
 \`\`\`
 
-You can compare values using:
-- \`==\` - checks if two values are equal
-- \`!=\` - checks if two values are not equal
-
-Add an \`if\` statement to check if the unit is "F" and print a message.`,
+Before accessing any more arguments, use an \`if\` statement to check if \`args.len()\` is less than \`3\`. (We need the program name, a number, and a unit).`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['if', 'unit', '"F"'],
+              patterns: ['if args.len() < 3'],
               allRequired: true,
-              hints: [
-                'Add an if statement: if unit == "F" { ... }',
-                'Compare the unit variable to the string "F"',
-                'You can use unit.as_str() == "F" or unit == "F" depending on type',
-              ],
+              hints: ['Add: if args.len() < 3 { ... }'],
             },
           ],
-          message: 'Add an if statement checking if unit is "F"',
+          message: 'Check the length of the arguments vector',
         },
-        test: [
-          'Code uses if statement',
-        ],
-        what_you_learned: `\`if\` statements and how to compare values using \`==\`.`,
+        test: ['Length check implemented'],
+        what_you_learned: `Defensive programming means anticipating potential errors and handling them gracefully.`,
       },
       {
         step: 13,
-        title: 'Convert Fahrenheit to Celsius',
-        instruction: `Rust supports standard arithmetic operations: \`+\` (addition), \`-\` (subtraction), \`*\` (multiplication), and \`/\` (division).
+        title: 'Explaining errors to users',
+        instruction: `When input is missing, a good program tells the user exactly how to fix it. This is often called a **usage message**.
 
-For division to produce decimal results, make sure at least one operand is a float. For example:
-- \`5 / 9\` gives integer division (0)
-- \`5.0 / 9.0\` gives floating-point division (0.555...)
+Inside your \`if args.len() < 3\` block, add a \`println!\` that explains the correct usage to the user.
 
-In \`println!\`, you can use \`{}\` as placeholders that get filled with values:
-
-\`\`\`rust
-println!("The temperature is {} degrees", temp);
-\`\`\`
-
-The formula to convert Fahrenheit to Celsius is: \`C = (F - 32) * 5/9\`
-
-Inside an \`if\` statement checking for "F", convert the temperature and print the result using string formatting.
-
-**Common mistakes:** Use \`println!\` (with the \`!\` — it's a macro). Use the numeric variable \`temp\` in the formula, not \`temp_str\`. Use float literals (\`32.0\`, \`5.0\`, \`9.0\`) so \`5/9\` doesn't become integer 0.`,
+Example: \`Usage: <temp> <unit>\`.`,
         validation: {
           rules: [
             {
-              type: 'code_contains',
-              patterns: ['- 32', 'println!', '{}'],
-              allRequired: true,
-              hints: [
-                'Use the formula: (temp - 32.0) * 5.0 / 9.0 for Celsius (use temp, not temp_str)',
-                'Use println! (with !) and {} placeholders — e.g. println!("{}°F is {}°C", temp, celsius);',
-                'Use float literals: 32.0, 5.0, 9.0 so division is not integer division',
-              ],
+              type: 'code_matches',
+              regex: 'if\\s+args\\.len\\(\\)\\s*<\\s*3\\s*\\{[^}]*println!',
+              hints: ['Put the println! inside the braces of your if statement'],
             },
           ],
-          message: 'Inside the if for "F", convert to Celsius and print with formatted output',
+          message: 'Add a usage message inside the if block',
         },
-        test: [
-          'Code compiles',
-          'Converts 32°F to 0°C correctly',
-          'Prints formatted result',
-        ],
-        what_you_learned: `Arithmetic operations, floating-point division, and string formatting with placeholders.`,
+        test: ['Usage message exists'],
+        what_you_learned: `Providing clear feedback makes your command-line tools much easier to use.`,
       },
       {
         step: 14,
-        title: 'Add else if for Celsius',
-        instruction: `You can chain multiple conditions using \`else if\`. This lets you check another condition if the first one was false.
-
-Here is an example:
-
-\`\`\`rust
-if number > 10 {
-    println!("Large");
-} else if number > 5 {
-    println!("Medium");
-} else {
-    println!("Small");
-}
-\`\`\`
-
-The formula to convert Celsius to Fahrenheit is: \`F = (C * 9/5) + 32\`
-
-Add an \`else if\` clause after your \`if\` statement to handle Celsius conversion. When the unit is "C", convert the temperature and print the result.`,
+        title: 'Exiting immediately',
+        instruction: `Once you've told the user their input is wrong, you should stop the program. We use \`std::process::exit\` for this. Run \`cargo run\` without any arguments to see your usage message and wait for the exit.`,
         validation: {
           rules: [
             {
-              type: 'code_contains',
-              patterns: ['else if', '"C"', '* 9'],
-              allRequired: true,
-              hints: [
-                'Add else if unit == "C" { ... } after your if block',
-                'Use the formula: (temp * 9.0 / 5.0) + 32.0 for Fahrenheit',
-                'Print the result with println! and {} placeholders',
-              ],
+              type: 'code_matches',
+              regex: 'if\\s+args\\.len\\(\\)\\s*<\\s*3\\s*\\{[^}]*println![^}]*exit\\(1\\)',
+              hints: ['Call std::process::exit(1) after your println!'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Test the error handling by running with no arguments'],
             },
           ],
-          message: 'Add else if for unit "C" and convert to Fahrenheit',
+          message: 'Call std::process::exit(1) and verify the error message',
         },
-        test: [
-          'Code compiles',
-          'Converts 0°C to 32°F correctly',
-          'Prints formatted result',
-        ],
-        what_you_learned: `\`else if\` for handling multiple conditions.`,
+        test: ['Program exits on missing input', 'Program was run'],
+        what_you_learned: `Non-zero exit codes signal failure. Running your program now verifies that your defensive check works.`,
       },
       {
         step: 15,
-        title: 'Handle invalid units',
-        instruction: `When a program encounters invalid input, it should inform the user and exit with an error code. Exit codes let other programs know if your program succeeded or failed:
-- 0 = success
-- 1 (or any non-zero) = error
+        title: 'Extracting user input',
+        instruction: `Now that we know we have enough arguments, we can safely access them. Index 1 will be our temperature value.
 
-The \`std::process::exit(1)\` function exits the program with an error code. You can use the full path \`std::process::exit(1)\` or add \`use std::process;\` at the top.
+Example:
 
-Add an \`else\` clause after your \`else if\` to handle invalid units. Print an error message and exit with code 1.`,
+\`\`\`rust
+let value = &args[1];
+\`\`\`
+
+Below your \`if\` block, create a variable named \`temp_str\` and assign it a reference to index \`1\` of the \`args\` vector.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['else', 'exit(1)'],
+              patterns: ['let temp_str = &args[1];'],
               allRequired: true,
-              hints: [
-                'Add an else clause after your else if',
-                'Print an error message for invalid unit',
-                'Call std::process::exit(1) or process::exit(1) to exit with error code',
-              ],
+              hints: ['Assign &args[1] to let temp_str; after the if block finishes'],
             },
           ],
-          message: 'Add else clause: print error and exit with code 1',
+          message: 'Store the temperature argument in temp_str',
         },
-        test: [
-          'Code compiles',
-          'Shows error message for invalid unit',
-          'Exits with code 1 on error',
-        ],
-        what_you_learned: `How to handle invalid input and exit programs with appropriate error codes.`,
+        test: ['temp_str variable created'],
+        what_you_learned: `References (\`&\`) let you access data without copying it or taking ownership of the underlying storage.`,
       },
       {
         step: 16,
-        title: 'Handle missing arguments',
-        instruction: `Always validate user input before using it. This is called defensive programming. You should check that you have enough arguments before trying to access them.
+        title: 'Getting the unit',
+        instruction: `We also need the unit (F or C) provided by the user. This will be at the next index.
 
-Use \`.len()\` to get the number of elements in a vector. For example:
-
-\`\`\`rust
-let items = vec!["a", "b", "c"];
-println!("Length: {}", items.len()); // Prints: Length: 3
-\`\`\`
-
-At the beginning of \`main\`, check if \`args.len()\` is less than 3 (program name + temperature + unit). If so, print a usage message and exit with code 1.`,
+Extract the unit from index \`2\` of the \`args\` vector and store it in a variable named \`unit_str\`. Use a reference (\`&\`) just like you did for the temperature.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['args.len()', '< 3', 'exit(1)'],
+              patterns: ['let unit_str = &args[2];'],
               allRequired: true,
-              hints: [
-                'At the start of main, add: if args.len() < 3 { ... }',
-                'Print a usage message (e.g. "Usage: temp_converter <temperature> <unit>")',
-                'Call exit(1) when arguments are missing',
-              ],
+              hints: ['Assign &args[2] to let unit_str;'],
             },
           ],
-          message: 'Check args.len() < 3 at start of main; print usage and exit(1)',
+          message: 'Store the unit argument in unit_str',
         },
-        test: [
-          'Code compiles',
-          'Shows usage message when run with no arguments',
-          'Shows usage message when run with only 1 argument',
-          'Works correctly with 2+ arguments',
-        ],
-        what_you_learned: `Defensive programming - always validate input before using it.`,
+        test: ['unit_str variable created'],
+        what_you_learned: `Positional arguments rely on the order in which the user types words in the terminal.`,
       },
       {
         step: 17,
-        title: 'Improve error messages',
-        instruction: `Good error messages help users fix problems quickly. They should explain what went wrong, include the problematic value, and suggest how to fix it.
+        title: 'Strings versus Numbers',
+        instruction: `Arguments from the terminal are always strings. We can't do math on the string \`"32"\`. We first need to "parse" it into a real number.
 
-You can include values in error messages using string formatting with \`{}\` placeholders:
+Example of parsing:
 
 \`\`\`rust
-println!("Error: Invalid value '{}'. Please use a valid value.", value);
+let result = value.parse();
 \`\`\`
 
-Update your error messages to include the actual values that caused the error. For invalid units, show the unit that was provided. For parsing errors, show the value that failed to parse.`,
+Call the \`.parse()\` method on your \`temp_str\` variable. We'll handle the result in the next few steps.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['{}', 'Error', 'invalid'],
+              patterns: ['temp_str.parse()'],
               allRequired: true,
+              hints: ['Call .parse() on temp_str'],
+            },
+          ],
+          message: 'Call the parse method',
+        },
+        test: ['parse() method initialized'],
+        what_you_learned: `The process of converting text to data is called parsing.`,
+      },
+      {
+        step: 18,
+        title: 'Handling parse failures',
+        instruction: `Parsing can fail (like if the user types "ABC" instead of a number). Rust forces you to handle this possibility. For now, we will use \`.expect()\`.
+
+Example:
+
+\`\`\`rust
+let val = text.parse().expect("Darn!");
+\`\`\`
+
+If parsing fails, \`.expect()\` will crash the program and print your provided message. Add a helpful error message using \`.expect()\` after your \`.parse()\` call.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['.parse().expect('],
+              allRequired: true,
+              hints: ['Add .expect("Your message") after .parse()'],
+            },
+          ],
+          message: 'Add an expect call to handle errors',
+        },
+        test: ['expect() added for error handling'],
+        what_you_learned: `\`.expect()\` is a simple but "brutal" way to handle errors by crashing with a message if things go wrong.`,
+      },
+      {
+        step: 19,
+        title: 'Specific numeric types',
+        instruction: `Rust needs to know exactly what kind of number you want (integer or decimal). For temperatures, we want a 64-bit floating point number, known as \`f64\`.
+
+Example of type annotation:
+
+\`\`\`rust
+let x: f64 = 10.5;
+\`\`\`
+
+Finish your conversion by assigning the parsed value to a variable named \`temp\` with the type \`: f64\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let temp: f64 = temp_str.parse()'],
+              allRequired: true,
+              hints: ['Use the type annotation: let temp: f64 = ...'],
+            },
+          ],
+          message: 'Specify the f64 type for your temperature',
+        },
+        test: ['temp is an f64 number'],
+        what_you_learned: `Type annotations tell the compiler exactly how much memory to allocate and what operations are valid.`,
+      },
+      {
+        step: 20,
+        title: 'Normalizing text',
+        instruction: `Users might type "F" or "f". It's best to convert their input to a standard format to simplify our comparisons.
+
+The \`.to_uppercase()\` method creates a new, all-caps string.
+
+Example:
+
+\`\`\`rust
+let upper = lower.to_uppercase();
+\`\`\`
+
+Convert \`unit_str\` to uppercase and store the result in a variable named \`unit\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let unit = unit_str.to_uppercase();'],
+              allRequired: true,
+              hints: ['Use: let unit = unit_str.to_uppercase();'],
+            },
+          ],
+          message: 'Convert the unit to uppercase',
+        },
+        test: ['unit is converted to uppercase'],
+        what_you_learned: `Normalization ensures your program accepts a wider range of user input styles.`,
+      },
+      {
+        step: 21,
+        title: 'Choice and Logic',
+        instruction: `An \`if\` statement runs code only when a condition is true. We use \`==\` to check if two things are exactly equal.
+
+Example:
+
+\`\`\`rust
+if choice == "A" {
+    // code
+}
+\`\`\`
+
+Add an \`if\` statement that checks if the \`unit\` is equal to the string \`"F"\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['if unit == "F"'],
+              allRequired: true,
+              hints: ['Add: if unit == "F" { ... }'],
+            },
+          ],
+          message: 'Create the first comparison block',
+        },
+        test: ['Fahrenheit block initialized'],
+        what_you_learned: `\`if\` statements are the building blocks of program decision-making.`,
+      },
+      {
+        step: 22,
+        title: 'Floating point math',
+        instruction: `In Rust, if you divide two integers like \`5 / 9\`, the result is \`0\` because it drops the decimals! To get \`0.55\`, you must use **floats** like \`5.0 / 9.0\`.
+
+Fahrenheit to Celsius Formula: \`(F - 32.0) * 5.0 / 9.0\`.
+
+Inside your \`if\` block, create a variable \`celsius\` and implement this formula using your \`temp\` variable. Use \`.0\` on all your numbers.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_matches',
+              regex: 'let\\s+\\w+\\s*=\\s*\\(\\s*temp\\s*-\\s*32\\.0\\s*\\)\\s*\\*\\s*5\\.0\\s*\\/\\s*9\\.0',
               hints: [
-                'Use {} in your error message strings to include the bad value',
-                'Example: format string with placeholder and value for invalid unit or parse error',
-                'For parse errors, include the string that failed to parse in the message',
+                'Ensure you use 32.0, 5.0, and 9.0',
+                'Use the temp variable in your formula',
               ],
             },
           ],
-          message: 'Include the problematic value in error messages using {}',
+          message: 'Calculate the Celsius result',
         },
-        test: [
-          'Code compiles',
-          'Error messages include the problematic value',
-          'Error messages are clear and helpful',
-        ],
-        what_you_learned: `The importance of clear, helpful error messages that guide users to fix problems.`,
+        test: ['Celsius calculation is accurate'],
+        what_you_learned: `\`5.0\` is a float, while \`5\` is an integer. Rust does not allow mixing these types without explicit conversion!`,
+      },
+      {
+        step: 23,
+        title: 'Dynamic text output',
+        instruction: `We can use placeholders \`{}\` inside \`println!\` to insert our variables into a message.
+
+Example:
+
+\`\`\`rust
+println!("{} is my name", name);
+\`\`\`
+
+Inside the same \`if\` block, print a message showing the original Fahrenheit value and the new Celsius value.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['println!', '{}', '{}'],
+              allRequired: true,
+              hints: ['Use println!("{}°F is {}°C", temp, celsius);'],
+            },
+          ],
+          message: 'Print the conversion result',
+        },
+        test: ['Result is printed using placeholders'],
+        what_you_learned: `\`println!\` placeholders provide a clean way to build complex messages without manual string concatenation.`,
+      },
+      {
+        step: 24,
+        title: 'Test your first conversion',
+        instruction: `You've completed the Fahrenheit to Celsius logic! Let's test it before moving on.
+
+Run \`cargo run -- 32 F\` to test the freezing point of water. You should see 0°C.`,
+        validation: {
+          rules: [
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              projectSpecific: '32 F',
+              hints: ['Run: cargo run -- 32 F', 'The double-dash tells Cargo to pass arguments to your program'],
+            },
+          ],
+          message: 'Test your F to C conversion works',
+        },
+        test: ['Program converts 32 F to 0 C'],
+        what_you_learned: `Testing incrementally catches bugs early. If something breaks, you know exactly which change caused it.`,
+      },
+      {
+        step: 25,
+        title: 'Handling another case',
+        instruction: `When the first \`if\` condition is false, you can check a second condition using \`else if\`.
+
+Example:
+
+\`\`\`rust
+if x == 1 { ... }
+else if x == 2 { ... }
+\`\`\`
+
+Add an \`else if\` block that checks if the \`unit\` is \`"C"\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['else if', 'unit == "C"'],
+              allRequired: true,
+              hints: [
+                'Add: else if unit == "C" { }',
+                'Ensure it comes directly after the closing brace of the first if',
+              ],
+            },
+          ],
+          message: 'Add an else if block',
+        },
+        test: ['Celsius unit handler added'],
+        what_you_learned: `\`else if\` lets you chain multiple mutually exclusive conditions together.`,
+      },
+      {
+        step: 26,
+        title: 'Celsius to Fahrenheit',
+        instruction: `The math for the reverse conversion is slightly different.
+
+Celsius to Fahrenheit Formula: \`(C * 9.0 / 5.0) + 32.0\`.
+
+Inside your new \`else if\` block, calculate the Fahrenheit value and print it using placeholders.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['* 9.0', '/ 5.0', '+ 32.0'],
+              allRequired: true,
+              hints: [
+                'Use formula: (temp * 9.0 / 5.0) + 32.0',
+                'Ensure all numbers are floats (e.g. 9.0)',
+              ],
+            },
+          ],
+          message: 'Calculate and print Fahrenheit',
+        },
+        test: ['Celsius to Fahrenheit conversion works'],
+        what_you_learned: `\`PEMDAS\` rules apply in programming math—parentheses control the order of operations.`,
+      },
+      {
+        step: 27,
+        title: 'Test the reverse conversion',
+        instruction: `Now test the Celsius to Fahrenheit conversion!
+
+Run \`cargo run -- 100 C\` to test the boiling point of water. You should see 212°F.`,
+        validation: {
+          rules: [
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              projectSpecific: '100 C',
+              hints: ['Run: cargo run -- 100 C'],
+            },
+          ],
+          message: 'Test your C to F conversion works',
+        },
+        test: ['Program converts 100 C to 212 F'],
+        what_you_learned: `Both conversion paths now work! Testing both ensures your logic is complete.`,
+      },
+      {
+        step: 28,
+        title: 'Catching mistakes',
+        instruction: `If the user types a unit that isn't "F" or "C", none of our previous blocks will run. An \`else\` clause handles any case that wasn't caught yet.
+
+Example:
+
+\`\`\`rust
+if ... { }
+else if ... { }
+else { // everything else }
+\`\`\`
+
+Add an \`else block\` to your chain.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['else {'],
+              allRequired: true,
+              hints: ['Add an else block at the end of the chain'],
+            },
+          ],
+          message: 'Implement the final catch-all',
+        },
+        test: ['else block exists'],
+        what_you_learned: `\`else\` is the ultimate fallback, ensuring your program can respond even when inputs are unexpected.`,
+      },
+      {
+        step: 29,
+        title: 'Handling unknown units',
+        instruction: `Inside the \`else\` block, we should inform the user that their unit choice was invalid.
+
+We can print variables inside errors too!
+
+Print an error message like: \`Invalid unit 'K'. Use 'F' or 'C'.\`. Use placeholders to show exactly what invalid unit the user typed.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_matches',
+              regex: 'else\\s*\\{[^}]*println!',
+              hints: ['Put a println! inside your else block'],
+            },
+          ],
+          message: 'Notify the user of the invalid unit',
+        },
+        test: ['Informative error message exists'],
+        what_you_learned: `Good error messages show the "bad" data back to the user to prove why it failed.`,
+      },
+      {
+        step: 30,
+        title: 'The final exit',
+        instruction: `Just like we did when arguments were missing, we should exit the program with an error code if the unit is wrong.
+
+Add \`std::process::exit(1);\` to your \`else\` block.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['exit(1)'],
+              allRequired: true,
+              hints: ['Add std::process::exit(1); at the end of the else block'],
+            },
+          ],
+          message: 'Perform a clean exit on error',
+        },
+        test: ['Program terminates on invalid units'],
+        what_you_learned: `Consistency in error handling makes your programs behave predictably for other system tools.`,
+      },
+      {
+        step: 31,
+        title: 'Test error handling',
+        instruction: `Let's verify our error handling works properly.
+
+Run \`cargo run -- 50 K\` to test with an invalid unit. You should see your custom error message.`,
+        validation: {
+          rules: [
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              projectSpecific: '50 K',
+              hints: ['Run: cargo run -- 50 K to test error handling'],
+            },
+          ],
+          message: 'Verify error handling works for invalid units',
+        },
+        test: ['Invalid unit K triggers error message'],
+        what_you_learned: `Always test your error paths. A program that handles errors gracefully is more reliable.`,
+      },
+      {
+        step: 32,
+        title: 'The final showcase',
+        instruction: `Excellent! Your program is complete. Let's do one final test to show all functionality.
+
+Run \`cargo run -- 32 F\` again to see the full working converter.`,
+        validation: {
+          rules: [
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              projectSpecific: '32 F',
+              hints: ['Run exactly: cargo run -- 32 F'],
+            },
+          ],
+          message: 'Test your converter with arguments!',
+        },
+        test: ['Final build and run succeeds'],
+        what_you_learned: `The \`--\` separator is a common convention for passing flags to underlying programs.`,
       },
     ],
     completion_message: `🎉 Congratulations! You've built your first Rust program - a temperature converter!
@@ -667,19 +862,19 @@ This foundation will serve you in every Rust program you write!`,
       title: 'Calculator',
       description: 'You will build a simple calculator that performs basic arithmetic operations using functions and match expressions.',
       example_output: `$ cargo run -- 10 + 5
-10 + 5 = 15
+10 + 5 = 15.00
 
 $ cargo run -- 20 - 8
-20 - 8 = 12
+20 - 8 = 12.00
 
 $ cargo run -- 6 * 7
-6 * 7 = 42
+6 * 7 = 42.00
 
-$ cargo run -- 100 / 4
-100 / 4 = 25
+$ cargo run -- 10 / 4
+10 / 4 = 2.50
 
 $ cargo run -- 10 % 3
-10 % 3 = 1
+10 % 3 = 1.00
 
 $ cargo run -- 5 ^ 2
 Error: Invalid operation '^'. Use +, -, *, /, or %.`,
@@ -687,259 +882,479 @@ Error: Invalid operation '^'. Use +, -, *, /, or %.`,
     steps: [
       {
         step: 1,
-        title: 'Set up your project',
-        instruction: `Create a new Rust project called \`calculator\` and navigate into its directory.`,
+        title: 'Project initialization',
+        instruction: `Create a new Rust project called \`calculator\`.`,
         validation: {
           rules: [
             {
               type: 'terminal_command',
               command: 'cargo new',
               projectSpecific: 'calculator',
-              hints: ['Type: cargo new calculator', 'Then: cd calculator'],
+              hints: ['Run: cargo new calculator'],
             },
           ],
-          message: 'Run cargo new calculator and cd calculator',
+          message: 'Initialize the calculator project',
         },
-        test: [
-          'Project directory exists',
-          'Cargo.toml contains correct package name',
-          'Code compiles with cargo build',
-        ],
-        what_you_learned: `Created a new Rust project.`,
+        test: ['calculator directory created'],
+        what_you_learned: `Standard practice for starting new Rust applications.`,
       },
       {
         step: 2,
-        title: 'Create an add function',
-        instruction: `Functions in Rust are defined using the \`fn\` keyword. They can take parameters and return values.
-
-Here is an example of a function that adds two numbers:
-
-\`\`\`rust
-fn add(a: i32, b: i32) -> i32 {
-    a + b
-}
-\`\`\`
-
-In Rust, the last expression in a function is automatically returned (no semicolon needed). The \`-> i32\` specifies the return type.
-
-Define a function called \`add\` that takes two \`i32\` parameters and returns their sum.`,
+        title: 'Entering the project',
+        instruction: `Move into your new \`calculator\` directory using the terminal.`,
         validation: {
           rules: [
             {
-              type: 'code_contains',
-              patterns: ['fn add', 'i32', 'a + b'],
-              allRequired: true,
-              hints: ['Add: fn add(a: i32, b: i32) -> i32 { a + b }', 'Use i32 for both parameters and return type'],
+              type: 'terminal_command',
+              command: 'cd calculator',
+              hints: ['Run: cd calculator'],
             },
           ],
-          message: 'Define add function with two i32 parameters returning their sum',
+          message: 'Navigate into the project folder',
         },
-        test: [
-          'Code compiles',
-          'add function exists with correct signature',
-          'add function returns sum of two numbers',
-        ],
-        what_you_learned: `How to define functions in Rust with parameters and return types.`,
+        test: ['Terminal in calculator directory'],
+        what_you_learned: `You must be in the project root for Cargo commands to work correctly.`,
       },
       {
         step: 3,
-        title: 'Create subtract, multiply, and divide functions',
-        instruction: `You can create multiple functions to organize your code. Each function should have a single, clear purpose.
+        title: 'Function fundamentals',
+        instruction: `Functions wrap reusable logic. In Rust, we use the \`fn\` keyword.
 
-When dividing integers in Rust, the result is truncated. For example, \`5 / 2\` gives \`2\`, not \`2.5\`. To get decimal results, you would need to use floating-point types like \`f64\`.
-
-Create three more functions following the same pattern as \`add\`:
-- \`subtract\` - takes two \`i32\`, returns \`a - b\`
-- \`multiply\` - takes two \`i32\`, returns \`a * b\`
-- \`divide\` - takes two \`i32\`, returns \`a / b\` (integer division)`,
-        validation: {
-          rules: [
-            {
-              type: 'code_contains',
-              patterns: ['fn subtract', 'fn multiply', 'fn divide'],
-              allRequired: true,
-              hints: ['Add subtract(a: i32, b: i32) -> i32 { a - b }', 'Add multiply and divide with same pattern'],
-            },
-          ],
-          message: 'Define subtract, multiply, and divide functions',
-        },
-        test: [
-          'Code compiles',
-          'All four functions exist',
-          'subtract returns correct difference',
-          'multiply returns correct product',
-          'divide returns correct quotient',
-        ],
-        what_you_learned: `How to create multiple functions and organize code logically.`,
-      },
-      {
-        step: 4,
-        title: 'Get operation and numbers from command line',
-        instruction: `You can make your calculator interactive by getting input from command-line arguments. The format will be: \`cargo run -- <operation> <num1> <num2>\`
-
-Use \`std::env::args()\` to get the arguments and collect them into a vector. Then extract:
-- The operation from index 1
-- The first number from index 2 (parse to \`i32\`)
-- The second number from index 3 (parse to \`i32\`)
-
-Remember that index 0 is the program name, so user arguments start at index 1.`,
-        validation: {
-          rules: [
-            {
-              type: 'code_contains',
-              patterns: ['env::args()', '.collect()', 'args[1]', '.parse()'],
-              allRequired: true,
-              hints: ['Use env::args().collect() for args', 'Get operation from args[1], numbers from args[2] and args[3]', 'Parse numbers with .parse().expect(...)'],
-            },
-          ],
-          message: 'Get operation and two numbers from command-line arguments',
-        },
-        test: [
-          'Code compiles',
-          'Gets operation from arguments',
-          'Gets and parses both numbers',
-          'Handles missing arguments',
-        ],
-        what_you_learned: `Applied knowledge of command-line arguments to make the calculator interactive.`,
-      },
-      {
-        step: 5,
-        title: 'Use match to select the operation',
-        instruction: `Rust's \`match\` expression is like a switch statement but more powerful. It forces you to handle all possible cases and is an expression that returns a value.
-
-Here is an example of using \`match\`:
-
+Example:
 \`\`\`rust
-let value = match choice.as_str() {
-    "option1" => 10,
-    "option2" => 20,
-    _ => 0,
-};
-\`\`\`
-
-The \`_\` pattern is a catch-all for any value not explicitly matched. Since \`match\` is an expression, you can assign its result to a variable.
-
-Use \`match\` to select which function to call based on the operation string. Store the result and print it with a formatted message showing the calculation.`,
-        validation: {
-          rules: [
-            {
-              type: 'code_contains',
-              patterns: ['match', '=>', 'println!', '{}'],
-              allRequired: true,
-              hints: ['Use match on operation string', 'Match "add", "subtract", "multiply", "divide"', 'Use _ for unknown operations', 'Print result with println! and {}'],
-            },
-          ],
-          message: 'Use match to select operation and print formatted result',
-        },
-        test: [
-          'Code compiles',
-          'Uses match expression',
-          'Handles "add" operation',
-          'Handles "subtract" operation',
-          'Handles "multiply" operation',
-          'Handles "divide" operation',
-          'Handles unknown operations',
-          'Result is printed with formatted message',
-        ],
-        what_you_learned: `Rust's \`match\` expression, which provides powerful pattern matching and is used throughout Rust code.`,
-      },
-      {
-        step: 6,
-        title: 'Handle division by zero',
-        instruction: `The \`Option<T>\` type represents a value that might not exist. It has two variants:
-- \`Some(value)\` - the value exists
-- \`None\` - no value
-
-This is Rust's safe way to handle operations that might fail, avoiding null pointer errors.
-
-Here is an example of a function that returns \`Option\`:
-
-\`\`\`rust
-fn safe_divide(a: i32, b: i32) -> Option<i32> {
-    if b == 0 {
-        None
-    } else {
-        Some(a / b)
-    }
+fn say_hi() {
+    println!("Hi!");
 }
 \`\`\`
 
-Modify your \`divide\` function to return \`Option<i32>\`. Return \`None\` if the divisor is 0, otherwise return \`Some(result)\`. Update your \`match\` to handle the \`Option\` result.`,
+Define an empty function named \`add\` above your \`main\` function.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['Option', 'None', 'Some'],
+              patterns: ['fn add()'],
               allRequired: true,
-              hints: ['Change divide return type to Option<i32>', 'Return None when b == 0', 'Return Some(a / b) otherwise', 'Handle Option in match with Some(result) and None'],
+              hints: ['Add: fn add() { } above main'],
             },
           ],
-          message: 'Make divide return Option<i32> and handle it in match',
+          message: 'Define the add function',
         },
-        test: [
-          'Code compiles',
-          'divide returns Option<i32>',
-          'Returns None for division by zero',
-          'Returns Some(result) for valid division',
-          'Handles None case in match',
-        ],
-        what_you_learned: `The \`Option\` type, Rust's safe way to represent values that might not exist.`,
+        test: ['add function detected'],
+        what_you_learned: `Functions allow you to break complex problems into smaller, manageable parts.`,
+      },
+      {
+        step: 4,
+        title: 'Passing data with parameters',
+        instruction: `Parameters allow functions to receive data. You must specify the name and the type.
+
+Example:
+\`\`\`rust
+fn multiply(x: i32, y: i32)
+\`\`\`
+
+Update your \`add\` function to take two parameters: \`a\` and \`b\`, both of type \`f64\` (floating point).`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['add(a: f64, b: f64)'],
+              allRequired: true,
+              hints: ['Update to: fn add(a: f64, b: f64)'],
+            },
+          ],
+          message: 'Add parameters to the function',
+        },
+        test: ['Function parameters correctly typed as f64'],
+        what_you_learned: `Type-safety starts at the function signature and prevents passing the wrong kind of data.`,
+      },
+      {
+        step: 5,
+        title: 'Sending data back',
+        instruction: `Functions return values using the \`->\` syntax.
+
+Example:
+\`\`\`rust
+fn get_number() -> i32 { ... }
+\`\`\`
+
+Update \`add\` to return an \`f64\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['-> f64'],
+              allRequired: true,
+              hints: ['Add -> f64 before the opening brace of the function'],
+            },
+          ],
+          message: 'Specify the return type',
+        },
+        test: ['Function return type is f64'],
+        what_you_learned: `The return type tells the compiler what to expect when the function finishes.`,
+      },
+      {
+        step: 6,
+        title: 'Implicit returns',
+        instruction: `In Rust, the last line of a function is returned automatically if you omit the semicolon.
+
+Update the body of \`add\` to simply be \`a + b\` with no semicolon.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['a + b'],
+              allRequired: true,
+              hints: ['Inside the braces, add: a + b'],
+            },
+            {
+              type: 'code_reject_patterns',
+              patterns: ['a + b;'],
+              hints: ['Remove the semicolon for an implicit return'],
+            },
+          ],
+          message: 'Implement the addition logic',
+        },
+        test: ['Sum is returned implicitly'],
+        what_you_learned: `Implicit returns make Rust code cleaner and more expressive.`,
       },
       {
         step: 7,
-        title: 'Add input validation',
-        instruction: `Always validate user input before processing it. Check that the user provided exactly 3 arguments (operation + 2 numbers).
-
-If not enough arguments were provided, print a helpful usage message showing the expected format and available operations.
-
-Also validate that the operation is one of the supported operations before trying to match it.`,
+        title: 'Implementing subtraction',
+        instruction: `Create a \`subtract\` function following the same pattern: two \`f64\` parameters and an \`f64\` return value.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['args.len()', '< 4', 'exit(1)'],
+              patterns: ['fn subtract', 'a - b'],
               allRequired: true,
-              hints: ['Check if args.len() < 4 (program + operation + 2 numbers)', 'Print usage message and exit(1)', 'Validate operation before matching'],
+              hints: ['Add: fn subtract(a: f64, b: f64) -> f64 { a - b }'],
             },
           ],
-          message: 'Check argument count and validate operation',
+          message: 'Add the subtract function',
         },
-        test: [
-          'Code compiles',
-          'Shows usage for wrong number of arguments',
-          'Validates operation is supported',
-          'Works correctly with valid input',
-        ],
-        what_you_learned: `The importance of input validation for robust programs.`,
+        test: ['subtract function implemented'],
+         what_you_learned: `Consistent patterns make your codebase easy to read and maintain.`,
       },
       {
         step: 8,
-        title: 'Improve error messages',
-        instruction: `Good error messages help users fix problems quickly. They should explain what went wrong, include the problematic value, and suggest how to fix it.
-
-You can include values in error messages using string formatting with \`{}\` placeholders.
-
-Make your error messages more specific:
-- Show which argument was missing
-- Show the invalid operation if provided
-- Show parsing errors with the actual value that failed to parse`,
+        title: 'Implementing multiplication',
+        instruction: `Create a \`multiply\` function that returns \`a * b\`.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['{}', 'Error', 'invalid'],
+              patterns: ['fn multiply', 'a * b'],
               allRequired: true,
-              hints: ['Use {} in error messages to include the bad value', 'Show missing argument or invalid operation', 'Include parse error value in message'],
+              hints: ['Add: fn multiply(a: f64, b: f64) -> f64 { a * b }'],
             },
           ],
-          message: 'Include problematic values in error messages using {}',
+          message: 'Add the multiply function',
         },
-        test: [
-          'Code compiles',
-          'Error messages are specific and helpful',
-          'Error messages include problematic values',
-        ],
-        what_you_learned: `How to write error messages that guide users to success.`,
+        test: ['multiply function implemented'],
+        what_you_learned: `Basic arithmetic operators in Rust work similarly to other languages.`,
+      },
+      {
+        step: 9,
+        title: 'Setup the main loop',
+        instruction: `In \`main\`, import \`std::env\` and collect the arguments into a \`Vec<String>\` called \`args\`, just like you did in the previous project.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['use std::env;', 'let args: Vec<String> = env::args().collect();'],
+              allRequired: true,
+              hints: ['Import env at the top and collect args in main'],
+            },
+          ],
+          message: 'Prepare argument handling in main',
+        },
+        test: ['Arguments collected into Vector'],
+        what_you_learned: `Reusing setup patterns helps you build programs faster.`,
+      },
+      {
+        step: 10,
+        title: 'The length check',
+        instruction: `We need exactly 4 arguments (program name, num1, operator, num2). Add an \`if\` statement to check if \`args.len() < 4\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['args.len() < 4'],
+              allRequired: true,
+              hints: ['Add length check: if args.len() < 4 { ... }'],
+            },
+          ],
+          message: 'Validate argument count',
+        },
+        test: ['Argument count check implemented'],
+        what_you_learned: `Validating length prevents "index out of bounds" panics later.`,
+      },
+      {
+        step: 11,
+        title: 'A helpful usage guide',
+        instruction: `Inside the \`if\` block, print the usage message: \`Usage: <num1> <operator> <num2>\` and exit with code \`1\`. Run \`cargo run\` to verify the message appears when arguments are missing.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['println!', 'std::process::exit(1)'],
+              allRequired: true,
+              hints: ['Print usage and then call std::process::exit(1);'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Test the usage output by running without arguments'],
+            },
+          ],
+          message: 'Inform the user on how to run the program and verify',
+        },
+        test: ['Usage message and exit call added', 'Program was run'],
+        what_you_learned: `Error messages should specify the expected format. Running the program now ensures your validation logic is active.`,
+      },
+      {
+        step: 12,
+        title: 'Parsing the first number',
+        instruction: `Below the \`if\` block, extract index \`1\` from \`args\`, parse it as an \`f64\`, and store it in a variable named \`num1\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let num1: f64 = args[1].parse().expect('],
+              allRequired: true,
+              hints: ['Use: let num1: f64 = args[1].parse().expect("Invalid number");'],
+            },
+          ],
+          message: 'Convert the first argument to a float',
+        },
+        test: ['First number parsed correctly'],
+        what_you_learned: `Parsing transforms text data into numerical data ready for math.`,
+      },
+      {
+        step: 13,
+        title: 'Getting the operator',
+        instruction: `Extract index \`2\` from \`args\` and store it in a variable named \`operator\`. Use a reference (\`&\`).`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let operator = &args[2];'],
+              allRequired: true,
+              hints: ['Use: let operator = &args[2];'],
+            },
+          ],
+          message: 'Extract the operator string',
+        },
+        test: ['Operator variable created'],
+        what_you_learned: `Positional arguments are accessed by index in the order they were provided.`,
+      },
+      {
+        step: 14,
+        title: 'Parsing the second number',
+        instruction: `Extract index \`3\` from \`args\`, parse it as an \`f64\`, and store it in a variable named \`num2\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let num2: f64 = args[3].parse().expect('],
+              allRequired: true,
+              hints: ['Use: let num2: f64 = args[3].parse().expect("Invalid number");'],
+            },
+          ],
+          message: 'Convert the second argument to a float',
+        },
+        test: ['Second number parsed correctly'],
+        what_you_learned: `Every piece of numerical input from a CLI must be parsed before use.`,
+      },
+      {
+        step: 15,
+        title: 'Pattern matching',
+        instruction: `The \`match\` expression is Rust's most powerful way to handle branching. It matches a value against patterns.
+
+Example:
+\`\`\`rust
+match operator.as_str() {
+    "+" => // do something,
+    _ => // catch all,
+}
+\`\`\`
+
+Create a \`match\` block for \`operator.as_str()\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['match operator.as_str()'],
+              allRequired: true,
+              hints: ['Use match operator.as_str() { }'],
+            },
+          ],
+          message: 'Start the match expression',
+        },
+        test: ['Match expression initialized'],
+        what_you_learned: `Match expressions are safer than if/else chains because they check for exhaustiveness.`,
+      },
+      {
+        step: 16,
+        title: 'Implementing "add"',
+        instruction: `Inside the \`match\` block, add a pattern for \`"+"\`. Call your \`add\` function with \`num1\` and \`num2\`, and store the result in a variable named \`result\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['"+" => add(num1, num2),'],
+              allRequired: true,
+              hints: ['Add pattern: "+" => add(num1, num2)'],
+            },
+          ],
+          message: 'Handle the addition case',
+        },
+        test: ['Addition case handled in match'],
+        what_you_learned: `Blocks of code inside match arms execute based on the pattern match.`,
+      },
+      {
+        step: 17,
+        title: 'Subtraction and Multiplication',
+        instruction: `Add patterns for \`"-"\` and \`"*"\` that call your \`subtract\` and \`multiply\` functions.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['"-" => subtract(num1, num2)', '"*" => multiply(num1, num2)'],
+              allRequired: true,
+              hints: ['Add patterns for - and *'],
+            },
+          ],
+          message: 'Handle more operations',
+        },
+        test: ['Subtraction and Multiplication handled'],
+        what_you_learned: `Match arms are separated by commas and map a pattern to an action.`,
+      },
+      {
+        step: 18,
+        title: 'Test basic operations',
+        instruction: `Let's make sure the basic operations work! Try these commands:
+
+- \`cargo run -- 10 + 5\` should give you 15.00
+- \`cargo run -- 20 - 8\` should give you 12.00
+- \`cargo run -- 6 * 7\` should give you 42.00
+
+Note: Your code might not compile yet if you haven't added a catch-all (_) arm. Just add a temporary one like \`_ => 0.0,\` to test.`,
+        validation: {
+          rules: [
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              projectSpecific: '10 + 5',
+              hints: ['Run: cargo run -- 10 + 5'],
+            },
+          ],
+          message: 'Test the basic operations',
+        },
+        test: ['Basic operations tested'],
+        what_you_learned: `Testing early and often catches bugs when they are still small and easy to fix.`,
+      },
+      {
+        step: 19,
+        title: 'Division by Zero protection',
+        instruction: `Create a \`divide\` function that returns \`Option<f64>\`. Use an \`if\` statement: if the divisor is \`0.0\`, return \`None\`, otherwise return \`Some(a / b)\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['Option<f64>', 'None', 'Some(a / b)'],
+              allRequired: true,
+              hints: ['Define fn divide(a: f64, b: f64) -> Option<f64>'],
+            },
+          ],
+          message: 'Handle potential division by zero safely',
+        },
+        test: ['Divide function uses Option type'],
+        what_you_learned: `The Option type is Rust's way of encouraging you to handle the absence of a value explicitly.`,
+      },
+      {
+        step: 20,
+        title: 'Matching nested results',
+        instruction: `Add a pattern for \`"/"\` in your \`match\` block. Since \`divide\` returns an \`Option\`, you can't just assign it to \`result\` directly. You need to handle it.
+
+For now, call \`divide(num1, num2).expect("Division by zero")\` inside the match arm to "unwrap" the value or crash with an error.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['"/" => divide(num1, num2).expect('],
+              allRequired: true,
+              hints: ['Use: "/" => divide(num1, num2).expect("Cannot divide by zero"),'],
+            },
+          ],
+          message: 'Handle division in the match block',
+        },
+        test: ['Division handled and unwrapped'],
+        what_you_learned: `Unwrapping with \`expect\` is a quick way to handle results when you want to terminate on failure.`,
+      },
+      {
+        step: 21,
+        title: 'Test division',
+        instruction: `Let's test the division logic:
+
+- \`cargo run -- 10 / 4\` should give you 2.50
+- \`cargo run -- 10 / 0\` should show your "Cannot divide by zero" error
+
+This verifies both your success and error paths!`,
+        validation: {
+          rules: [
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              projectSpecific: '10 / 4',
+              hints: ['Run: cargo run -- 10 / 4'],
+            },
+          ],
+          message: 'Test division works correctly',
+        },
+        test: ['Division logic tested'],
+        what_you_learned: `Always test both the happy path (valid data) and error paths (invalid data) when dealing with operations that can fail.`,
+      },
+      {
+        step: 22,
+        title: 'The catch-all branch',
+        instruction: `Match expressions MUST cover all cases. Use the \`_\` pattern as a catch-all to print an "Invalid operator" message and exit.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['_ =>'],
+              allRequired: true,
+              hints: ['Add: _ => { println!("Error"); std::process::exit(1); }'],
+            },
+          ],
+          message: 'Add the default match case',
+        },
+        test: ['Default match arm implemented'],
+        what_you_learned: `The underscore (_) acts as a wildcard, ensuring your match block always has a path to follow.`,
+      },
+      {
+        step: 23,
+        title: 'Formatting the final output',
+        instruction: `After the match block, print the final result using \`println!\`. Use \`{:.2}\` in the placeholder to format the number to 2 decimal places. Run \`cargo run -- 10 / 3\` to see it in action!`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['{:.2}', 'result'],
+              allRequired: true,
+              hints: ['Use: println!("{} {} {} = {:.2}", num1, operator, num2, result);'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Perform a sample calculation to see the formatted output'],
+            },
+          ],
+          message: 'Display the formatted result and verify',
+        },
+        test: ['Output is formatted to two decimal places', 'Program was run'],
+        what_you_learned: `Advanced formatting strings allow you to control exactly how data is presented. Regular testing ensures your math and formatting are correct.`,
       },
     ],
     completion_message: `🎉 Excellent work! You've built a functional calculator!
@@ -995,264 +1410,503 @@ You win! Thanks for playing!`,
     steps: [
       {
         step: 1,
-        title: 'Set up your project',
-        instruction: `Create a new Rust project called \`text_adventure\` and navigate into its directory.`,
+        title: 'Project Setup',
+        instruction: `Create a new Rust project called \`text_adventure\`.`,
         validation: {
           rules: [
             {
               type: 'terminal_command',
               command: 'cargo new',
               projectSpecific: 'text_adventure',
-              hints: ['Type: cargo new text_adventure', 'Then: cd text_adventure'],
+              hints: ['Run: cargo new text_adventure'],
             },
           ],
-          message: 'Run cargo new text_adventure and cd text_adventure',
+          message: 'Initialize the text adventure project',
         },
-        test: ['Project directory exists', 'Code compiles'],
-        what_you_learned: `Created a new Rust project.`,
+        test: ['text_adventure directory exists'],
+        what_you_learned: `Standard setup for a new Rust command-line application.`,
       },
       {
         step: 2,
-        title: 'Create a player name variable',
-        instruction: `Rust has two main string types: \`String\` (owned, growable) and \`&str\` (borrowed string slice). The \`String\` type is owned, meaning you have full control over it and can modify it.
-
-Here is an example of creating a String:
-
-\`\`\`rust
-let name = String::from("Alice");
-println!("{}", name);
-\`\`\`
-
-The \`String::from()\` function creates an owned String from a string literal.
-
-In \`main\`, create a variable \`player_name\` that holds a String with your name.`,
+        title: 'Entering the Project',
+        instruction: `Change into the \`text_adventure\` directory.`,
         validation: {
           rules: [
             {
-              type: 'code_contains',
-              patterns: ['String::from', 'player_name', 'println!'],
-              allRequired: true,
-              hints: ['Add: let player_name = String::from("YourName");', 'Print it with println!'],
+              type: 'terminal_command',
+              command: 'cd text_adventure',
+              hints: ['Run: cd text_adventure'],
             },
           ],
-          message: 'Create player_name String and print it',
+          message: 'Navigate into the project folder',
         },
-        test: ['Code compiles', 'Creates String variable', 'Prints player name'],
-        what_you_learned: `String, an owned type that you can modify.`,
+        test: ['Terminal in text_adventure directory'],
+        what_you_learned: `Cargo commands must be run from within the project's root directory.`,
       },
       {
         step: 3,
-        title: 'Create a function that takes ownership',
-        instruction: `Create a function \`greet_player\` that takes a \`String\` parameter and prints a greeting.
+        title: 'Heap-allocated Strings',
+        instruction: `Rust has two main string types. \`String\` is growable and heap-allocated. We create one using \`String::from()\`.
 
-Notice: after calling this function, try to use \`player_name\` again in main. What happens?`,
-        explanation: `**Ownership Transfer:**
-
-When you pass a \`String\` to a function, ownership moves to that function. The original variable can no longer be used.
-
-\`\`\`rust
-fn greet_player(name: String) {
-    println!("Welcome, {}!", name);
-} // name is dropped here
-
-let player = String::from("Alice");
-greet_player(player);  // ownership moves to function
-// player can no longer be used here!
-\`\`\`
-
-This is Rust's way of ensuring memory safety - only one owner at a time.`,
-        task: `After calling the function, attempt to print \`player_name\` again in main. The compiler error shows Rust's ownership protection. Try calling the function twice with the same variable.`,
+Create a variable named \`player_name\` in \`main\` and initialize it with your name using \`String::from()\`.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['fn greet_player', 'String', 'player_name'],
+              patterns: ['let player_name = String::from("'],
               allRequired: true,
-              hints: ['Define fn greet_player(name: String)', 'Call greet_player(player_name)'],
+              hints: ['Example: let player_name = String::from("Alice");'],
             },
           ],
-          message: 'Create greet_player that takes String and call it with player_name',
+          message: 'Create an owned String variable',
         },
-        test: [
-          'Code compiles',
-          'Function takes String parameter',
-          'Ownership moves (original variable unusable)',
-        ],
-        what_you_learned: `Passing a String to a function transfers ownership.`,
+        test: ['player_name is a String'],
+        what_you_learned: `The String type owns its data and manages it on the heap.`,
       },
       {
         step: 4,
-        title: 'Use borrowing instead',
-        instruction: `Instead of taking ownership, functions can borrow values using references. The \`&\` symbol creates a reference (borrow), allowing the function to read the value without taking ownership.
-
-Here is an example:
-
-\`\`\`rust
-fn greet_player(name: &String) {
-    println!("Welcome, {}!", name);
-}
-
-let player = String::from("Alice");
-greet_player(&player);  // pass a reference
-// player is still usable here!
-\`\`\`
-
-The function can read the value but doesn't own it, so the original variable remains usable.
-
-Modify \`greet_player\` to take a \`&String\` (a reference) instead of \`String\`. Call it with \`greet_player(&player_name)\` and notice that \`player_name\` is still usable afterward.`,
+        title: 'Printing owned data',
+        instruction: `Print a welcome message that includes the \`player_name\`. Then run \`cargo run\` to see your first output.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['&String', '&player_name'],
+              patterns: ['println!', 'player_name'],
               allRequired: true,
-              hints: ['Change parameter to name: &String', 'Call with greet_player(&player_name)'],
+              hints: ['Use: println!("Welcome, {}!", player_name);'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Run the program to see the welcome message'],
             },
           ],
-          message: 'Change greet_player to take &String and call with &player_name',
+          message: 'Print the player name and verify',
         },
-        test: [
-          'Code compiles',
-          'Function takes &String parameter',
-          'Original variable still usable after call',
-        ],
-        what_you_learned: `Borrowing - passing references instead of transferring ownership.`,
+        test: ['Welcome message printed to console', 'Program was run'],
+        what_you_learned: `The println! macro can borrow ownership of a variable to display it. Running your code early helps you see progress.`,
       },
       {
         step: 5,
-        title: 'Create game locations',
-        instruction: `Functions can return owned values. When a function returns a \`String\`, the caller receives ownership of that String.
-
-Here is an example:
-
-\`\`\`rust
-fn describe_location(name: &str) -> String {
-    format!("You are in a {}.", name)
-}
-
-let description = describe_location("forest");
-// description now owns the String
-\`\`\`
-
-Create a function \`describe_location\` that takes a location name and returns a description String. Create a few locations (like "forest", "cave", "castle") and call the function to get their descriptions. Store the descriptions in variables.`,
+        title: 'Creating a Greeting Function',
+        instruction: `Define a function named \`greet\` above \`main\` that takes one parameter named \`name\` of type \`String\`. Leave the body empty for now.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['fn describe_location', '-> String', 'format!'],
+              patterns: ['fn greet(name: String)'],
               allRequired: true,
-              hints: ['Define fn describe_location(name: &str) -> String', 'Use format! to build description', 'Return the String'],
+              hints: ['Add: fn greet(name: String) { }'],
             },
           ],
-          message: 'Create describe_location that returns String',
+          message: 'Define a function that takes ownership',
         },
-        test: [
-          'Code compiles',
-          'Function returns String',
-          'Can store returned values',
-        ],
-        what_you_learned: `Functions can return owned values, transferring ownership to the caller.`,
+        test: ['greet function exists with correct signature'],
+        what_you_learned: `Functions can take full ownership of the data passed to them.`,
       },
       {
         step: 6,
-        title: 'Create a choice system',
-        instruction: `As Strings move through your program, ownership transfers from one owner to another. Values are created with ownership, moved to functions, returned with new ownership, and eventually dropped when no longer needed.
-
-Create a function \`make_choice\` that takes a question and two options, then returns the player's choice. For now, you can return a placeholder String like \`String::from("1")\`.
-
-The function should print the question and options, then return a String representing the choice.`,
+        title: 'Moving Ownership',
+        instruction: `Inside \`main\`, call the \`greet\` function and pass \`player_name\` as the argument.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['fn make_choice', '-> String', 'println!'],
+              patterns: ['greet(player_name)'],
               allRequired: true,
-              hints: ['Define fn make_choice that takes question and options', 'Print question and options', 'Return String like String::from("1")'],
+              hints: ['Add: greet(player_name); inside main'],
             },
           ],
-          message: 'Create make_choice function that prints and returns choice',
+          message: 'Pass the String to the function',
         },
-        test: [
-          'Code compiles',
-          'Function handles choices',
-          'Ownership flows correctly',
-        ],
-        what_you_learned: `Ownership in action as values move through your program.`,
+        test: ['greet function called with player_name'],
+        what_you_learned: `When you pass a String to a function, ownership is "moved" to that function.`,
       },
       {
         step: 7,
-        title: 'Build the adventure flow',
-        instruction: `To modify a String, it must be declared as \`mut\`. Then you can use methods like \`push_str()\` to modify it in place.
+        title: 'Run and observe',
+        instruction: `Try running \`cargo run\` now. Your code should compile fine and print the welcome message.
 
-Here is an example:
-
-\`\`\`rust
-let mut location = String::from("forest");
-location.push_str(" entrance");  // modifies in place
-\`\`\`
-
-Alternatively, you can create new Strings:
-
-\`\`\`rust
-let location = String::from("forest");
-let new_location = format!("{} entrance", location);  // new String
-\`\`\`
-
-Create a simple adventure flow: start at a location, present choices, and move based on choices. Keep track of the current location as a String variable. Use your functions to describe locations and present choices.`,
+This works because we're not trying to use \`player_name\` after passing it to \`greet\`.`,
         validation: {
           rules: [
             {
-              type: 'code_contains',
-              patterns: ['String', 'location', 'make_choice', 'describe_location'],
-              allRequired: true,
-              hints: ['Keep location as a String variable', 'Call describe_location and make_choice', 'Update location based on choice'],
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Run: cargo run to see the welcome message'],
             },
           ],
-          message: 'Build adventure flow with location and choices',
+          message: 'Verify the program runs',
         },
-        test: [
-          'Code compiles',
-          'Adventure flow works',
-          'Location updates correctly',
-        ],
-        what_you_learned: `Built a working game while learning ownership rules naturally.`,
+        test: ['Program runs and prints welcome message'],
+        what_you_learned: `Moving ownership is valid as long as you don't try to use the moved value afterwards.`,
       },
       {
         step: 8,
-        title: 'Use string slices for efficiency',
-        instruction: `The \`&str\` type (string slice) is more flexible than \`&String\` for function parameters. It can accept both \`&String\` references and string literals like \`"forest"\`.
+        title: 'The Move Error',
+        instruction: `Try to print \`player_name\` again after the \`greet(player_name)\` call. Notice the compiler error.
 
-Here is an example:
+Rust prevents you from using data after it has been moved to ensure memory safety. Remove that second print statement to fix the code.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_reject_patterns',
+              patterns: ['greet(player_name);', 'println!', 'player_name'],
+              // We want to ensure they don't have println! after the move if it mentions player_name
+              hints: ['If you try to use player_name after greet(player_name), it fails.'],
+            },
+          ],
+          message: 'Fix the move error by removing the invalid usage',
+        },
+        test: ['Code compiles (invalid usage removed)'],
+        what_you_learned: `Rust's borrow checker ensures that data has only one owner at a time.`,
+      },
+      {
+        step: 9,
+        title: 'Borrowing with References',
+        instruction: `Instead of moving, we can "borrow" data. Use the \`&\` symbol to create a reference.
 
-\`\`\`rust
-fn describe(name: &str) {
-    println!("Location: {}", name);
-}
-
-describe("forest");           // string literal works
-describe(&String::from("forest"));  // &String also works
-\`\`\`
-
-\`&str\` is the idiomatic type for string function parameters in Rust.
-
-Refactor your functions to use \`&str\` instead of \`&String\` where possible.`,
+Change the \`greet\` function signature to take \`name: &String\` instead of \`String\`.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['&str'],
+              patterns: ['fn greet(name: &String)'],
               allRequired: true,
-              hints: ['Change function parameters from &String to &str', '&str accepts both &String and string literals'],
+              hints: ['Change to: fn greet(name: &String)'],
             },
           ],
-          message: 'Use &str for function parameters where possible',
+          message: 'Update function to use a reference',
         },
-        test: [
-          'Code compiles',
-          'Functions use &str parameters',
-          'Can pass both &String and literals',
-        ],
-        what_you_learned: `\`&str\` is the idiomatic type for string function parameters.`,
+        test: ['greet function now uses a reference'],
+        what_you_learned: `References allow you to access data without taking ownership.`,
+      },
+      {
+        step: 10,
+        title: 'Passing a Reference',
+        instruction: `Update the call in \`main\` to pass a reference by adding \`&\` before \`player_name\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['greet(&player_name)'],
+              allRequired: true,
+              hints: ['Change to: greet(&player_name);'],
+            },
+          ],
+          message: 'Pass a reference to the function',
+        },
+        test: ['Function call updated to pass &player_name'],
+        what_you_learned: `The & symbol creates a borrow that lasts only for the duration of the function call.`,
+      },
+      {
+        step: 11,
+        title: 'Verifying Continued Ownership',
+        instruction: `Now that you are borrowing, you can use \`player_name\` again! Add a \`println!\` statement after the \`greet(&player_name)\` call to print the name again. Run \`cargo run\` to prove the code works.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['greet(&player_name);', 'println!', 'player_name'],
+              allRequired: true,
+              hints: ['Add println! after the call to prove player_name is still valid'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Run the program to verify borrowing behavior'],
+            },
+          ],
+          message: 'Use the variable after borrowing and verify',
+        },
+        test: ['Code compiles and name is printed twice', 'Program was run'],
+        what_you_learned: `Borrowing keeps the original owner in control, allowing the variable to be reused. Seeing it run proves the borrow checker is happy!`,
+      },
+      {
+        step: 12,
+        title: 'The &str Type',
+        instruction: `String literals like \`"forest"\` are of type \`&str\` (string slices). They are immutable references to text.
+
+Define a function \`describe_location\` that takes a parameter \`loc: &str\` and returns a \`String\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['fn describe_location(loc: &str) -> String'],
+              allRequired: true,
+              hints: ['Add: fn describe_location(loc: &str) -> String { ... }'],
+            },
+          ],
+          message: 'Define a function using string slices',
+        },
+        test: ['describe_location function detected'],
+        what_you_learned: `&str is more efficient and flexible than &String for function parameters.`,
+      },
+      {
+        step: 13,
+        title: 'Creating Descriptions',
+        instruction: `Inside \`describe_location\`, use the \`format!\` macro to return a string like \`"You are in the {}."\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['format!', 'loc'],
+              allRequired: true,
+              hints: ['Inside the function: format!("You are in the {}.", loc)'],
+            },
+          ],
+          message: 'Implement the location description logic',
+        },
+        test: ['Function returns a formatted String'],
+        what_you_learned: `The format! macro creates a new owned String by interpolating values.`,
+      },
+      {
+        step: 14,
+        title: 'Tracking Location',
+        instruction: `In \`main\`, create a mutable variable \`current_location\` and initialize it with \`String::from("forest")\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let mut current_location = String::from("forest")'],
+              allRequired: true,
+              hints: ['Use: let mut current_location = String::from("forest");'],
+            },
+          ],
+          message: 'Initialize the player location',
+        },
+        test: ['current_location is mutable'],
+        what_you_learned: `Variables must be marked as mut if they will change over time.`,
+      },
+      {
+        step: 15,
+        title: 'Deref Coercion',
+        instruction: `Call \`describe_location\` passing \`&current_location\` and print the result.
+
+Wait, \`describe_location\` takes \`&str\` but we are passing \`&String\`. Rust automatically converts \`&String\` to \`&str\`. This is called deref coercion.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['describe_location(&current_location)'],
+              allRequired: true,
+              hints: ['Add: println!("{}", describe_location(&current_location));'],
+            },
+          ],
+          message: 'Use deref coercion to pass a String as a slice',
+        },
+        test: ['Location description printed using &String'],
+        what_you_learned: `Deref coercion makes Rust APIs more ergonomic by automatically converting between related types.`,
+      },
+      {
+        step: 16,
+        title: 'Capturing Input',
+        instruction: `Import \`std::io\` at the top of your file.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['use std::io;'],
+              allRequired: true,
+              hints: ['Add at line 1: use std::io;'],
+            },
+          ],
+          message: 'Import the I/O module',
+        },
+        test: ['std::io is imported'],
+        what_you_learned: `The standard library provides tools for interacting with the outside world, like the terminal.`,
+      },
+      {
+        step: 17,
+        title: 'The Input Buffer',
+        instruction: `In \`main\`, create a new empty \`String\` named \`choice\` using \`String::new()\`. Make it mutable.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let mut choice = String::new()'],
+              allRequired: true,
+              hints: ['Use: let mut choice = String::new();'],
+            },
+          ],
+          message: 'Prepare a buffer for user input',
+        },
+        test: ['choice variable initialized as empty String'],
+        what_you_learned: `An empty String can act as a buffer to receive data from standard input.`,
+      },
+      {
+        step: 18,
+        title: 'Reading from Stdin',
+        instruction: `Use \`io::stdin().read_line(&mut choice).expect("Failed to read line");\` to get input from the user.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['io::stdin().read_line(&mut choice)'],
+              allRequired: true,
+              hints: ['Add the read_line call in main'],
+            },
+          ],
+          message: 'Capture user input from the terminal',
+        },
+        test: ['stdin() is used to read input'],
+        what_you_learned: `The read_line method requires a mutable reference because it modifies the string buffer.`,
+      },
+      {
+        step: 19,
+        title: 'The Mutable Borrow Rule',
+        instruction: `While you have a mutable borrow (\`&mut choice\`), you cannot have any other borrows of that same variable. This prevents data races.
+        
+        Add a print statement: \`println!("You chose: {}", choice);\` AFTER the \`read_line\` call. Run \`cargo run\` and type something in the terminal!`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['println!', 'choice'],
+              allRequired: true,
+              hints: ['Print the choice after reading it'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Test the input by running and typing a value'],
+            },
+          ],
+          message: 'Print the user choice and verify input',
+        },
+        test: ['User input is printed correctly', 'Program was run'],
+        what_you_learned: `Rust ensures that you can't read from a variable while it is being written to elsewhere. Interacting with your program makes it feel real!`,
+      },
+      {
+        step: 20,
+        title: 'Cleaning Input Strings',
+        instruction: `\`read_line\` includes the newline character (\`\\n\`). Use \`.trim()\` to remove whitespace and store the result in a new variable named \`choice_clean\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let choice_clean = choice.trim()'],
+              allRequired: true,
+              hints: ['Use: let choice_clean = choice.trim();'],
+            },
+          ],
+          message: 'Trim the whitespace from input',
+        },
+        test: ['Choice is trimmed of newlines'],
+        what_you_learned: `The trim method returns a string slice (&str) that points into the original String.`,
+      },
+      {
+        step: 21,
+        title: 'Decision Branching',
+        instruction: `Use a \`match\` expression on \`choice_clean\`. Handle \`"1"\` and \`"2"\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['match choice_clean', '"1" =>', '"2" =>'],
+              allRequired: true,
+              hints: ['Add: match choice_clean { "1" => ..., "2" => ..., _ => ... }'],
+            },
+          ],
+          message: 'Start the decision matching',
+        },
+        test: ['Match expression added for choices'],
+        what_you_learned: `Pattern matching works on string slices just as it does on numbers or enums.`,
+      },
+      {
+        step: 22,
+        title: 'Updating the Location',
+        instruction: `Inside the match arms, update \`current_location\` to \`"cave"\` for choice "1" and \`"castle"\` for choice "2".`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['current_location = String::from("cave")', 'current_location = String::from("castle")'],
+              allRequired: true,
+              hints: ['Update the location inside the match arms'],
+            },
+          ],
+          message: 'Update the game state based on choice',
+        },
+        test: ['Location updates correctly based on input'],
+        what_you_learned: `Re-assigning a variable transfers ownership of the new value and drops the old one.`,
+      },
+      {
+        step: 23,
+        title: 'Handling the Unknown',
+        instruction: `Add a default arm \`_ =>\` to the match block that prints \`"Invalid choice"\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['_ => println!("Invalid choice")'],
+              allRequired: true,
+              hints: ['Add the catch-all case'],
+            },
+          ],
+          message: 'Handle unexpected user input',
+        },
+        test: ['Invalid input handled gracefully'],
+        what_you_learned: `The underscore (_) is a wildcard pattern that keeps your match expressions exhaustive.`,
+      },
+      {
+        step: 24,
+        title: 'String Transformation',
+        instruction: `Strings can be appended to. Use \`push_str()\` to add \`" adventure"\` to the end of your \`player_name\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['player_name.push_str(" adventure")'],
+              allRequired: true,
+              hints: ['Note: player_name must be let mut for this to work'],
+            },
+          ],
+          message: 'Modify the player name string',
+        },
+        test: ['player_name modified in place'],
+        what_you_learned: `push_str appends a string slice effectively into the owned String buffer.`,
+      },
+      {
+        step: 25,
+        title: 'Cloning for Resilience',
+        instruction: `Sometimes you NEED two owners. Use \`.clone()\` to create a deep copy of \`current_location\` and store it in \`last_location\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let last_location = current_location.clone()'],
+              allRequired: true,
+              hints: ['Example: let last_location = current_location.clone();'],
+            },
+          ],
+          message: 'Create a deep copy of a String',
+        },
+        test: ['Both variables coexist independently'],
+        what_you_learned: `Cloning duplicates the data on the heap, giving you two independent owners.`,
+      },
+      {
+        step: 26,
+        title: 'The Final Description',
+        instruction: `Print a final message describing the new location using the \`describe_location\` function. Run \`cargo run\` for the final playthrough of your game!`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['println!', 'describe_location'],
+              allRequired: true,
+              hints: ['Call describe_location and print the output'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Perform the final verification run'],
+            },
+          ],
+          message: 'Show the final result and verify the whole game',
+        },
+        test: ['New location is described to the user', 'Final run successful'],
+        what_you_learned: `Combining functions and ownership rules results in a safe, predictable program flow. You've built a real interactive game with ownership!`,
       },
     ],
     completion_message: `🎉 Great job! You've built a text adventure and learned ownership!
@@ -1272,11 +1926,7 @@ Ownership is Rust's superpower - it prevents memory bugs at compile time!`,
 - Use enums for locations instead of Strings`,
   },
 
-  // Note: Due to length constraints, I'm creating a condensed version
-  // The remaining projects (4-18) would follow the same detailed pattern
-  // Each with full step-by-step instructions, explanations, tests, etc.
-
-  // Project 4: Learn Structs by Building a Student Manager (condensed example)
+  // Project 4: Learn Structs by Building a Student Manager
   {
     id: 'project-004',
     title: 'Learn Structs by Building a Student Manager',
@@ -1284,173 +1934,458 @@ Ownership is Rust's superpower - it prevents memory bugs at compile time!`,
     type: 'practice',
     estimated_time: 90,
     difficulty: 'beginner',
-    concepts_taught: ['structs', 'methods', 'associated_functions', 'field_access'],
-    project_overview: `Build a system to manage student records. You'll learn how to define structs, create instances, and implement methods.`,
-    why_this_project: `Structs let you group related data together. This project teaches you how to model real-world entities in Rust.`,
+    concepts_taught: [
+      'structs',
+      'methods',
+      'associated_functions',
+      'field_access',
+      'mutability',
+      'impl_blocks',
+    ],
+    project_overview: `Build a student management system where you'll define a Student struct, implement methods for summaries and grade updates, and manage a collection of students to calculate class averages.`,
+    why_this_project: `Structs are the foundation of data organization in Rust. This project teaches you how to model real-world entities and encapsulate data with behavior, a critical skill for any Rust developer.`,
     prerequisites: [
       'Completed: Learn Functions by Building a Calculator',
-      'Understanding of basic types',
+      'Understanding of basic types and ownership',
     ],
     preview: {
       mode: 'onLoad',
       title: 'Student Manager',
-      description: 'You will build a system to manage student records, learning how to define structs, create instances, and implement methods.',
+      description: 'A tool to manage student records and calculate performance statistics.',
       example_output: `$ cargo run
 
 Student Manager
 ===============
 
-Student: Alice (ID: 1, Grade: 95)
-Student: Bob (ID: 2, Grade: 87)
-Student: Charlie (ID: 3, Grade: 92)
+Student: Alice (ID: 1, Grade: 95.00)
+Student: Bob (ID: 2, Grade: 87.50)
+Student: Charlie (ID: 3, Grade: 92.10)
 
-Average grade: 91.33`,
+Average grade: 91.53`,
     },
     steps: [
       {
         step: 1,
-        title: 'Define a Student struct',
-        instruction: `Structs let you group related data together. They're defined using the \`struct\` keyword followed by the struct name and a list of fields.
-
-Here is an example of a struct:
-
-\`\`\`rust
-struct Person {
-    name: String,
-    age: u32,
-}
-\`\`\`
-
-Create a struct called \`Student\` with fields: \`name: String\`, \`age: u32\`, and \`grade: f64\`.`,
+        title: 'Project Setup',
+        instruction: `Create a new Rust project called \`student_manager\`.`,
         validation: {
           rules: [
             {
-              type: 'code_contains',
-              patterns: ['struct Student', 'name: String', 'age: u32', 'grade: f64'],
-              allRequired: true,
-              hints: ['Define struct Student { name: String, age: u32, grade: f64 }'],
+              type: 'terminal_command',
+              command: 'cargo new',
+              projectSpecific: 'student_manager',
+              hints: ['Run: cargo new student_manager'],
             },
           ],
-          message: 'Define Student struct with name, age, grade fields',
+          message: 'Initialize the student manager project',
         },
-        test: ['Code compiles', 'Student struct exists with correct fields'],
-        what_you_learned: `How to define structs to group related data.`,
+        test: ['student_manager directory exists'],
+        what_you_learned: `Setting up a clean workspace for learning data structures.`,
       },
       {
         step: 2,
-        title: 'Create a Student instance',
-        instruction: `To create an instance of a struct, you provide values for each field. You can then access fields using dot notation.
-
-Here is an example:
-
-\`\`\`rust
-let person = Person {
-    name: String::from("Bob"),
-    age: 25,
-};
-println!("{}", person.name);  // Access field with dot notation
-\`\`\`
-
-In main, create a Student instance with values for all fields. Access and print each field using dot notation.`,
+        title: 'Entering the Project',
+        instruction: `Navigate into the \`student_manager\` directory.`,
         validation: {
           rules: [
             {
-              type: 'code_contains',
-              patterns: ['Student {', 'println!', '.name', '.age', '.grade'],
-              allRequired: true,
-              hints: ['Create let student = Student { name: String::from(...), age: ..., grade: ... };', 'Print with student.name, student.age, student.grade'],
+              type: 'terminal_command',
+              command: 'cd student_manager',
+              hints: ['Run: cd student_manager'],
             },
           ],
-          message: 'Create Student instance and print fields',
+          message: 'Navigate into the project folder',
         },
-        test: ['Code compiles', 'Can create Student instance'],
-        what_you_learned: `How to create struct instances.`,
+        test: ['Terminal in student_manager directory'],
+        what_you_learned: `Cargo commands only work from within the project's root folder.`,
       },
       {
         step: 3,
-        title: 'Implement methods',
-        instruction: `Methods are functions associated with a type. They're defined in an \`impl\` block and take \`&self\` as the first parameter, which refers to the instance the method is called on.
-
-Here is an example:
-
-\`\`\`rust
-impl Person {
-    fn greet(&self) {
-        println!("Hello, I'm {}", self.name);
-    }
-}
-\`\`\`
-
-Add an \`impl\` block for \`Student\` with a method \`display_info\` that prints the student's information.`,
+        title: 'Defining a Struct',
+        instruction: `Structs let you group related data together. Define an empty struct named \`Student\` above your \`main\` function.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['impl Student', 'fn display_info', '&self'],
+              patterns: ['struct Student { }'],
               allRequired: true,
-              hints: ['Add impl Student { fn display_info(&self) { ... } }', 'Print self.name, self.age, self.grade'],
+              hints: ['Add: struct Student { } above main'],
             },
           ],
-          message: 'Add impl Student with display_info method',
+          message: 'Define the Student struct structure',
         },
-        test: ['Code compiles', 'Method exists and can be called'],
-        what_you_learned: `How to implement methods on structs.`,
+        test: ['Student struct exists'],
+        what_you_learned: `Structs are the primary way to define custom types in Rust.`,
       },
       {
         step: 4,
-        title: 'Add an associated function',
-        instruction: `Associated functions are functions defined in an \`impl\` block that don't take \`self\` as a parameter. They're often used as constructors.
-
-Here is an example:
-
-\`\`\`rust
-impl Person {
-    fn new(name: String, age: u32) -> Person {
-        Person { name, age }
-    }
-}
-\`\`\`
-
-You call associated functions using \`::\` (like \`Person::new()\`), while methods use \`.\` (like \`person.greet()\`).
-
-Add an associated function \`new\` to \`Student\` that creates a new Student instance.`,
+        title: 'Name and ID',
+        instruction: `Add two fields to \`Student\`: \`name\` as a \`String\` and \`id\` as a \`u32\`.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['fn new', 'Student {', 'Student::new'],
+              patterns: ['name: String', 'id: u32'],
               allRequired: true,
-              hints: ['Add fn new(name: String, age: u32, grade: f64) -> Student', 'Return Student { name, age, grade }', 'Call with Student::new(...)'],
+              hints: ['Example: name: String, id: u32'],
             },
           ],
-          message: 'Add Student::new associated function',
+          message: 'Add identifier fields to the struct',
         },
-        test: ['Code compiles', 'Can call Student::new()'],
-        what_you_learned: `Associated functions (like constructors).`,
+        test: ['Student struct has name and id'],
+        what_you_learned: `Fields give your struct its properties and state.`,
       },
       {
         step: 5,
-        title: 'Create multiple students',
-        instruction: `You can store multiple struct instances in a \`Vec\`. Use \`push()\` to add items, and iterate over them with a \`for\` loop.
-
-Create a \`Vec<Student>\` and add multiple students using \`Student::new()\`. Then iterate over the vector and call each student's \`display_info\` method.`,
+        title: 'Adding the Grade',
+        instruction: `Add one more field: \`grade\` of type \`f64\`.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['Vec<Student>', 'push(', 'display_info'],
+              patterns: ['grade: f64'],
               allRequired: true,
-              hints: ['Create let mut students = Vec::new() or vec![]', 'students.push(Student::new(...))', 'for student in &students { student.display_info() }'],
+              hints: ['Add: grade: f64'],
             },
           ],
-          message: 'Create Vec<Student>, add students, iterate and call display_info',
+          message: 'Add the grade field',
         },
-        test: ['Code compiles', 'Can store multiple students', 'Can iterate and display'],
-        what_you_learned: `How to work with collections of structs.`,
+        test: ['Student struct has all three fields'],
+        what_you_learned: `You can mix different types within a single struct.`,
+      },
+      {
+        step: 6,
+        title: 'Instantiating a Student',
+        instruction: `In \`main\`, create a variable \`alice\` and initialize it with your name (as a \`String\`), ID \`1\`, and grade \`95.0\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let alice = Student {'],
+              allRequired: true,
+              hints: ['Use: let alice = Student { name: String::from("Alice"), id: 1, grade: 95.0 };'],
+            },
+          ],
+          message: 'Create a struct instance',
+        },
+        test: ['alice variable created properly'],
+        what_you_learned: `Creating an instance requires providing values for all defined fields.`,
+      },
+      {
+        step: 7,
+        title: 'Accessing Fields',
+        instruction: `Print Alice's name and grade using dot notation. Then, run \`cargo run\` to verify the output.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['alice.name', 'alice.grade'],
+              allRequired: true,
+              hints: ['Use: println!("{} - {}", alice.name, alice.grade);'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Run the program to see Alice\'s details'],
+            },
+          ],
+          message: 'Access field values and verify by running the program',
+        },
+        test: ['Fields accessed and printed', 'Program executed'],
+        what_you_learned: `The dot (.) operator is used to read individual values from a struct instance. Running your code regularly helps catch errors early.`,
+      },
+      {
+        step: 8,
+        title: 'Immutability Error',
+        instruction: `Try to update the grade: \`alice.grade = 100.0;\`. You will see a compiler error because variables are immutable by default. Fix this by adding \`mut\` to Alice's declaration.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let mut alice = Student'],
+              allRequired: true,
+              hints: ['Change to: let mut alice = ...'],
+            },
+          ],
+          message: 'Make the struct instance mutable',
+        },
+        test: ['Variable is now mutable'],
+        what_you_learned: `Mutability in Rust applies to the entire struct, or not at all.`,
+      },
+      {
+        step: 9,
+        title: 'The Implementation Block',
+        instruction: `To define behavior (methods) for a struct, use an \`impl\` block. Create an \`impl Student { }\` block.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['impl Student { }'],
+              allRequired: true,
+              hints: ['Add: impl Student { } below the struct definition'],
+            },
+          ],
+          message: 'Create an implementation block',
+        },
+        test: ['impl block detected'],
+        what_you_learned: `Implementation blocks separate the data layout from the logic.`,
+      },
+      {
+        step: 10,
+        title: 'Defining a Method',
+        instruction: `Inside the \`impl\` block, define a method \`summary\` that takes \`&self\`. Leave the body empty for now.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['fn summary(&self)'],
+              allRequired: true,
+              hints: ['Add: fn summary(&self) { }'],
+            },
+          ],
+          message: 'Define a method signature',
+        },
+        test: ['summary method exists'],
+        what_you_learned: `\&self allows the method to read from the instance without taking ownership.`,
+      },
+      {
+        step: 11,
+        title: 'The self Keyword',
+        instruction: `In \`summary\`, print the student's name and grade using the \`self\` keyword.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['self.name', 'self.grade'],
+              allRequired: true,
+              hints: ['Example: println!("{} has grade {}", self.name, self.grade);'],
+            },
+          ],
+          message: 'Use self to access instance data',
+        },
+        test: ['Method logic is correct'],
+        what_you_learned: `self refers to the specific instance the method was called on.`,
+      },
+      {
+        step: 12,
+        title: 'Calling the Method',
+        instruction: `In \`main\`, call \`alice.summary()\`. Then run \`cargo run\` to see the method's output.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['alice.summary()'],
+              allRequired: true,
+              hints: ['Use dot notation to invoke methods'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Verify the method behavior in the terminal'],
+            },
+          ],
+          message: 'Invoke the method and verify execution',
+        },
+        test: ['summary method called successfully', 'Program was run'],
+        what_you_learned: `Methods feel like field access but execute behavior. Running the code confirms the behavior works as expected.`,
+      },
+      {
+        step: 13,
+        title: 'Mutable Methods',
+        instruction: `Define a method \`update_grade\` that takes \`&mut self\` and a new grade as an argument.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['fn update_grade(&mut self', 'self.grade ='],
+              allRequired: true,
+              hints: ['Use &mut self to modify the struct from within a method'],
+            },
+          ],
+          message: 'Create a method that modifies state',
+        },
+        test: ['update_grade method works'],
+        what_you_learned: `\&mut self allows a method to safely mutate the instance's fields.`,
+      },
+      {
+        step: 14,
+        title: 'Associated Functions',
+        instruction: `Associated functions don't take \`self\`. They are called with \`::\`. Add a function \`new\` to the \`impl\` block.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['fn new(', '-> Student'],
+              allRequired: true,
+              hints: ['Associated functions are often used as constructors'],
+            },
+          ],
+          message: 'Define an associated function',
+        },
+        test: ['new function detected'],
+        what_you_learned: `Associated functions belong to the type itself, not a specific instance.`,
+      },
+      {
+        step: 15,
+        title: 'The Constructor Pattern',
+        instruction: `In \`new\`, return a \`Student\` instance initialized with the parameters provided to the function.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['Student {', 'name,', 'id,', 'grade', '}'],
+              allRequired: true,
+              hints: ['Use field initialization shorthand if names match'],
+            },
+          ],
+          message: 'Implement the constructor logic',
+        },
+        test: ['new() returns a valid Student'],
+        what_you_learned: `Initialization shorthand makes constructors cleaner when parameter names match field names.`,
+      },
+      {
+        step: 16,
+        title: 'Simplified Creation',
+        instruction: `In \`main\`, replace Alice's initialization with a call to \`Student::new()\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['Student::new('],
+              allRequired: true,
+              hints: ['Use: let mut alice = Student::new(...)'],
+            },
+          ],
+          message: 'Use the associated function in main',
+        },
+        test: ['Student::new used for creation'],
+        what_you_learned: `Constructor functions centralize how your objects are created.`,
+      },
+      {
+        step: 17,
+        title: 'Creating Bob',
+        instruction: `Create another student named \`Bob\` using the \`new\` function. Then call \`bob.summary()\` and run \`cargo run\` to see both students.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let bob = Student::new(', 'bob.summary()'],
+              allRequired: true,
+              hints: ['Example: let bob = Student::new(String::from("Bob"), 2, 87.5);', 'Call bob.summary();'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Observe both student summaries in the terminal'],
+            },
+          ],
+          message: 'Create a second student, use summary, and verify',
+        },
+        test: ['Bob instance created', 'Program was run'],
+        what_you_learned: `Multiple instances of the same struct can coexist independently.`,
+      },
+      {
+        step: 18,
+        title: 'The Student Collection',
+        instruction: `Create a mutable \`Vec<Student>\` named \`students\` and add both Alice and Bob to it.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let mut students: Vec<Student> =', 'students.push('],
+              allRequired: true,
+              hints: ['Use: students.push(alice); students.push(bob);'],
+            },
+          ],
+          message: 'Store students in a vector',
+        },
+        test: ['Vector contains two students'],
+        what_you_learned: `Vectors can store complex custom types like structs.`,
+      },
+      {
+        step: 19,
+        title: 'Iterating over Structs',
+        instruction: `Use a \`for\` loop to call \`summary()\` on every student in the vector. Hint: borrow with \`&students\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['for student in &students', 'student.summary()'],
+              allRequired: true,
+              hints: ['Always borrow in loops unless you want to move ownership'],
+            },
+          ],
+          message: 'Loop through the students',
+        },
+        test: ['All summaries printed'],
+        what_you_learned: `Iterating over references allows you to inspect each item without consuming the vector.`,
+      },
+      {
+        step: 20,
+        title: 'Grade Calculation',
+        instruction: `Calculate the total sum of all grades in the vector using a loop.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let mut total = 0.0', 'total += student.grade'],
+              allRequired: true,
+              hints: ['Accumulate field values from each struct in the loop'],
+            },
+          ],
+          message: 'Calculate total grades',
+        },
+        test: ['Total sum is correct'],
+        what_you_learned: `You can access fields of items within a collection while iterating.`,
+      },
+      {
+        step: 21,
+        title: 'Class Average',
+        instruction: `Print the average grade. Note: convert \`students.len()\` to \`f64\` using \`as f64\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['/ students.len() as f64'],
+              allRequired: true,
+              hints: ['Math in Rust requires both sides to be the same numerical type'],
+            },
+          ],
+          message: 'Compute and print average',
+        },
+        test: ['Average calculation is accurate'],
+        what_you_learned: `Explicit casting with "as" is necessary for math between integers and floats.`,
+      },
+      {
+        step: 22,
+        title: 'Efficiency Check',
+        instruction: `Add one more student directly into the vector in a single line without using a separate variable. Finally, run \`cargo run\` to see the final output with all students and the average!`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['students.push(Student::new('],
+              allRequired: true,
+              hints: ['Example: students.push(Student::new(String::from("Charlie"), 3, 92.1));'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Run for the final project verification'],
+            },
+          ],
+          message: 'Push an anonymous instance and run the final program',
+        },
+        test: ['Third student added directly', 'Final verification complete'],
+        what_you_learned: `You can pass the result of a function directly as an argument without naming it first. Continuous testing leads to robust software!`,
       },
     ],
-    completion_message: `🎉 You've learned structs! They're the foundation for organizing data in Rust.`,
-    extensions: `Add methods to update grades, calculate averages, etc.`,
+    completion_message: `🎉 You've mastered structs! They are the primary way you'll model data in all your future Rust programs.`,
+    extensions: `**Challenge yourself:**
+- Add a field for the student's age
+- Create a method to check if a student is passing (grade > 60)
+- Add a function to find the top performing student
+- Support multiple subjects per student using a Hashmap`,
   },
 
   // Project 5: Learn Enums by Building a Traffic Light Simulator
@@ -1459,488 +2394,959 @@ Create a \`Vec<Student>\` and add multiple students using \`Student::new()\`. Th
     title: 'Learn Enums by Building a Traffic Light Simulator',
     section: 1,
     type: 'practice',
-    estimated_time: 60,
+    estimated_time: 90,
     difficulty: 'beginner',
-    concepts_taught: ['enums', 'pattern_matching', 'enum_methods', 'match_expression'],
-    project_overview: `Build a traffic light simulator that cycles through red, yellow, and green. You'll learn about enums - Rust's way of defining a type that can be one of several variants.`,
-    why_this_project: `Enums are perfect for representing states or choices. Traffic lights are a perfect real-world example of an enum - a light can be Red, Yellow, or Green, but never multiple at once.`,
+    concepts_taught: [
+      'enums',
+      'variants',
+      'pattern_matching',
+      'impl_enums',
+      'debug_trait',
+      'methods',
+    ],
+    project_overview: `You will build a traffic light simulator that cycles through Red, Yellow, and Green states. You'll learn how to represent bounded sets of values using enums and how to implement logic for them using match and methods.`,
+    why_this_project: `Enums are one of Rust's most powerful features. They allow you to represent data that can be one of several distinct variants, which is perfect for modelling states like traffic lights, game levels, or network status.`,
     prerequisites: [
       'Completed: Learn Structs by Building a Student Manager',
-      'Understanding of basic types',
+      'Basic understanding of functions and match',
     ],
     preview: {
       mode: 'onLoad',
       title: 'Traffic Light Simulator',
-      description: 'You will build a traffic light simulator that cycles through red, yellow, and green, learning about enums and pattern matching.',
+      description: 'A simulator that cycles through traffic light states using enums and methods.',
       example_output: `$ cargo run
 
-Traffic Light Simulator
-=======================
-
-Current state: 🔴 Red
-Current state: 🟡 Yellow
-Current state: 🟢 Green
-Current state: 🔴 Red
-
-Cycle complete!`,
+Traffic Light: Red
+Duration: 30 seconds
+Next state: Green
+---
+Traffic Light: Green
+Duration: 25 seconds
+Next state: Yellow`,
     },
     steps: [
       {
         step: 1,
-        title: 'Define a TrafficLight enum',
-        instruction: `Enums (enumerations) define a type that can be one of several variants. Each variant is a different possible value. Traffic lights are perfect for enums - they can only be one color at a time.
-
-Here is an example of an enum:
-
-\`\`\`rust
-enum Direction {
-    North,
-    South,
-    East,
-    West,
-}
-\`\`\`
-
-Create an enum called \`TrafficLight\` with three variants: \`Red\`, \`Yellow\`, and \`Green\`.`,
+        title: 'Project Initialization',
+        instruction: `Create a new Rust project called \`traffic_light\`.`,
         validation: {
           rules: [
             {
-              type: 'code_contains',
-              patterns: ['enum TrafficLight', 'Red', 'Yellow', 'Green'],
-              allRequired: true,
-              hints: ['Define enum TrafficLight { Red, Yellow, Green }'],
+              type: 'terminal_command',
+              command: 'cargo new',
+              projectSpecific: 'traffic_light',
+              hints: ['Run: cargo new traffic_light'],
             },
           ],
-          message: 'Define TrafficLight enum with Red, Yellow, Green variants',
+          message: 'Initialize the traffic_light project',
         },
-        test: ['Code compiles', 'TrafficLight enum exists with three variants'],
-        what_you_learned: `How to define enums to represent a fixed set of possibilities.`,
+        test: ['traffic_light directory exists'],
+        what_you_learned: `Starting a new project workspace for learning enums.`,
       },
       {
         step: 2,
-        title: 'Create a traffic light instance',
-        instruction: `To create an instance of an enum variant, use the enum name followed by \`::\` and the variant name.
-
-Here is an example:
-
-\`\`\`rust
-let direction = Direction::North;
-\`\`\`
-
-In main, create a variable holding a \`TrafficLight::Red\` value and print a message.`,
+        title: 'Entering the Project',
+        instruction: `Navigate into the \`traffic_light\` directory.`,
         validation: {
           rules: [
             {
-              type: 'code_contains',
-              patterns: ['TrafficLight::Red', 'println!'],
-              allRequired: true,
-              hints: ['Add: let light = TrafficLight::Red;', 'Print with println!'],
+              type: 'terminal_command',
+              command: 'cd traffic_light',
+              hints: ['Run: cd traffic_light'],
             },
           ],
-          message: 'Create TrafficLight::Red and print a message',
+          message: 'Navigate into the project folder',
         },
-        test: ['Code compiles', 'Can create enum instance', 'Can print message'],
-        what_you_learned: `How to create instances of enum variants.`,
+        test: ['Terminal in traffic_light directory'],
+        what_you_learned: `Always ensure you are in the project root before running cargo commands.`,
       },
       {
         step: 3,
-        title: 'Use match to handle each variant',
-        instruction: `The \`match\` expression is perfect for enums - it forces you to handle every variant. Rust ensures you handle all cases, so you can't forget a variant.
-
-Here is an example:
-
-\`\`\`rust
-match direction {
-    Direction::North => println!("Going north"),
-    Direction::South => println!("Going south"),
-    Direction::East => println!("Going east"),
-    Direction::West => println!("Going west"),
-}
-\`\`\`
-
-Create a function \`get_duration\` that takes a \`TrafficLight\` and returns how long that light should stay on (in seconds). Use \`match\` to return different durations: Red: 30 seconds, Yellow: 5 seconds, Green: 25 seconds.`,
+        title: 'Defining an Enum',
+        instruction: `Enums (short for enumerations) allow you to define a type that can be one of several variants. Define an empty enum named \`TrafficLight\` above your \`main\` function.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['fn get_duration', 'match', 'TrafficLight::Red', 'TrafficLight::Yellow', 'TrafficLight::Green'],
+              patterns: ['enum TrafficLight { }'],
               allRequired: true,
-              hints: ['Define fn get_duration(light: TrafficLight) -> u32', 'Match on light, return 30, 5, 25 for Red, Yellow, Green'],
+              hints: ['Add: enum TrafficLight { } above main'],
             },
           ],
-          message: 'Create get_duration with match on TrafficLight',
+          message: 'Define the TrafficLight enum',
         },
-        test: [
-          'Code compiles',
-          'Uses match expression',
-          'Handles all three variants',
-          'Returns correct durations',
-        ],
-        what_you_learned: `How to use match with enums for exhaustive pattern matching.`,
+        test: ['TrafficLight enum detected'],
+        what_you_learned: `Enums are used to represent a value that can be one of several predefined options.`,
       },
       {
         step: 4,
-        title: 'Implement methods on the enum',
-        instruction: `Enums can have methods just like structs. You define them in an \`impl\` block and use \`match\` on \`self\` to handle each variant.
-
-Here is an example:
-
-\`\`\`rust
-impl Direction {
-    fn is_north(&self) -> bool {
-        match self {
-            Direction::North => true,
-            _ => false,
-        }
-    }
-}
-\`\`\`
-
-Add an \`impl\` block for \`TrafficLight\` with a method \`duration\` that returns the duration. Now you can call \`light.duration()\` instead of \`get_duration(light)\`.`,
+        title: 'The Red Variant',
+        instruction: `Add a variant named \`Red\` to your \`TrafficLight\` enum. Variants in Rust are typically UpperCamelCase.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['impl TrafficLight', 'fn duration', '&self'],
+              patterns: ['enum TrafficLight {', 'Red', '}'],
               allRequired: true,
-              hints: ['Add impl TrafficLight { fn duration(&self) -> u32 { ... } }', 'Use match on self'],
+              hints: ['Add Red inside the braces of the enum'],
             },
           ],
-          message: 'Add impl TrafficLight with duration method',
+          message: 'Add the Red variant',
         },
-        test: ['Code compiles', 'Method exists', 'Can call light.duration()'],
-        what_you_learned: `Enums can have methods, making them more powerful.`,
+        test: ['Red variant added to TrafficLight'],
+        what_you_learned: `Variants are the different forms an enum can take.`,
       },
       {
         step: 5,
-        title: 'Simulate the traffic light cycle',
-        instruction: `Create a function that simulates the traffic light cycling through states: Red -> Green -> Yellow -> Red.
-
-Print each state and its duration. Use a loop to cycle through a few times.`,
+        title: 'The Yellow Variant',
+        instruction: `Add the \`Yellow\` variant to the enum, separated by a comma.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['TrafficLight::', 'println!', 'for', 'loop'],
+              patterns: ['Red,', 'Yellow'],
               allRequired: true,
-              hints: ['Cycle through Red, Green, Yellow, Red', 'Print state and duration', 'Use for or loop'],
+              hints: ['Add: Yellow, after Red'],
             },
           ],
-          message: 'Simulate cycle: Red -> Green -> Yellow -> Red, print each',
+          message: 'Add the Yellow variant',
         },
-        test: [
-          'Code compiles',
-          'Cycles through all states',
-          'Prints correct durations',
-        ],
-        what_you_learned: `Built a working simulator using enums and pattern matching!`,
+        test: ['Yellow variant detected'],
+        what_you_learned: `Enum variants are separated by commas.`,
+      },
+      {
+        step: 6,
+        title: 'The Green Variant',
+        instruction: `Add the final \`Green\` variant to the enum.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['Yellow,', 'Green'],
+              allRequired: true,
+              hints: ['Add: Green to the enum list'],
+            },
+          ],
+          message: 'Add the Green variant',
+        },
+        test: ['All three variants (Red, Yellow, Green) exist'],
+        what_you_learned: `A complete enum represents all possible states of a system.`,
+      },
+      {
+        step: 7,
+        title: 'Instantiating an Enum',
+        instruction: `In \`main\`, create a variable named \`light\` and assign it the \`Red\` variant. Use the syntax \`TrafficLight::Red\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let light = TrafficLight::Red;'],
+              allRequired: true,
+              hints: ['Use: let light = TrafficLight::Red;'],
+            },
+          ],
+          message: 'Create an instance of an enum variant',
+        },
+        test: ['light variable holds TrafficLight::Red'],
+        what_you_learned: `Double colons (::) are used to access the variants defined within an enum's namespace.`,
+      },
+      {
+        step: 8,
+        title: 'The Printing Challenge',
+        instruction: `Try to print the \`light\` variable using \`println!("{}", light);\`. This will fail because our enum doesn't know how to format itself as text yet. Observe the compiler error.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['println!', 'light'],
+              allRequired: true,
+              hints: ['Add the println! statement to see the error'],
+            },
+          ],
+          message: 'Experience the need for formatting traits',
+        },
+        test: ['User added println! for the enum'],
+        what_you_learned: `By default, custom types in Rust don't implement the Display trait.`,
+      },
+      {
+        step: 9,
+        title: 'The Debug Trait',
+        instruction: `Rust provides a special trait called \`Debug\` for developers to inspect values. Add \`#[derive(Debug)]\` immediately above your \`enum TrafficLight\` definition.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['#[derive(Debug)]', 'enum TrafficLight'],
+              allRequired: true,
+              hints: ['Add the derive attribute on the line before the enum'],
+            },
+          ],
+          message: 'Enable debug printing for the enum',
+        },
+        test: ['Debug trait derived for TrafficLight'],
+        what_you_learned: `Deriving traits automatically implements common functionality for your custom types.`,
+      },
+      {
+        step: 10,
+        title: 'Printing with Debug',
+        instruction: `Update your \`println!\` to use the debug formatter \`{:?}\` instead of \`{}\`. Then run \`cargo run\` to see the output.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['println!', '{:?}', 'light'],
+              allRequired: true,
+              hints: ['Change the placeholder to {:?}'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Run the program to see the result'],
+            },
+          ],
+          message: 'Print the enum variant using debug formatting',
+        },
+        test: ['Code compiles and prints "Red"', 'Program was run'],
+        what_you_learned: `The {:?} formatter uses the Debug trait to display a representation of the value. Running it yourself confirms the trait is working.`,
+      },
+      {
+        step: 11,
+        title: 'Enum Logic with impl',
+        instruction: `Just like structs, enums can have \`impl\` blocks for methods. Create an \`impl TrafficLight { }\` block.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['impl TrafficLight { }'],
+              allRequired: true,
+              hints: ['Add: impl TrafficLight { }'],
+            },
+          ],
+          message: 'Create an implementation block for the enum',
+        },
+        test: ['impl block detected'],
+        what_you_learned: `Methods allow you to attach behavior directly to your enum variants.`,
+      },
+      {
+        step: 12,
+        title: 'The Duration Method',
+        instruction: `Inside the \`impl\` block, define a method named \`duration\` that takes \`&self\` and returns a \`u32\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['fn duration(&self) -> u32'],
+              allRequired: true,
+              hints: ['Add the method signature inside the block'],
+            },
+          ],
+          message: 'Define a method to get the light duration',
+        },
+        test: ['duration method signature is correct'],
+        what_you_learned: `Methods on enums use &self to refer to the current variant instance.`,
+      },
+      {
+        step: 13,
+        title: 'Matching on Self',
+        instruction: `Inside \`duration\`, use \`match self { }\` to handle the variants. Match expressions on enums must be exhaustive!`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['match self {'],
+              allRequired: true,
+              hints: ['Use: match self { ... }'],
+            },
+          ],
+          message: 'Start pattern matching on self',
+        },
+        test: ['Match expression used inside method'],
+        what_you_learned: `Match is the most common way to branch logic based on an enum's variant.`,
+      },
+      {
+        step: 14,
+        title: 'Red Duration',
+        instruction: `In the match block, handle \`TrafficLight::Red\` and return \`30\`. Since we are matching on \`self\`, we've already imported the name; you can just use \`self::Red\` or if you use the full name \`TrafficLight::Red\`. Usually just \`TrafficLight::Red => 30,\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['TrafficLight::Red => 30'],
+              allRequired: true,
+              hints: ['Add the Red arm to the match'],
+            },
+          ],
+          message: 'Implement the Red arm',
+        },
+        test: ['Red duration handled'],
+        what_you_learned: `Each arm of a match maps a variant pattern to a return value or expression.`,
+      },
+      {
+        step: 15,
+        title: 'Yellow and Green Duration',
+        instruction: `Add arms for \`Yellow\` (returning \`5\`) and \`Green\` (returning \`25\`).`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['TrafficLight::Yellow => 5', 'TrafficLight::Green => 25'],
+              allRequired: true,
+              hints: ['Add arms for Yellow and Green (durations: 5 and 25)'],
+            },
+          ],
+          message: 'Complete the exhaustive match',
+        },
+        test: ['All variants handled in duration method'],
+        what_you_learned: `Exhaustiveness checking ensures that you handle every possible state of your enum.`,
+      },
+      {
+        step: 16,
+        title: 'Testing the Method',
+        instruction: `In \`main\`, print the duration of your \`light\` variable by calling \`light.duration()\`. Run \`cargo run\` to verify the 30s duration.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['light.duration()'],
+              allRequired: true,
+              hints: ['Use: println!("Duration: {}s", light.duration());'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Check the duration output in the terminal'],
+            },
+          ],
+          message: 'Call the method on an enum instance and verify',
+        },
+        test: ['Method called and duration printed', 'Program was run'],
+        what_you_learned: `Methods on enums are called using the same dot notation as methods on structs. Verification in the terminal is key!`,
+      },
+      {
+        step: 17,
+        title: 'State Transitions',
+        instruction: `Enums are great for state machines. Define a method \`next(&self)\` that returns a new \`TrafficLight\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['fn next(&self) -> TrafficLight'],
+              allRequired: true,
+              hints: ['Add the next method to the impl block'],
+            },
+          ],
+          message: 'Define a method for state transitions',
+        },
+        test: ['next method signature detected'],
+        what_you_learned: `Methods can return new instances of the same enum to represent transitions.`,
+      },
+      {
+        step: 18,
+        title: 'Red to Green',
+        instruction: `Inside \`next\`, match on \`self\`. For \`TrafficLight::Red\`, return \`TrafficLight::Green\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['TrafficLight::Red => TrafficLight::Green'],
+              allRequired: true,
+              hints: ['Transition from Red to Green'],
+            },
+          ],
+          message: 'Implement Red to Green transition',
+        },
+        test: ['Red transitions to Green'],
+        what_you_learned: `Logic flows between enum variants allow you to model real-world cycles.`,
+      },
+      {
+        step: 19,
+        title: 'Green to Yellow',
+        instruction: `Add the arm to transition \`Green\` to \`Yellow\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['TrafficLight::Green => TrafficLight::Yellow'],
+              allRequired: true,
+              hints: ['Transition from Green to Yellow'],
+            },
+          ],
+          message: 'Implement Green to Yellow transition',
+        },
+        test: ['Green transitions to Yellow'],
+        what_you_learned: `Sequential logic is naturally expressed using match arms.`,
+      },
+      {
+        step: 20,
+        title: 'Yellow to Red',
+        instruction: `Complete the cycle by transitioning \`Yellow\` back to \`Red\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['TrafficLight::Yellow => TrafficLight::Red'],
+              allRequired: true,
+              hints: ['Transition from Yellow back to Red'],
+            },
+          ],
+          message: 'Complete the traffic cycle',
+        },
+        test: ['All transitions implemented'],
+        what_you_learned: `Cycles are completed when the last variant points back to the first.`,
+      },
+      {
+        step: 21,
+        title: 'The Simulation Loop',
+        instruction: `In \`main\`, use a \`mut\` variable for the light. Inside a \`for _ in 0..3\` loop, update the light to its next state using \`light = light.next();\` and print it.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let mut light', 'for', 'light.next()'],
+              allRequired: true,
+              hints: ['Make light mutable and call next() inside the loop'],
+            },
+          ],
+          message: 'Simulate a multi-step light cycle',
+        },
+        test: ['Simulation loop implemented correctly'],
+        what_you_learned: `Enum variables must be mutable if you intend to reassign them to different variants.`,
+      },
+      {
+        step: 22,
+        title: 'Final Output',
+        instruction: `Print \`Cycle complete!\` after the loop. Then run \`cargo run\` for the final simulation check!`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['println!("Cycle complete!")'],
+              allRequired: true,
+              hints: ['Print the message outside the loop'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Run for the final simulation verification'],
+            },
+          ],
+          message: 'Add a final notification and verify',
+        },
+        test: ['Final message printed', 'Final run successful'],
+        what_you_learned: `You have successfully built a state machine using Rust enums! Logic cycles point back. You've mastered enums and state transitions in Rust!`,
       },
     ],
-    completion_message: `🎉 You've learned enums! They're essential for representing states and choices in Rust.`,
-    extensions: `Add a pedestrian crossing button, add timers, add multiple intersections.`,
+    completion_message: `🎉 Great job! You've mastered enums! 
+
+You've learned:
+✓ How to define enums and variants
+✓ How to use #[derive(Debug)] for easy printing
+✓ How to implement methods on enums
+✓ How to use exhaustive match expressions
+✓ How to model state transitions
+
+Enums are the key to writing concise, safe, and bug-free code in Rust.`,
+    extensions: `**Challenge yourself:**
+- Add a "BlinkingYellow" variant
+- Associate data with variants (e.g., Green(u32) for a specific speed limit)
+- Implement the "Display" trait manually instead of using "Debug"
+- Add a sleep timer between transitions using "std::thread::sleep"`,
   },
 
   // Project 6: Learn Error Handling by Building a File Processor
-  // This is the detailed example from the curriculum rules
   {
     id: 'project-006',
     title: 'Learn Error Handling by Building a File Processor',
     section: 1,
     type: 'practice',
-    estimated_time: 240,
+    estimated_time: 120,
     difficulty: 'beginner',
-    concepts_taught: ['Result', 'Option', 'custom_errors', 'error_propagation'],
-    project_overview: `In this project, you'll build a command-line tool that processes text files, converting them to uppercase, lowercase, or title case. Along the way, you'll learn how to handle errors gracefully using Rust's Result and Option types.`,
-    why_this_project: `File processing is a common real-world task. This project teaches you how to handle the inevitable errors that occur (missing files, permission issues, invalid input) in a way that makes your program robust and user-friendly.`,
-    prerequisites: [
-      'Completed: Learn Variables by Building a Temperature Converter',
-      'Completed: Learn Ownership by Building a Text Adventure',
-      'Understand basic file I/O from previous projects',
+    concepts_taught: [
+      'Result',
+      'Option',
+      'expect_unwrap',
+      'error_propagation',
+      'question_mark_operator',
+      'match_patterns',
     ],
+    project_overview: `You will build a command-line tool that reads a file and processes its text. You'll learn how to handle errors gracefully using Rust's Result and Option types, moving from basic panics to proper error propagation and recovery.`,
+    why_this_project: `Real-world programs must deal with failure (missing files, invalid inputs). Rust makes these failures explicit, helping you write robust code that doesn't crash unexpectedly. learning these patterns early is essential.`,
+    prerequisites: [
+      'Completed: Learn Enums by Building a Traffic Light Simulator',
+      'Basic understanding of String and &str',
+    ],
+    preview: {
+      mode: 'onLoad',
+      title: 'File Processor',
+      description: 'A tool that reads files and handles potential errors using Result and Option.',
+      example_output: `$ cargo run -- hello.txt
+Reading hello.txt...
+File content: Hello Rust!
+
+$ cargo run -- missing.txt
+Error: The file "missing.txt" could not be found.`,
+    },
     steps: [
       {
         step: 1,
-        title: 'Set up your project',
-        instruction: `Create a new Rust project and get command-line arguments:
-
-\`\`\`bash
-cargo new file_processor
-cd file_processor
-\`\`\`
-
-Here's an example of collecting command-line arguments:
-
-\`\`\`rust
-use std::env;
-
-let arguments: Vec<String> = env::args().collect();
-\`\`\`
-
-The first argument (index 0) is always the program name. Add code to collect command-line arguments into a vector called \`args\` using \`env::args()\`.`,
+        title: 'Project Setup',
+        instruction: `Create a new Rust project called \`file_processor\`.`,
         validation: {
           rules: [
             {
-              type: 'code_contains',
-              patterns: ['env::args()', '.collect()', 'args'],
-              allRequired: true,
-              hints: ['Use env::args().collect()', 'Store in variable named args', 'Run: cargo new file_processor, cd file_processor'],
+              type: 'terminal_command',
+              command: 'cargo new',
+              projectSpecific: 'file_processor',
+              hints: ['Run: cargo new file_processor'],
             },
           ],
-          message: 'Collect command-line arguments into args using env::args()',
+          message: 'Initialize the file_processor project',
         },
-        test: [
-          'Project directory exists',
-          'Cargo.toml contains correct package name',
-          'Code compiles with cargo build',
-          'Uses std::env::args()',
-        ],
-        what_you_learned: `Created a new Rust project and how to access command-line arguments.`,
+        test: ['file_processor directory exists'],
+        what_you_learned: `Starting a new workspace for learning system interactions and error handling.`,
       },
       {
         step: 2,
-        title: 'Handle missing arguments with Option',
-        instruction: `When you try to access an element in a vector using \`.get()\`, Rust returns an \`Option\` because the element might not exist. \`Option<T>\` has two variants: \`Some(value)\` if the element exists, or \`None\` if it doesn't.
-
-Here is an example:
-
-\`\`\`rust
-let items = vec!["first", "second"];
-match items.get(0) {
-    Some(value) => println!("Found: {}", value),
-    None => println!("No value at that index"),
-}
-\`\`\`
-
-Check if enough arguments were provided using \`.get()\`. If not, print a usage message and exit.`,
+        title: 'Entering the Project',
+        instruction: `Navigate into the \`file_processor\` directory.`,
         validation: {
           rules: [
             {
-              type: 'code_contains',
-              patterns: ['.get(', 'None', 'Some'],
-              allRequired: true,
-              hints: ['Use args.get(0), args.get(1), etc.', 'Match on Option: None => print usage and exit', 'Some(value) => continue'],
+              type: 'terminal_command',
+              command: 'cd file_processor',
+              hints: ['Run: cd file_processor'],
             },
           ],
-          message: 'Use .get() to check arguments, handle None with usage and exit',
+          message: 'Navigate into the project folder',
         },
-        test: [
-          'Shows usage message when run with no arguments',
-          'Shows usage message when run with only 1 argument',
-          'Continues when run with 2+ arguments',
-          'Uses Option type (checking for None)',
-        ],
-        what_you_learned: `Rust's Option type, which represents a value that might be present (Some) or absent (None).`,
+        test: ['Terminal in file_processor directory'],
+        what_you_learned: `Ensuring you are in the correct directory for Cargo to find your manifest file.`,
       },
       {
         step: 3,
-        title: 'Read the file with Result',
-        instruction: `Many operations in Rust can fail. Reading a file might fail because the file doesn't exist, you don't have permission, or the disk has an error.
-
-Instead of throwing exceptions, Rust uses the \`Result\` type. \`Result<T, E>\` has two variants:
-- \`Ok(T)\` - the operation succeeded with value T
-- \`Err(E)\` - the operation failed with error E
-
-The \`read_to_string()\` function returns \`Result<String, std::io::Error>\`. For now, use \`.expect()\` to handle errors, which will panic with your message if reading fails.
-
-Read the file contents using \`std::fs::read_to_string()\`.`,
+        title: 'Importing Modules',
+        instruction: `To handle files and arguments, we need modules from the standard library. Add \`use std::env;\` and \`use std::fs;\` to the top of \`main.rs\`.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['read_to_string', '.expect('],
+              patterns: ['use std::env;', 'use std::fs;'],
               allRequired: true,
-              hints: ['Use std::fs::read_to_string(path)', 'Add .expect("message") for error handling'],
+              hints: ['Add these lines at the very top of main.rs'],
             },
           ],
-          message: 'Read file with std::fs::read_to_string() and .expect()',
+          message: 'Import necessary modules',
         },
-        test: [
-          'Code compiles',
-          'Reads file contents successfully when file exists',
-          'Uses std::fs::read_to_string()',
-          'Uses .expect() for error handling',
-        ],
-        what_you_learned: `Rust's Result type for handling operations that can fail.`,
+        test: ['std::env and std::fs imported'],
+        what_you_learned: `The standard library provides core functionality for environment and file system access.`,
       },
       {
         step: 4,
-        title: 'Implement uppercase conversion',
-        instruction: `Rust strings have built-in methods for common transformations. The \`.to_uppercase()\` method creates a new string with all characters converted to uppercase - it doesn't modify the original string.
-
-Convert the file contents to uppercase when the operation is "uppercase" and print the result.`,
+        title: 'Collecting Arguments',
+        instruction: `In \`main\`, collect the command-line arguments into a vector of strings named \`args\`.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['to_uppercase()', 'uppercase', 'println!'],
+              patterns: ['let args: Vec<String> = env::args().collect();'],
               allRequired: true,
-              hints: ['Check if operation is "uppercase"', 'Call .to_uppercase() on contents', 'Print the result'],
+              hints: ['Use: let args: Vec<String> = env::args().collect();'],
             },
           ],
-          message: 'Convert to uppercase when operation is uppercase and print',
+          message: 'Collect CLI arguments',
         },
-        test: [
-          'Converts text to uppercase correctly',
-          'Prints the converted text',
-          'Uses .to_uppercase() method',
-        ],
-        what_you_learned: `String methods and how Rust often prefers creating new values rather than mutating existing ones.`,
+        test: ['args vector contains the program arguments'],
+        what_you_learned: `env::args() returns an iterator over arguments, which .collect() turns into a collection like a Vec.`,
       },
       {
         step: 5,
-        title: 'Add lowercase and titlecase',
-        instruction: `Use \`match\` to handle all three operations. For titlecase, you'll need to split the text into words, capitalize the first letter of each word, and join them back together.
-
-Use methods like \`.split_whitespace()\` to split text and \`.join()\` to combine strings. The \`_\` pattern in \`match\` handles unknown operations.
-
-Implement "lowercase" and "titlecase" operations in addition to "uppercase".`,
+        title: 'The Option Type',
+        instruction: `Vectors might not have the index you're looking for. The \`.get(index)\` method returns an \`Option<&T>\`.
+        
+        Try to get the first argument (index 1) using \`args.get(1)\` and store it in a variable \`filename_option\`.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['match', 'lowercase', 'titlecase', 'to_lowercase'],
+              patterns: ['let filename_option = args.get(1);'],
               allRequired: true,
-              hints: ['Use match on operation string', 'Handle "uppercase", "lowercase", "titlecase"', 'Use to_lowercase(), split_whitespace for titlecase', 'Use _ for unknown'],
+              hints: ['Index 0 is the program name, index 1 is the first argument'],
             },
           ],
-          message: 'Use match for uppercase, lowercase, titlecase',
+          message: 'Get an optional argument',
         },
-        test: [
-          'Converts to lowercase correctly',
-          'Converts to titlecase correctly',
-          'Uses match statement for operation selection',
-          'Handles unknown operations gracefully',
-        ],
-        what_you_learned: `Pattern matching with \`match\` and working with iterators for text processing.`,
+        test: ['filename_option is of type Option<&String>'],
+        what_you_learned: `Option represents a value that might be something (Some) or nothing (None).`,
       },
       {
         step: 6,
-        title: 'Create a custom error type',
-        instruction: `Custom error types let you distinguish between different error cases and provide specific error messages. You can create an error enum with variants for each type of error.
-
-To print your error nicely, implement the \`Display\` trait. This lets you use \`println!\` and other formatting functions with your error type.
-
-Define an enum called \`ProcessError\` with variants for different error types (like FileNotFound, InvalidOperation, PermissionDenied). Each variant should hold a String with error details. Implement \`std::fmt::Display\` for your error type.`,
+        title: 'Matching on Option',
+        instruction: `Use a \`match\` expression on \`filename_option\` to handle both cases. If it's \`None\`, print "Please provide a filename" and exit the program early using \`return;\`.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['enum ProcessError', 'Display', 'fmt::Display'],
+              patterns: ['match filename_option', 'None =>', 'return;'],
               allRequired: true,
-              hints: ['Define enum ProcessError { FileNotFound(String), ... }', 'impl std::fmt::Display for ProcessError', 'fn fmt(&self, f: &mut Formatter)'],
+              hints: ['Use: match filename_option { None => { println!("..."); return; }, ... }'],
             },
           ],
-          message: 'Define ProcessError enum and implement Display',
+          message: 'Handle the None case',
         },
-        test: [
-          'ProcessError enum exists with required variants',
-          'Implements Display trait',
-          'Error messages are clear and helpful',
-        ],
-        what_you_learned: `Creating custom error types using enums. This is the standard pattern in Rust for representing domain-specific errors.`,
+        test: ['Program exits gracefully if no argument is provided'],
+        what_you_learned: `Pattern matching ensures you handle the case where a value might be missing.`,
       },
       {
         step: 7,
-        title: 'Use ? operator for error propagation',
-        instruction: `The \`?\` operator is syntactic sugar for error handling. When you write \`value?\`, it automatically returns the error if something went wrong, otherwise unwraps the Ok value.
+        title: 'Test the error path',
+        instruction: `Let's verify our error handling works. Run \`cargo run\` without any arguments.
 
-Since \`read_to_string\` returns \`io::Error\` but your function returns \`ProcessError\`, you need to convert between them using \`.map_err()\`.
-
-Change your \`main\` function to return \`Result<(), ProcessError>\`. Then use \`?\` after operations that return \`Result\` to automatically propagate errors.`,
+You should see the error message you just added. This confirms you're properly handling the missing filename case!`,
         validation: {
           rules: [
             {
-              type: 'code_contains',
-              patterns: ['Result<(), ProcessError>', '?', 'map_err'],
-              allRequired: true,
-              hints: ['fn main() -> Result<(), ProcessError>', 'Use ? after read_to_string and other Result ops', 'Use .map_err() to convert io::Error to ProcessError'],
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Run: cargo run without any arguments to see the error message'],
             },
           ],
-          message: 'main returns Result, use ? and map_err',
+          message: 'Test the None case error handling',
         },
-        test: [
-          'main returns Result<(), ProcessError>',
-          'Uses ? operator for error propagation',
-          'Converts io::Error to ProcessError',
-          'Errors are properly propagated',
-        ],
-        what_you_learned: `The ? operator, Rust's elegant way to handle errors.`,
+        test: ['Error message displayed for missing argument'],
+        what_you_learned: `Always test your error paths. A program that fails gracefully is more trustworthy.`,
       },
       {
         step: 8,
-        title: 'Write output to a file',
-        instruction: `You can manipulate file paths using the \`Path\` type from \`std::path\`. Use \`file_stem()\` to get the filename without extension and \`extension()\` to get the file extension.
-
-Use \`std::fs::write()\` to write a String to a file. It returns a \`Result\`, so you can use \`?\` to handle errors.
-
-Write the processed text to a new file. Create the output filename by inserting "_processed" before the extension (e.g., "document.txt" becomes "document_processed.txt").`,
+        title: 'Extracting the Value',
+        instruction: `In the \`Some(name)\` arm of your match, simply print "Processing: {name}". Then run \`cargo run -- test.txt\` to see it work.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['std::fs::write', 'Path', 'file_stem', 'extension'],
+              patterns: ['Some(name) =>', 'println!'],
               allRequired: true,
-              hints: ['Use std::path::Path', 'file_stem() and extension() for filename', 'std::fs::write(path, contents)?'],
+              hints: ['Example: Some(name) => println!("Processing: {}", name),'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Run the program with a filename argument'],
             },
           ],
-          message: 'Write output file using std::fs::write and path manipulation',
+          message: 'Handle the Some case and verify',
         },
-        test: [
-          'Writes output to correct filename',
-          'Output file contains processed text',
-          'Handles write errors gracefully',
-          'Works with different file extensions',
-        ],
-        what_you_learned: `File path manipulation using std::path and how to write files with proper error handling.`,
+        test: ['Program prints the filename if provided', 'Program was run'],
+        what_you_learned: `The Some(value) pattern extracts the inner value from the Option. Running with arguments verifies your logic works for real inputs.`,
       },
       {
         step: 9,
-        title: 'Add comprehensive error messages',
-        instruction: `Programs have two output streams: stdout (for normal output) and stderr (for error messages). Using \`eprintln!\` for errors lets users redirect output without mixing errors.
-
-Use \`eprintln!\` to print errors to stderr and \`std::process::exit(1)\` to exit with an error code. Make sure your error messages include context like the filename when relevant.`,
+        title: 'Reading a File',
+        instruction: `Use \`fs::read_to_string(name)\` to read the file. This function returns a \`Result<String, std::io::Error>\`. Store the result in \`content_result\`.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['eprintln!', 'exit(1)'],
+              patterns: ['let content_result = fs::read_to_string('],
               allRequired: true,
-              hints: ['Use eprintln! for error messages', 'Call std::process::exit(1) on error', 'Include filename or context in messages'],
+              hints: ['Call this inside the Some arm or after the match (if you assign name to a variable)'],
             },
           ],
-          message: 'Use eprintln! for errors and exit(1)',
+          message: 'Perform a fallible file read',
         },
-        test: [
-          'Errors print to stderr',
-          'Error messages include context',
-          'Program exits with code 1 on error',
-          'Successful runs exit with code 0',
-        ],
-        what_you_learned: `Best practices for error reporting in CLI tools: using stderr, providing context, and using exit codes.`,
+        test: ['File read operation attempted'],
+        what_you_learned: `Result is used for operations that can fail due to external factors.`,
+      },
+      {
+        step: 10,
+        title: 'Matching on Result',
+        instruction: `Just like Option, Result uses \`match\`. Use it on \`content_result\`. If it's \`Ok(text)\`, print the content.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['match content_result', 'Ok(text) =>'],
+              allRequired: true,
+              hints: ['Follow the same pattern as Option, but use Ok and Err instead'],
+            },
+          ],
+          message: 'Handle the Success case',
+        },
+        test: ['File content printed on success'],
+        what_you_learned: `Result's Ok variant contains the successful output of an operation.`,
+      },
+      {
+        step: 11,
+        title: 'Handling the Error',
+        instruction: `In the \`Err(e)\` arm of your match, print the error using \`println!("Error: {}", e);\`. Run \`cargo run -- missing.txt\` to verify error handling.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['Err(e) =>', 'println!'],
+              allRequired: true,
+              hints: ['Example: Err(e) => println!("Failed: {}", e),'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Test the error case with a missing file'],
+            },
+          ],
+          message: 'Handle the Failure case and verify',
+        },
+        test: ['Helpful error message printed if file is missing', 'Error case verified'],
+        what_you_learned: `The Err variant contains information about why the operation failed. Proper error handling makes your CLI robust.`,
+      },
+      {
+        step: 12,
+        title: 'The unwrap Method',
+        instruction: `Sometimes you're SURE an operation will succeed. The \`.unwrap()\` method returns the \`Ok\` value or PANICS (crashes) if it's an \`Err\`.
+        
+        Change your file read to use \`let content = fs::read_to_string(name).unwrap();\`. Be careful!`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['.unwrap()'],
+              allRequired: true,
+              hints: ['Note: unwrap() should be used sparingly in production code'],
+            },
+          ],
+          message: 'Use unwrap for quick development',
+        },
+        test: ['Program uses unwrap()'],
+        what_you_learned: `unwrap is a shortcut that assumes success but can lead to unhandled crashes.`,
+      },
+      {
+        step: 13,
+        title: 'The expect Method',
+        instruction: `\`.expect("message")\` is like \`unwrap()\`, but it lets you provide a custom panic message.
+        
+        Replace \`.unwrap()\` with \`.expect("Failed to read the file")\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['.expect(', 'Failed to read the file'],
+              allRequired: true,
+              hints: ['Use: .expect("your custom message here")'],
+            },
+          ],
+          message: 'Use expect for better panic messages',
+        },
+        test: ['Program uses expect() with a custom message'],
+        what_you_learned: `expect makes debugging easier by explaining why a panic occurred.`,
+      },
+      {
+        step: 14,
+        title: 'Error Propagation',
+        instruction: `Handling errors everywhere makes code messy. We can "pass the buck" to the caller.
+        
+        Define a function \`read_and_process(path: &str) -> Result<String, std::io::Error>\` above \`main\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['fn read_and_process(', '-> Result<String, std::io::Error>'],
+              allRequired: true,
+              hints: ['The return type tells Rust this function might fail'],
+            },
+          ],
+          message: 'Define a function that returns a Result',
+        },
+        test: ['Function with Result return type detected'],
+        what_you_learned: `Returning a Result allows a function to propagate errors to its caller.`,
+      },
+      {
+        step: 15,
+        title: 'The Question Mark Operator',
+        instruction: `Inside \`read_and_process\`, use the \`?\` operator: \`let content = fs::read_to_string(path)?;\`.
+        
+        The \`?\` either returns the \`Ok\` value or immediately returns the \`Err\` from the entire function.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['read_to_string(path)?'],
+              allRequired: true,
+              hints: ['Add the ? after the function call'],
+            },
+          ],
+          message: 'Use the ? operator for propagation',
+        },
+        test: ['? operator used correctly'],
+        what_you_learned: `The ? operator is the idiomatic way to handle errors in Rust, making propagation concise.`,
+      },
+      {
+        step: 16,
+        title: 'Completing the Function',
+        instruction: `After reading, use \`.to_uppercase()\` on the content and return it wrapped in \`Ok()\`.
+        
+        Example: \`Ok(content.to_uppercase())\``,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['to_uppercase()', 'Ok('],
+              allRequired: true,
+              hints: ['Remember to return the final result at the end of the function'],
+            },
+          ],
+          message: 'Return a successful Result',
+        },
+        test: ['Function returns processed content wrapped in Ok'],
+        what_you_learned: `Successful values must be explicitly wrapped in the Ok variant of the Result.`,
+      },
+      {
+        step: 17,
+        title: 'Using the Propagator',
+        instruction: `In \`main\`, call \`read_and_process(name)\` and handle its result using \`if let\`. Run \`cargo run\` to see the processed output.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['if let Ok(processed) = read_and_process('],
+              allRequired: true,
+              hints: ['if let is a concise way to handle only one variant'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Execute the final logic in main'],
+            },
+          ],
+          message: 'Use if let and verify the results',
+        },
+        test: ['Processed content printed using if let', 'Program verified'],
+        what_you_learned: `if let is literal shorthand for match when you only care about one patterns logic. It makes success handling much cleaner.`,
+      },
+      {
+        step: 18,
+        title: 'Handling Errors with if let',
+        instruction: `Add an \`else\` block to your \`if let\` or use a separate \`if let Err(e)\` to print "An error occurred".`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['else {', 'println!'],
+              allRequired: true,
+              hints: ['Example: if let Ok(p) = ... { ... } else { println!("Error!"); }'],
+            },
+          ],
+          message: 'Add an error fallback',
+        },
+        test: ['Overall program handles success and failure'],
+        what_you_learned: `if let with else provides a clean alternative to simple match statements.`,
+      },
+      {
+        step: 19,
+        title: 'Default Values with Option',
+        instruction: `Option has a \`.unwrap_or()\` method. Use it to get a filename or default to \`"input.txt"\`.
+        
+        \`let filename = args.get(1).map(|s| s.as_str()).unwrap_or("input.txt");\``,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['.unwrap_or("input.txt")'],
+              allRequired: true,
+              hints: ['Use: let name = args.get(1).unwrap_or(&default_string);'],
+            },
+          ],
+          message: 'Provide a default value using Option',
+        },
+        test: ['Program defaults to input.txt if no argument is provided'],
+        what_you_learned: `unwrap_or allows you to safely recover from a None value by providing a backup.`,
+      },
+      {
+        step: 20,
+        title: 'The Default Trait',
+        instruction: `Some types have a default value. \`String::default()\` is an empty string.
+        
+        Print \`String::default()\` in main just to see it.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['String::default()'],
+              allRequired: true,
+              hints: ['Example: println!("Default: {:?}", String::default());'],
+            },
+          ],
+          message: 'Use the Default trait',
+        },
+        test: ['Default string printed'],
+        what_you_learned: `Many Rust types implement the Default trait to provide a sensible initial state.`,
+      },
+      {
+        step: 21,
+        title: 'Custom Error Messages',
+        instruction: `Inside \`main\`, if \`read_and_process\` fails, use \`eprintln!\` instead of \`println!\`. \`eprintln!\` prints to standard error.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['eprintln!'],
+              allRequired: true,
+              hints: ['eprintln! is for error reporting'],
+            },
+          ],
+          message: 'Use standard error for diagnostics',
+        },
+        test: ['Error messages sent to stderr'],
+        what_you_learned: `Standard error (stderr) is a separate stream meant specifically for diagnostic and error messages.`,
+      },
+      {
+        step: 22,
+        title: 'Filtering Content',
+        instruction: `In your \`read_and_process\` function, if the file content is empty, return an \`Err\` with a custom message. Wait, returning a custom message requires a different error type. For now, just return the \`Ok\` value regardless.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['if content.is_empty()'],
+              allRequired: true,
+              hints: ['Check if the content is empty'],
+            },
+          ],
+          message: 'Check for empty file content',
+        },
+        test: ['Logic accounts for empty files'],
+        what_you_learned: `You can use standard control flow (if/else) alongside Result logic.`,
+      },
+      {
+        step: 23,
+        title: 'Final Assembly',
+        instruction: `Clean up your \`main\` to only: collect args, get filename (with default), call \`read_and_process\`, and print the result or error. Run \`cargo run -- any_file.txt\` for the final project check!`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['read_and_process', 'args.get(1)'],
+              allRequired: true,
+              hints: ['Assemble the components into a clean final program'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Final validation run'],
+            },
+          ],
+          message: 'Finalize the file processor and verify',
+        },
+        test: ['Complete program works as expected', 'Project complete'],
+        what_you_learned: `Congratulations! You've built a robust tool using Rust's powerful error handling system. Regular execution is the hallmark of a good developer.`,
       },
     ],
-    completion_message: `🎉 Congratulations! You've built a complete file processor with robust error handling.
-
-You've learned:
-✓ Option for values that might not exist
-✓ Result for operations that can fail
-✓ Custom error types with enums
-✓ Error propagation with the ? operator
-✓ File I/O with proper error handling
-✓ Best practices for CLI tools
-
-These error handling patterns are used throughout professional Rust code. You're now ready to build more complex programs that handle failures gracefully!`,
+    completion_message: `🎉 You've mastered Error Handling! You now know how to handle Option and Result, use the ? operator, and provide fallback values. These are the tools that make Rust programs incredibly reliable.`,
     extensions: `**Challenge yourself:**
-- Add support for more operations (reverse text, remove vowels, etc.)
-- Process multiple files in one run
-- Add a --output flag to specify custom output filename
-- Support stdin/stdout for piping (e.g., \`cat file.txt | file_processor uppercase\`)
-- Add color to error messages using the \`colored\` crate`,
+- Add a choice between uppercase and lowercase conversion
+- Count the words in the file and return the count
+- Create a custom Error enum to represent different failure reasons
+- Use the 'anyhow' crate for even easier error handling (look it up!)`,
   },
 
-  // Note: Projects 7-18 would follow the same detailed pattern
-  // Each with 5-25 steps, full explanations, tests, etc.
-  // For brevity, showing structure for a few key ones:
+
 
   // Project 7: Learn Collections by Building a Contact Manager
   {
@@ -1948,128 +3354,466 @@ These error handling patterns are used throughout professional Rust code. You're
     title: 'Learn Collections by Building a Contact Manager',
     section: 1,
     type: 'practice',
-    estimated_time: 180,
+    estimated_time: 120,
     difficulty: 'beginner',
-    concepts_taught: ['Vec', 'HashMap', 'CRUD', 'collections', 'iteration'],
-    project_overview: `Build a contact manager that stores names and phone numbers. You'll learn about Vec and HashMap - Rust's primary collection types.`,
-    why_this_project: `Collections are essential for managing data. This project teaches you how to store, retrieve, update, and delete data using Rust's collection types.`,
-    prerequisites: [
-      'Completed: Learn Structs by Building a Student Manager',
-      'Understanding of basic types',
+    concepts_taught: [
+      'Vec',
+      'HashMap',
+      'CRUD_operations',
+      'iterators',
+      'entry_api',
+      'cloning',
     ],
+    project_overview: `You will build a contact management system. You'll start with basic vectors to list contacts, then move to HashMaps for lightning-fast lookups, learning how to Create, Read, Update, and Delete data effectively in Rust.`,
+    why_this_project: `Almost every program needs to store and search for data. Rust's collections are powerful and safe, but they have unique rules about ownership and borrowing. This project will make you comfortable with the two most used collections: Vec and HashMap.`,
+    prerequisites: [
+      'Completed: Learn Error Handling by Building a File Processor',
+      'Basic understanding of Structs and Enums',
+    ],
+    preview: {
+      mode: 'onLoad',
+      title: 'Contact Manager',
+      description: 'A system to manage contact information using vectors and hash maps.',
+      example_output: `$ cargo run
+--- Contact Manager ---
+1. Add Contact
+2. Look up Phone
+3. Remove Contact
+4. Exit
+
+> 2
+Enter name: Alice
+Phone: 555-0199`,
+    },
     steps: [
       {
         step: 1,
-        title: 'Create a Contact struct',
-        instruction: `Define a \`Contact\` struct:
-
-\`\`\`rust
-struct Contact {
-    name: String,
-    phone: String,
-}
-\`\`\``,
+        title: 'Project Setup',
+        instruction: `Create a new Rust project called \`contact_manager\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'terminal_command',
+              command: 'cargo new',
+              projectSpecific: 'contact_manager',
+              hints: ['Run: cargo new contact_manager'],
+            },
+          ],
+          message: 'Initialize the contact_manager project',
+        },
+        test: ['contact_manager directory exists'],
+        what_you_learned: `Standard setup for a new collection-based application.`,
+      },
+      {
+        step: 2,
+        title: 'Entering the Project',
+        instruction: `Navigate into the \`contact_manager\` directory.`,
+        validation: {
+          rules: [
+            {
+              type: 'terminal_command',
+              command: 'cd contact_manager',
+              hints: ['Run: cd contact_manager'],
+            },
+          ],
+          message: 'Navigate into the project folder',
+        },
+        test: ['Terminal in contact_manager directory'],
+        what_you_learned: `You must be in the package root to perform Cargo operations.`,
+      },
+      {
+        step: 3,
+        title: 'The Contact Data',
+        instruction: `Define a \`Contact\` struct above \`main\` with fields for \`name\` and \`phone\`, both as \`String\`.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
               patterns: ['struct Contact', 'name: String', 'phone: String'],
               allRequired: true,
-              hints: ['Define struct Contact { name: String, phone: String }'],
+              hints: ['Example: struct Contact { name: String, phone: String }'],
             },
           ],
-          message: 'Define Contact struct with name and phone',
+          message: 'Define the data structure',
         },
-        test: ['Code compiles', 'Contact struct exists'],
-        what_you_learned: `Defined a struct to represent contact data.`,
-      },
-      {
-        step: 2,
-        title: 'Store contacts in a Vec',
-        instruction: `\`Vec\` is Rust's growable array type. You can create a vector and add items to it using \`push()\`.
-
-Create a \`Vec<Contact>\` and add a few contacts.`,
-        validation: {
-          rules: [
-            {
-              type: 'code_contains',
-              patterns: ['Vec<Contact>', 'push('],
-              allRequired: true,
-              hints: ['Create let mut contacts = Vec::new() or vec![]', 'contacts.push(Contact { ... })'],
-            },
-          ],
-          message: 'Create Vec<Contact> and add contacts with push',
-        },
-        test: ['Code compiles', 'Can create Vec<Contact>', 'Can add contacts'],
-        what_you_learned: `Vec, Rust's dynamic array type.`,
-      },
-      {
-        step: 3,
-        title: 'Find a contact by name',
-        instruction: `You can search a vector using iterators. The \`.iter()\` method creates an iterator, and \`.find()\` searches for an element matching a condition.
-
-Create a function that searches the Vec for a contact by name and returns it. The function should return \`Option<&Contact>\` since the contact might not exist.`,
-        validation: {
-          rules: [
-            {
-              type: 'code_contains',
-              patterns: ['Option', '.find(', '.iter()'],
-              allRequired: true,
-              hints: ['fn find_contact(contacts: &[Contact], name: &str) -> Option<&Contact>', 'Use contacts.iter().find(|c| c.name == name)'],
-            },
-          ],
-          message: 'Create function that returns Option<&Contact> using find or iter',
-        },
-        test: ['Code compiles', 'Can find contacts by name'],
-        what_you_learned: `How to search collections.`,
+        test: ['Contact struct exists with required fields'],
+        what_you_learned: `Structs are the building blocks that collections will hold.`,
       },
       {
         step: 4,
-        title: 'Use HashMap for faster lookup',
-        instruction: `\`HashMap\` provides O(1) lookup time vs O(n) for Vec. It stores key-value pairs, making it ideal for lookups by key.
-
-Refactor your code to use \`HashMap<String, Contact>\` where the key is the contact's name. Use \`.insert()\` to add contacts and \`.get()\` to retrieve them.`,
+        title: 'Making it Printable',
+        instruction: `Add \`#[derive(Debug)]\` to your \`Contact\` struct so we can easily print it for debugging.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['HashMap', 'insert(', '.get('],
+              patterns: ['#[derive(Debug)]', 'struct Contact'],
               allRequired: true,
-              hints: ['Use HashMap<String, Contact>', 'contacts.insert(name, contact)', 'contacts.get(name)'],
+              hints: ['Place the attribute directly above the struct definition'],
             },
           ],
-          message: 'Use HashMap with insert and get',
+          message: 'Add Debug derive',
         },
-        test: ['Code compiles', 'Uses HashMap', 'Lookup is faster'],
-        what_you_learned: `When to use HashMap vs Vec for different use cases.`,
+        test: ['Contact implements Debug'],
+        what_you_learned: `Deriving Debug is the easiest way to inspect your data during development.`,
       },
       {
         step: 5,
-        title: 'Implement CRUD operations',
-        instruction: `CRUD stands for Create, Read, Update, and Delete - the four basic operations for managing data.
-
-Add functions to implement all four operations:
-- Create: Add a new contact
-- Read: Retrieve a contact by name
-- Update: Modify an existing contact's information
-- Delete: Remove a contact`,
+        title: 'The Basic Vector',
+        instruction: `In \`main\`, create a mutable vector of \`Contact\` structs named \`contact_list\`. Use \`Vec::new()\`.`,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['insert', 'get(', 'remove'],
+              patterns: ['let mut contact_list', 'Vec::new()'],
               allRequired: true,
-              hints: ['Create: insert new contact', 'Read: get by name', 'Update: insert to overwrite', 'Delete: remove(name)'],
+              hints: ['Example: let mut contact_list: Vec<Contact> = Vec::new();'],
             },
           ],
-          message: 'Implement Create (insert), Read (get), Update (insert), Delete (remove)',
+          message: 'Initialize a vector',
         },
-        test: ['Code compiles', 'All CRUD operations work'],
-        what_you_learned: `Implemented a complete data management system.`,
+        test: ['contact_list initialized as an empty vector'],
+        what_you_learned: `Vec is a growable array that stores items contiguously in memory.`,
+      },
+      {
+        step: 6,
+        title: 'Adding Items',
+        instruction: `Use the \`.push()\` method to add a new \`Contact\` instance to your \`contact_list\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['contact_list.push('],
+              allRequired: true,
+              hints: ['Example: contact_list.push(Contact { name: ... })'],
+            },
+          ],
+          message: 'Add data to the collection',
+        },
+        test: ['Vector contains one or more contacts'],
+        what_you_learned: `push() adds an element to the end of the vector, increasing its length.`,
+      },
+      {
+        step: 7,
+        title: 'Iterating over Vectors',
+        instruction: `Use a \`for\` loop to iterate over \`&contact_list\` and print each contact's name. Then run \`cargo run\` to see the list in the terminal.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['for', '&contact_list', 'println!'],
+              allRequired: true,
+              hints: ['Iterating over a reference (&) avoids moving the vector.'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Check the output for the contact names'],
+            },
+          ],
+          message: 'Loop through the collection and verify',
+        },
+        test: ['Contact names are printed from the loop', 'Program was run'],
+        what_you_learned: `Iterating over references allows you to read from a collection without taking ownership. Running the code confirms your data is stored correctly.`,
+      },
+      {
+        step: 8,
+        title: 'The Lookup Problem',
+        instruction: `Searching a large vector requires checking every element (O(n)). If you have a million contacts, this is slow!
+        
+        Comment out your vector code and we'll switch to a more efficient collection.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['//'],
+              allRequired: false,
+              hints: ['Just prepare to move to HashMaps!'],
+            },
+          ],
+          message: 'Acknowledge the O(n) search limitation',
+        },
+        test: ['Ready for HashMaps'],
+        what_you_learned: `Linear search becomes inefficient as the collection size grows.`,
+      },
+      {
+        step: 9,
+        title: 'Importing HashMap',
+        instruction: `Unlike Vec, \`HashMap\` is not in the default prelude. Add \`use std::collections::HashMap;\` to the top of your file.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['use std::collections::HashMap;'],
+              allRequired: true,
+              hints: ['Add this at the very top of main.rs'],
+            },
+          ],
+          message: 'Import the HashMap type',
+        },
+        test: ['HashMap imported correctly'],
+        what_you_learned: `Specific collections must be imported from the collections module.`,
+      },
+      {
+        step: 10,
+        title: 'Initializing a Map',
+        instruction: `In \`main\`, create a new mutable \`HashMap\` called \`contacts\` where keys are \`String\` (names) and values are \`Contact\` structs.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let mut contacts', 'HashMap::new()'],
+              allRequired: true,
+              hints: ['Example: let mut contacts: HashMap<String, Contact> = HashMap::new();'],
+            },
+          ],
+          message: 'Initialize a hash map',
+        },
+        test: ['contacts map created'],
+        what_you_learned: `HashMaps store key-value pairs and provide logarithmic or near-constant time lookups.`,
+      },
+      {
+        step: 11,
+        title: 'Inserting Data',
+        instruction: `Use \`.insert(key, value)\` to add a contact. Note that the key must be an owned \`String\`.
+        
+        Example: \`contacts.insert(String::from("Alice"), Contact { ... });\``,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['contacts.insert(', 'String::from('],
+              allRequired: true,
+              hints: ['The map takes ownership of both the key and the value.'],
+            },
+          ],
+          message: 'Add data to the map',
+        },
+        test: ['One contact inserted into the map'],
+        what_you_learned: `insert() adds a pair. If the key already exists, the old value is replaced.`,
+      },
+      {
+        step: 12,
+        title: 'Retrieving Data',
+        instruction: `Use \`.get("Name")\` to look up a contact. This returns an \`Option<&Contact>\`. Store the result in \`found_contact\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let found_contact = contacts.get('],
+              allRequired: true,
+              hints: ['get() takes a reference to the key, e.g., "Alice"'],
+            },
+          ],
+          message: 'Look up a value by key',
+        },
+        test: ['found_contact contains the lookup result'],
+        what_you_learned: `Map lookups return Options because the key might not exist.`,
+      },
+      {
+        step: 13,
+        title: 'Handling the Result',
+        instruction: `Use \`match\` on \`found_contact\`. If \`Some(c)\`, print the phone number. If \`None\`, print "Contact not found". Run \`cargo run\` to see the lookup result.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['match found_contact', 'Some(c) =>', 'None =>'],
+              allRequired: true,
+              hints: ['Standard Option handling pattern'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Verify the lookup behavior in the terminal'],
+            },
+          ],
+          message: 'Respond to lookup results and verify',
+        },
+        test: ['Lookup success and failure are handled', 'Program was run'],
+        what_you_learned: `Always handle the None case to prevent program crashes on missing keys. Verification with cargo run ensures your match paths are correct.`,
+      },
+      {
+        step: 14,
+        title: 'The Entry API',
+        instruction: `The \`.entry()\` API is a powerful way to check and modify in one go. Use \`contacts.entry(name).or_insert(new_contact);\` to add a contact ONLY if it doesn't exist.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['.entry(', '.or_insert('],
+              allRequired: true,
+              hints: ['Example: contacts.entry(String::from("Bob")).or_insert(c);'],
+            },
+          ],
+          message: 'Use the entry API for conditional logic',
+        },
+        test: ['Entry API used for safe insertion'],
+        what_you_learned: `The entry API prevents multiple lookups, making conditional updates more efficient.`,
+      },
+      {
+        step: 15,
+        title: 'Updating Values',
+        instruction: `To update, simply \`insert\` again with the same key. The old value will be returned by the \`insert\` method.
+        
+        Update Alice's phone number and print the "Old" number that was returned.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let old_value = contacts.insert('],
+              allRequired: true,
+              hints: ['insert() returns Option<V> of the previous value'],
+            },
+          ],
+          message: 'Update an existing entry',
+        },
+        test: ['Value updated and previous value captured'],
+        what_you_learned: `insert() acts as both "add" and "upsert" (update if exists).`,
+      },
+      {
+        step: 16,
+        title: 'Removing Data',
+        instruction: `Use \`.remove("Name")\` to delete a contact. This also returns the removed value as an \`Option\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['contacts.remove('],
+              allRequired: true,
+              hints: ['Provide the key to remove from the map'],
+            },
+          ],
+          message: 'Delete an entry from the map',
+        },
+        test: ['Contact removed from the mapping'],
+        what_you_learned: `remove() completely deletes the key and its associated value from the map.`,
+      },
+      {
+        step: 17,
+        title: 'Iterating over Maps',
+        instruction: `Iterating over a HashMap gives you both the \`(key, value)\`. Use a \`for\` loop to print all contacts in the format: "Name: Phone". Run \`cargo run\` to see the results.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['for (name, contact) in &contacts'],
+              allRequired: true,
+              hints: ['Note the parentheses for destructuring the (K, V) tuple'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['See all contacts in the unsorted map'],
+            },
+          ],
+          message: 'Iterate over key-value pairs and verify',
+        },
+        test: ['All contacts printed in the requested format', 'Program was run'],
+        what_you_learned: `HashMaps are unordered; iteration will give results in a seemingly random sequence. Always verify your iteration logic with a test run.`,
+      },
+      {
+        step: 18,
+        title: 'Iterating over Values Only',
+        instruction: `Sometimes you only need the values. Use \`contacts.values()\` in a loop to print just the contact names.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['.values()'],
+              allRequired: true,
+              hints: ['Example: for contact in contacts.values() { ... }'],
+            },
+          ],
+          message: 'Access values directly',
+        },
+        test: ['Loop iterates only over the values'],
+        what_you_learned: `Direct value iteration is more efficient if you don't need the keys.`,
+      },
+      {
+        step: 19,
+        title: 'Map Size',
+        instruction: `Use the \`.len()\` method to print how many contacts are currently in the system.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['contacts.len()'],
+              allRequired: true,
+              hints: ['Works the same for Vec and HashMap'],
+            },
+          ],
+          message: 'Check collection size',
+        },
+        test: ['Correct count of contacts is displayed'],
+        what_you_learned: `len() gives you the current number of elements (key-value pairs) in the map.`,
+      },
+      {
+        step: 20,
+        title: 'Capacity and Reallocation',
+        instruction: `Collections grow automatically, but this can be slow. Comment: Explain why you might use \`HashMap::with_capacity(count)\`.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['capacity'],
+              allRequired: false,
+              hints: ['Informational step'],
+            },
+          ],
+          message: 'Acknowledge performance tuning with capacity',
+        },
+        test: ['Understanding of capacity confirmed'],
+        what_you_learned: `Pre-allocating space prevents expensive memory reallocations as the collection grows.`,
+      },
+      {
+        step: 21,
+        title: 'Clearing the Map',
+        instruction: `Use \`.clear()\` to remove every contact at once.`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['contacts.clear()'],
+              allRequired: true,
+              hints: ['This makes the map empty but keeps its capacity'],
+            },
+          ],
+          message: 'Clear all data from the collection',
+        },
+        test: ['Contacts map is empty after clearing'],
+        what_you_learned: `clear() is an efficient way to reset a collection without deallocating the memory.`,
+      },
+      {
+        step: 22,
+        title: 'Final Completion',
+        instruction: `Add a final \`println!("System Shutdown")\` at the end of \`main\`. Then run \`cargo run\` for the final whole-project verification!`,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['System Shutdown'],
+              allRequired: true,
+              hints: ['The final piece of the logic'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              hints: ['Perform the final verification run'],
+            },
+          ],
+          message: 'Finalize the program structure and verify',
+        },
+        test: ['Program execution ends with final message', 'Final project run successful'],
+        what_you_learned: `You've mastered the primary collections of Rust for managing complex data sets! Regular testing with cargo run is the best way to ensure quality.`,
       },
     ],
-    completion_message: `🎉 You've learned collections! Vec and HashMap are essential Rust types.`,
-    extensions: `Add persistence to file, search functionality, contact groups.`,
+    completion_message: `🎉 Success! You've mastered Vec and HashMap. You now know how to store data, perform efficient lookups, handle edge cases with Options, and manage data lifecycle using CRUD operations.`,
+    extensions: `**Challenge yourself:**
+- Add a category field (Work, Family) to Contact and group them
+- Implement a search by phone number (requires iterating or a second map)
+- Save the contact list to a file and load it on startup
+- Use the 'Index' trait to access contacts (advanced!)`,
   },
 
   // Certification Projects (no steps, only requirements and tests)

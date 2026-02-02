@@ -6,6 +6,8 @@ import { TestPanel } from './TestPanel';
 import { Terminal } from './Terminal';
 import { StepGrid } from './StepGrid';
 import { ProjectPreviewModal } from './ProjectPreviewModal';
+import { CompletionModal } from './CompletionModal';
+import { triggerConfetti } from '@/lib/confetti';
 import { runTests } from '@/lib/test-runner';
 import { markChallengeComplete, updateChallengeAttempt, loadProgress, addTerminalCommand, markStepComplete, resetChallengeProgress, saveChallengeCode, getTerminalCommandsForStep, isStepAccessible, markPreviewSeen, hasPreviewBeenSeen } from '@/lib/progress';
 import { validateStep } from '@/lib/step-validator';
@@ -100,6 +102,8 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
   const [hintLevels, setHintLevels] = useState<Record<number, number>>({}); // Track hint visibility per step
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [isMessageBoxVisible, setIsMessageBoxVisible] = useState(true);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const hasProjectCompletedRef = useRef(false); // Track if we've already shown completion for this project
   const codeBlockScrollRefs = useRef<Map<string, number>>(new Map());
 
   // Step key for memoizing markdown components (must be at top level for useMemo)
@@ -275,6 +279,11 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional: avoid reload on progress save
   }, [challenge.id, currentStep]);
+
+  // Reset completion state when challenge changes
+  useEffect(() => {
+    hasProjectCompletedRef.current = false;
+  }, [challenge.id]);
 
   // Always load saved code when step changes (preserves code across step navigation)
   // Only reload when step or challenge actually changes, NOT when progress updates from saves
@@ -496,6 +505,11 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
             if (!completedSteps.includes(step.step)) {
               markStepComplete(challenge.id, step.step);
               reloadProgress();
+              
+              // Check if this is the last step - trigger project completion!
+              // Check if this is the last step - trigger project completion!
+              // We don't auto-complete anymore - wait for the user to clicking the "Complete Project" button
+              // This prevents double-counting time/attempts and accidental completions
             }
           }
           // If prerequisites not met, don't mark complete (step is locked)
@@ -791,33 +805,55 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
                     Previous
                   </Button>
                   <Button
-                    variant="outline"
+                    variant={currentStep === challenge.steps.length - 1 && stepValidation?.completed ? "default" : "outline"}
                     size="sm"
                     onClick={() => {
-                      const newStep = Math.min(challenge.steps.length - 1, currentStep + 1);
-                      
-                      // Check if next step is accessible (all previous steps completed)
-                      const completedSteps = progress.challengeProgress[challenge.id]?.completedSteps || [];
-                      if (isStepAccessible(challenge, newStep, completedSteps)) {
-                        setCurrentStep(newStep);
-                        setStepValidation(null);
+                      const isLastStep = currentStep === challenge.steps.length - 1;
+                      if (isLastStep && stepValidation?.completed) {
+                        // On last step with validation complete - show completion modal if not already shown
+                        if (!hasProjectCompletedRef.current) {
+                          hasProjectCompletedRef.current = true;
+                          markChallengeComplete(challenge.id, code, timeSpent);
+                          triggerConfetti();
+                          setShowCompletionModal(true);
+                        } else {
+                          // Already completed - just show modal again
+                          setShowCompletionModal(true);
+                        }
+                      } else {
+                        const newStep = Math.min(challenge.steps.length - 1, currentStep + 1);
+                        
+                        // Check if next step is accessible (all previous steps completed)
+                        const completedSteps = progress.challengeProgress[challenge.id]?.completedSteps || [];
+                        if (isStepAccessible(challenge, newStep, completedSteps)) {
+                          setCurrentStep(newStep);
+                          setStepValidation(null);
+                        }
                       }
                     }}
                     disabled={
-                      currentStep === challenge.steps.length - 1 || 
                       !stepValidation?.completed ||
-                      (() => {
-                        // Also disable if next step is locked
+                      (currentStep !== challenge.steps.length - 1 && (() => {
+                        // Disable if next step is locked (only for non-last steps)
                         const nextStep = currentStep + 1;
                         if (nextStep >= challenge.steps.length) return true;
                         const completedSteps = progress.challengeProgress[challenge.id]?.completedSteps || [];
                         return !isStepAccessible(challenge, nextStep, completedSteps);
-                      })()
+                      })())
                     }
-                    className="flex-1"
+                    className={cn("flex-1", currentStep === challenge.steps.length - 1 && stepValidation?.completed && "bg-green-600 hover:bg-green-700 text-white border-green-600")}
                   >
-                    Next
-                    <ChevronRight className="h-4 w-4 ml-1" />
+                    {currentStep === challenge.steps.length - 1 ? (
+                      <>
+                        <CheckCircle2 className="h-4 w-4 mr-1" />
+                        Complete Project
+                      </>
+                    ) : (
+                      <>
+                        Next
+                        <ChevronRight className="h-4 w-4 ml-1" />
+                      </>
+                    )}
                   </Button>
                 </div>
               </>
@@ -974,6 +1010,8 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
               onNextStep={isPracticeProject(challenge) ? handleNextStep : undefined}
               canGoNext={isPracticeProject(challenge) && stepValidation?.completed && currentStep < challenge.steps.length - 1}
               canFocus={canFocusEditor}
+              highlightLine={isPracticeProject(challenge) ? challenge.steps[currentStep]?.highlightLine : undefined}
+              editableRegion={isPracticeProject(challenge) ? challenge.steps[currentStep]?.editableRegion : undefined}
             />
           </div>
 
@@ -1144,6 +1182,22 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
           preview={challenge.preview}
           open={showPreviewModal}
           onClose={handlePreviewClose}
+        />
+      )}
+
+      {/* Project Completion Modal */}
+      {isPracticeProject(challenge) && (
+        <CompletionModal
+          open={showCompletionModal}
+          onOpenChange={setShowCompletionModal}
+          title="🎉 Project Complete!"
+          message={challenge.completion_message || `Congratulations! You've completed ${challenge.title}!`}
+          onContinue={() => {
+            navigate({ to: '/' });
+          }}
+          onClose={() => {
+            setShowCompletionModal(false);
+          }}
         />
       )}
     </div>
