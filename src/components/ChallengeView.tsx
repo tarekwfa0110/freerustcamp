@@ -540,8 +540,7 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
               reloadProgress();
               
               // Check if this is the last step - trigger project completion!
-              // Check if this is the last step - trigger project completion!
-              // We don't auto-complete anymore - wait for the user to clicking the "Complete Project" button
+              // We don't auto-complete anymore - wait for the user to click the "Complete Project" button
               // This prevents double-counting time/attempts and accidental completions
             }
           }

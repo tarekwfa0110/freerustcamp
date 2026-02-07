@@ -1,6 +1,6 @@
 import { Test } from '@/types/challenge';
 import { TestResult } from '@/lib/test-runner';
-import { CheckCircle2, XCircle, Clock, ChevronDown, X } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, ChevronDown, X, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState, memo } from 'react';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,7 @@ interface TestPanelProps {
   onReset?: () => void;
 }
 
-function TestPanelComponent({ tests, results, isRunning, onRunTests, onCancelTests }: TestPanelProps) {
+function TestPanelComponent({ tests, results, isRunning, onRunTests, onCancelTests, onReset }: TestPanelProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const getTestResult = (testName: string): TestResult | undefined => {
@@ -68,6 +68,17 @@ function TestPanelComponent({ tests, results, isRunning, onRunTests, onCancelTes
               >
                 <X className="h-4 w-4 mr-2" />
                 Cancel
+              </Button>
+            )}
+            {onReset && results && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={onReset}
+                disabled={isRunning}
+              >
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Reset
               </Button>
             )}
             {onRunTests && (

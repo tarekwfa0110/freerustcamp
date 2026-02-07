@@ -100,7 +100,7 @@ export default {
       },
       fontFamily: {
         display: ["Orbitron", "sans-serif"],
-        body: ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "sans-serif"],
+        body: ["Source Sans Pro", "sans-serif"],
         ui: ["Rajdhani", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
