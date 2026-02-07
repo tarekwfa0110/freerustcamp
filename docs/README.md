@@ -19,6 +19,10 @@ Single-source docs for the FreeRustCamp codebase. Everything here is aligned wit
 - **TanStack Query** (root provider in `__root.tsx`)
 - **Monaco Editor** (code), **Tailwind** (styles), **shadcn-style** UI
 
+## Content Philosophy
+
+**Granular, step-by-step guidance** is the core philosophy. Each step should teach one concept or require one clear action. Project 1 (Temperature Converter) demonstrates this: 23 steps for a 1-hour project, breaking down every concept into individual steps. This granularity makes learning easier and reduces cognitive load. When creating new projects, reference Project 1's structure and granularity as the target.
+
 ## Quick commands
 
 ```bash

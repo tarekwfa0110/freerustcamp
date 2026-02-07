@@ -35,6 +35,56 @@ Usage: temp_converter <temperature> <unit>`,
     },
     steps: [
       {
+        step: 0,
+        title: 'Understand what you\'re building',
+        instruction: `Welcome! In this project, you'll build a command-line temperature converter that converts between Fahrenheit and Celsius.
+
+**What you're building:**
+A Rust program that reads a temperature and unit from the command line, converts it to the other scale, and prints the result. For example:
+- Input: \`cargo run -- 98.6 F\` → Output: \`98.6°F is 37.0°C\`
+- Input: \`cargo run -- 25 C\` → Output: \`25.0°C is 77.0°F\`
+
+**Why this project?**
+Temperature conversion is practical and real-world. You'll learn:
+- How to create Rust projects with Cargo
+- Variables, types, and basic arithmetic
+- Reading command-line arguments
+- Parsing strings into numbers
+- Handling errors gracefully
+- Formatting output beautifully
+
+**Temperature scale reference:**
+
+| Temperature | Fahrenheit | Celsius | Description |
+|------------|------------|---------|-------------|
+| Absolute Zero | -459.67°F | -273.15°C | Coldest possible |
+| Special Case | -40°F | -40°C | Only point where scales meet |
+| Freezing Water | 32°F | 0°C | Water freezes |
+| Body Temperature | 98.6°F | 37°C | Normal human body |
+| Boiling Water | 212°F | 100°C | Water boils |
+
+**The conversion formulas:**
+You'll use two formulas:
+
+1. **Fahrenheit to Celsius:** \`celsius = (fahrenheit - 32) × 5/9\`
+   - Subtract 32 to account for different zero points
+   - Multiply by 5/9 because Celsius degrees are larger than Fahrenheit degrees
+
+2. **Celsius to Fahrenheit:** \`fahrenheit = (celsius × 9/5) + 32\`
+   - Multiply by 9/5 to convert from larger Celsius degrees to smaller Fahrenheit degrees
+   - Add 32 to account for different zero points
+
+**Special case:** -40°F equals -40°C. This is the only temperature where both scales meet!
+
+Don't worry about memorizing these formulas. You'll implement them step by step, and each step will explain why the formula works.`,
+        task: `Read through this introduction to understand what you'll build. When you're ready, click "Next" to start creating your project!`,
+        starterCode: `// Welcome to your first Rust project!
+// You'll build a temperature converter step by step.
+// Click "Next" when you're ready to begin.`,
+        test: ['Introduction read'],
+        what_you_learned: `You understand what you're building: a practical temperature converter that will teach you Rust fundamentals.`,
+      },
+      {
         step: 1,
         title: 'Create the project',
         instruction: `Cargo is Rust's standard build tool and most projects start with it. It creates a consistent structure so other Rust developers know where to look.
@@ -748,9 +798,21 @@ fn main() {
       {
         step: 18,
         title: 'Convert Fahrenheit to Celsius',
-        instruction: `Fahrenheit to Celsius uses the formula \`(temp - 32) * 5 / 9\`. 
+        instruction: `Convert Fahrenheit temperatures to Celsius using the formula \`(temp - 32) * 5 / 9\`.
 
-**How the formula works:** The Fahrenheit scale sets water's freezing point at 32°F and boiling at 212°F, while Celsius uses 0°C and 100°C. The ratio between the scales is 5/9 (Celsius degrees are larger). We subtract 32 to account for the different zero points, then multiply by 5/9 to convert the scale.
+**How the formula works:**
+
+The Fahrenheit scale sets water's freezing point at 32°F and boiling at 212°F, while Celsius uses 0°C and 100°C. The ratio between the scales is 5/9 because Celsius degrees are larger than Fahrenheit degrees. We subtract 32 to account for the different zero points, then multiply by 5/9 to convert the scale.
+
+**Example conversion:**
+
+Converting 98.6°F (body temperature) to Celsius:
+
+| Step | Calculation | Result |
+|------|-------------|--------|
+| Start | 98.6°F | - |
+| Subtract 32 | 98.6 - 32 | 66.6 |
+| Multiply by 5/9 | 66.6 × (5/9) | 37.0°C |
 
 We use floating-point literals (\`32.0\`, \`5.0\`, \`9.0\`) to avoid integer division. If we used \`32\` instead of \`32.0\`, Rust would perform integer math and lose decimal precision.
 
@@ -826,11 +888,13 @@ println!("{} -> {}", a, b);
 {:.1}\u{00b0}F is {:.1}\u{00b0}C
 \`\`\`
 
-Then run the program with a Fahrenheit input to see the output:
+Then run the program with a Fahrenheit input to see the output. Try converting human body temperature:
 
 \`\`\`bash
-cargo run -- 32 F
-\`\`\``,
+cargo run -- 98.6 F
+\`\`\`
+
+You're converting 98.6°F (normal human body temperature) to Celsius!`,
         starterCode: `use std::env;
 use std::process;
 
@@ -868,8 +932,8 @@ fn main() {
             {
               type: 'terminal_command',
               command: 'cargo run',
-              projectSpecific: '32 f',
-              hints: ['Run: cargo run -- 32 F'],
+              projectSpecific: '98.6 f',
+              hints: ['Run: cargo run -- 98.6 F'],
             },
           ],
           message: 'Print the F to C output',
@@ -880,9 +944,21 @@ fn main() {
       {
         step: 20,
         title: 'Convert Celsius to Fahrenheit',
-        instruction: `Celsius to Fahrenheit is the inverse formula: \`(temp * 9 / 5) + 32\`.
+        instruction: `Convert Celsius temperatures to Fahrenheit using the inverse formula: \`(temp * 9 / 5) + 32\`.
 
-**How this formula works:** We multiply by 9/5 to convert from Celsius degrees (larger) to Fahrenheit degrees (smaller), then add 32 to account for the different zero points. This is the reverse of the F-to-C conversion.
+**How this formula works:**
+
+We multiply by 9/5 to convert from Celsius degrees (larger) to Fahrenheit degrees (smaller), then add 32 to account for the different zero points. This is the reverse of the F-to-C conversion.
+
+**Example conversion:**
+
+Converting 25°C (room temperature) to Fahrenheit:
+
+| Step | Calculation | Result |
+|------|-------------|--------|
+| Start | 25°C | - |
+| Multiply by 9/5 | 25 × (9/5) | 45 |
+| Add 32 | 45 + 32 | 77°F |
 
 Using \`else if\` ensures only one branch runs. If the unit is "F", we skip the "C" branch entirely.
 
@@ -957,11 +1033,13 @@ println!("{} -> {}", a, b);
 {:.1}\u{00b0}C is {:.1}\u{00b0}F
 \`\`\`
 
-Then run the program with a Celsius input to see the output:
+Then run the program with a Celsius input to see the output. Try this special case:
 
 \`\`\`bash
-cargo run -- 100 C
-\`\`\``,
+cargo run -- -40 C
+\`\`\`
+
+Fun fact: -40°C equals -40°F! This is the only temperature where both scales meet.`,
         starterCode: `use std::env;
 use std::process;
 
@@ -1002,8 +1080,8 @@ fn main() {
             {
               type: 'terminal_command',
               command: 'cargo run',
-              projectSpecific: '100 c',
-              hints: ['Run: cargo run -- 100 C'],
+              projectSpecific: '-40 c',
+              hints: ['Run: cargo run -- -40 C'],
             },
           ],
           message: 'Print the C to F output',
@@ -1163,7 +1241,7 @@ fn main() {
 
 **Important edge cases for temperature conversion:**
 - Negative temperatures (below freezing)
-- Zero degrees (freezing point)
+- Zero degrees (freezing point of water)
 - Very large numbers
 - Decimal temperatures
 - Boundary values (like -40°F, which equals -40°C)
@@ -1172,27 +1250,31 @@ Testing helps you catch bugs before users do. Good programs handle both normal a
 
 
 \`\`\`bash
-# Test negative temperatures
-cargo run -- -10 F
-cargo run -- -10 C
-
-# Test zero
-cargo run -- 0 F
+# Test freezing point (water freezes at 0°C / 32°F)
 cargo run -- 0 C
+cargo run -- 32 F
 
-# Test decimal values
+# Test body temperature (normal human body temp)
 cargo run -- 98.6 F
-cargo run -- 37.5 C
+cargo run -- 37 C
+
+# Test below freezing (cold winter day)
+cargo run -- -10 F
+cargo run -- -23 C
 
 # Test the special -40 case (same in both scales)
 cargo run -- -40 F
 cargo run -- -40 C
+
+# Test absolute zero (coldest possible temperature)
+cargo run -- -273.15 C
 \`\`\``,
         task: `Test your program with various edge cases. Run it with:
-- Negative temperatures (\`-10 F\`, \`-10 C\`)
-- Zero (\`0 F\`, \`0 C\`)
-- Decimal values (\`98.6 F\`, \`37.5 C\`)
-- The special case \`-40 F\` (which equals \`-40 C\`)
+- Freezing point: \`0 C\` and \`32 F\` (water freezes at these temperatures)
+- Body temperature: \`98.6 F\` and \`37 C\` (normal human body temperature)
+- Below freezing: \`-10 F\` and \`-23 C\` (cold winter day)
+- The special case: \`-40 F\` and \`-40 C\` (the only temperature where both scales meet)
+- Absolute zero: \`-273.15 C\` (the coldest possible temperature)
 
 Verify that all outputs are correct and the program doesn't crash.`,
         starterCode: `use std::env;
@@ -1232,20 +1314,20 @@ fn main() {
             {
               type: 'terminal_command',
               command: 'cargo run',
-              projectSpecific: '-10 f',
-              hints: ['Test with: cargo run -- -10 F'],
-            },
-            {
-              type: 'terminal_command',
-              command: 'cargo run',
               projectSpecific: '0 c',
-              hints: ['Test with: cargo run -- 0 C'],
+              hints: ['Test freezing point: cargo run -- 0 C'],
             },
             {
               type: 'terminal_command',
               command: 'cargo run',
               projectSpecific: '98.6 f',
-              hints: ['Test with: cargo run -- 98.6 F'],
+              hints: ['Test body temperature: cargo run -- 98.6 F'],
+            },
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              projectSpecific: '-40 f',
+              hints: ['Test the special -40 case: cargo run -- -40 F'],
             },
           ],
           message: 'Test edge cases',
@@ -1253,8 +1335,88 @@ fn main() {
         test: ['Edge cases tested'],
         what_you_learned: `Testing edge cases helps ensure your program works correctly for all valid inputs, not just typical ones.`,
       },
+      {
+        step: 25,
+        title: 'Use your tool in real life',
+        instruction: `Your converter is complete and ready to use! This isn't just a learning exercise; you've built a real tool that solves a practical problem.
+
+Try using it for real scenarios:
+- Check the weather: convert your local temperature between scales
+- Cooking: convert oven temperatures (like 350°F for baking)
+- Science: understand temperatures in different contexts
+- Travel: convert temperatures when planning trips
+
+You've built something useful. That's what programming is all about: creating tools that solve problems.`,
+        task: `Try using your converter for real scenarios:
+- Convert your local weather: \`cargo run -- 72 F\` (a nice day)
+- Check cooking temperatures: \`cargo run -- 350 F\` (oven temperature for baking)
+- Understand scientific temps: \`cargo run -- 37 C\` (human body temperature)
+- Plan for travel: \`cargo run -- 25 C\` (comfortable room temperature)
+
+Your tool is ready to use whenever you need it!`,
+        starterCode: `use std::env;
+use std::process;
+
+fn main() {
+    println!("Temperature Converter");
+
+    let args: Vec<String> = env::args().collect();
+
+    if args.len() < 3 {
+        println!("Usage: temp_converter <temperature> <unit>");
+        process::exit(1);
+    }
+
+    let temp_str = &args[1];
+    let unit_str = &args[2];
+
+    let temp: f64 = temp_str.parse().expect("Invalid temperature");
+
+    let unit = unit_str.to_uppercase();
+
+    if unit == "F" {
+        let celsius = (temp - 32.0) * 5.0 / 9.0;
+        println!("{:.1}\u{00b0}F is {:.1}\u{00b0}C", temp, celsius);
+    } else if unit == "C" {
+        let fahrenheit = (temp * 9.0 / 5.0) + 32.0;
+        println!("{:.1}\u{00b0}C is {:.1}\u{00b0}F", temp, fahrenheit);
+    } else {
+        println!("Error: Invalid unit '{}'. Use 'F' or 'C'.", unit_str);
+        process::exit(1);
+    }
+}`,
+        highlightLine: 1,
+        validation: {
+          rules: [
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              projectSpecific: '72 f',
+              hints: ['Try: cargo run -- 72 F'],
+            },
+          ],
+          message: 'Use your converter for real scenarios',
+        },
+        test: ['Converter used for real scenarios'],
+        what_you_learned: `You've built a real tool that solves a practical problem. This is what programming is all about: creating useful tools.`,
+      },
     ],
-    completion_message: `Nice work! You built a temperature converter that reads args, validates input, handles errors, and works correctly for edge cases. You now have a solid CLI foundation for the next projects.`,
+    completion_message: `🎉 Congratulations! You've built your first Rust CLI tool!
+
+You've transformed from someone who runs programs to someone who BUILDS them.
+
+What you accomplished:
+✓ Created a Rust project with Cargo
+✓ Learned about variables, types, and references
+✓ Parsed command-line arguments
+✓ Handled errors gracefully
+✓ Performed calculations with floating-point math
+✓ Formatted beautiful output
+✓ Tested edge cases thoroughly
+
+This temperature converter is now YOURS. Use it whenever you need to convert temperatures. You built it, you understand it, you own it.
+
+Ready for the next challenge? Let's build a calculator next!`,
     extensions: `Try extending your converter:
 - Format output to 2 decimal places
 - Accept lowercase units without normalization

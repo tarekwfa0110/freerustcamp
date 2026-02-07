@@ -9,7 +9,7 @@ import { ProjectPreviewModal } from './ProjectPreviewModal';
 import { CompletionModal } from './CompletionModal';
 import { triggerConfetti } from '@/lib/confetti';
 import { runTests } from '@/lib/test-runner';
-import { markChallengeComplete, updateChallengeAttempt, loadProgress, addTerminalCommand, markStepComplete, resetChallengeProgress, saveChallengeCode, getTerminalCommandsForStep, isStepAccessible, markPreviewSeen, hasPreviewBeenSeen } from '@/lib/progress';
+import { markChallengeComplete, updateChallengeAttempt, loadProgress, addTerminalCommand, markStepComplete, resetChallengeProgress, saveChallengeCode, getTerminalCommandsForStep, isStepAccessible } from '@/lib/progress';
 import { validateStep } from '@/lib/step-validator';
 import { TestResult } from '@/lib/test-runner';
 import { Button } from '@/components/ui/button';
@@ -85,6 +85,7 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
   const [terminalHeight, setTerminalHeight] = useState(300); // Default expanded height
   const [isTerminalCollapsed, setIsTerminalCollapsed] = useState(true); // Closed by default
   const [messageBoxWidth, setMessageBoxWidth] = useState(400); // Default message box width
+  const [instructionsPanelWidth, setInstructionsPanelWidth] = useState(400); // Default instructions panel width
   const [terminalCommands, setTerminalCommands] = useState<string[]>([]);
   const [testAbortController, setTestAbortController] = useState<AbortController | null>(null);
   const [canFocusEditor, setCanFocusEditor] = useState(true);
@@ -211,6 +212,35 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
     document.body.style.cursor = 'row-resize';
     document.body.style.userSelect = 'none';
   }, [terminalHeight]);
+
+  // Handle instructions panel resize (horizontal split with editor)
+  const handleInstructionsPanelResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const startX = e.clientX;
+    const startWidth = instructionsPanelWidth;
+    
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      // Allow up to 60% of viewport width (for very large screens)
+      const maxWidth = Math.min(window.innerWidth * 0.6, 1200);
+      const newWidth = Math.max(300, Math.min(maxWidth, startWidth + deltaX));
+      setInstructionsPanelWidth(newWidth);
+    };
+    
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  }, [instructionsPanelWidth]);
 
   // Handle message box resize (horizontal split with terminal)
   const handleMessageBoxResizeStart = useCallback((e: React.MouseEvent) => {
@@ -476,6 +506,9 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
       setStepValidation(null);
       setIsTerminalCollapsed(true);
       loadedChallengeIdRef.current = null; // Force reload on next effect
+      // Reset completion tracking state
+      hasProjectCompletedRef.current = false;
+      setShowCompletionModal(false);
     }
   };
 
@@ -569,14 +602,14 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
     // Don't clear all - let each block manage its own
   }, [currentStep]);
 
-  // Check if preview should be shown on mount
+  // Check if preview should be shown when opening step 1
   useEffect(() => {
     if (isPracticeProject(challenge) && challenge.preview) {
-      const isFirstStep = currentStep === 0;
+      // Show preview every time step 1 is opened (step number 1, which is index 1)
+      const isStep1 = challenge.steps[currentStep]?.step === 1;
       const shouldShowPreview = 
         challenge.preview.mode === 'onLoad' && 
-        isFirstStep && 
-        !hasPreviewBeenSeen(challenge.id);
+        isStep1;
       
       if (shouldShowPreview) {
         setShowPreviewModal(true);
@@ -585,14 +618,11 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only run on challenge/step change
   }, [challenge.id, currentStep]);
 
-  // Handle preview modal close - mark as seen when user closes it
+  // Handle preview modal close - don't mark as seen so it shows again next time
   const handlePreviewClose = useCallback(() => {
     setShowPreviewModal(false);
-    if (isPracticeProject(challenge) && challenge.preview) {
-      markPreviewSeen(challenge.id);
-      reloadProgress();
-    }
-  }, [challenge, reloadProgress]);
+    // Don't mark as seen - we want it to show every time step 1 is opened
+  }, []);
 
   // Handle submit step (Ctrl+Enter / Submit button) - FCC-style hint reveal
   const handleSubmitStep = useCallback(() => {
@@ -712,8 +742,11 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
 
       {/* Main Content */}
       <div className="relative flex flex-1 overflow-hidden">
-        {/* Instructions Panel - Only scrollbar here */}
-        <div className="w-full max-w-md border-r border-metal-600 bg-metal-800/50 lg:w-[400px] flex flex-col">
+        {/* Instructions Panel - Resizable */}
+        <div 
+          className="border-r border-metal-600 bg-metal-800/50 flex flex-col flex-shrink-0"
+          style={{ width: `${instructionsPanelWidth}px` }}
+        >
           {/* Instructions Panel Header */}
           <div className="border-b border-metal-600 bg-metal-800/70 px-4 py-3 flex items-center justify-between flex-shrink-0">
             <h2 className="text-sm font-semibold text-foreground truncate flex-1">
@@ -822,24 +855,58 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
                         }
                       } else {
                         const newStep = Math.min(challenge.steps.length - 1, currentStep + 1);
+                        const currentStepData = challenge.steps[currentStep];
+                        const isIntroductionStep = currentStepData?.step === 0;
                         
-                        // Check if next step is accessible (all previous steps completed)
-                        const completedSteps = progress.challengeProgress[challenge.id]?.completedSteps || [];
-                        if (isStepAccessible(challenge, newStep, completedSteps)) {
+                        // For introduction step (step 0), always allow navigation to step 1
+                        if (isIntroductionStep) {
                           setCurrentStep(newStep);
                           setStepValidation(null);
+                        } else {
+                          // Check if next step is accessible (all previous steps completed)
+                          const completedSteps = progress.challengeProgress[challenge.id]?.completedSteps || [];
+                          if (isStepAccessible(challenge, newStep, completedSteps)) {
+                            setCurrentStep(newStep);
+                            setStepValidation(null);
+                          }
                         }
                       }
                     }}
                     disabled={
-                      !stepValidation?.completed ||
-                      (currentStep !== challenge.steps.length - 1 && (() => {
-                        // Disable if next step is locked (only for non-last steps)
-                        const nextStep = currentStep + 1;
-                        if (nextStep >= challenge.steps.length) return true;
-                        const completedSteps = progress.challengeProgress[challenge.id]?.completedSteps || [];
-                        return !isStepAccessible(challenge, nextStep, completedSteps);
-                      })())
+                      (() => {
+                        const currentStepData = challenge.steps[currentStep];
+                        const isIntroductionStep = currentStepData?.step === 0;
+                        const hasNoValidation = !currentStepData?.validation;
+                        
+                        // For introduction step (step 0), always allow navigation to step 1
+                        if (isIntroductionStep) {
+                          return false; // Always enabled for step 0
+                        }
+                        
+                        // For steps without validation config, allow navigation if next step is accessible
+                        if (hasNoValidation) {
+                          if (currentStep === challenge.steps.length - 1) return false; // Last step, allow
+                          const nextStep = currentStep + 1;
+                          if (nextStep >= challenge.steps.length) return true;
+                          const completedSteps = progress.challengeProgress[challenge.id]?.completedSteps || [];
+                          return !isStepAccessible(challenge, nextStep, completedSteps);
+                        }
+                        
+                        // For steps with validation, require completion
+                        if (!stepValidation?.completed) {
+                          return true; // Disabled if not completed
+                        }
+                        
+                        // Check if next step is accessible
+                        if (currentStep !== challenge.steps.length - 1) {
+                          const nextStep = currentStep + 1;
+                          if (nextStep >= challenge.steps.length) return true;
+                          const completedSteps = progress.challengeProgress[challenge.id]?.completedSteps || [];
+                          return !isStepAccessible(challenge, nextStep, completedSteps);
+                        }
+                        
+                        return false; // Last step, allow
+                      })()
                     }
                     className={cn("flex-1", currentStep === challenge.steps.length - 1 && stepValidation?.completed && "bg-green-600 hover:bg-green-700 text-white border-green-600")}
                   >
@@ -862,7 +929,7 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
             {/* Certification Project: Show Requirements */}
             {isCertificationProject(challenge) && (
               <div className="space-y-4">
-                <div className="font-sans text-base font-semibold text-foreground leading-relaxed markdown-content">
+                <div className="font-body text-base font-normal text-foreground leading-relaxed markdown-content">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={{
@@ -920,7 +987,7 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
                     {challenge.description}
                   </ReactMarkdown>
                 </div>
-                <div className="space-y-3 font-sans text-base font-semibold text-foreground">
+                <div className="space-y-3 font-body text-base font-normal text-foreground">
                   {challenge.requirements.functional.map((req: string, idx: number) => (
                     <div key={idx} className="leading-relaxed">
                       <ReactMarkdown
@@ -995,6 +1062,12 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
             </div>
           </div>
         </div>
+
+        {/* Resize Handle - Horizontal split between instructions and editor */}
+        <div
+          onMouseDown={handleInstructionsPanelResizeStart}
+          className="w-2 bg-transparent hover:bg-rust-500 cursor-col-resize transition-colors flex-shrink-0 z-10"
+        />
 
         {/* Editor Panel with Terminal */}
         <div className="flex flex-1 flex-col overflow-hidden min-w-0">

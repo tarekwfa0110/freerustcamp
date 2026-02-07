@@ -36,7 +36,8 @@ In `step.validation` (see `src/types/validation.ts`): **rules** array of validat
 ## Writing guidelines (condensed)
 
 - **One clear action per step;** instructions start with verbs; 1–3 sentences.
-- **Explanations** in a collapsible “Learn more” (use **explanation** and **what_you_learned**).
+- **Granular steps are the target:** Break down concepts into small, digestible steps. Project 1 (Temperature Converter) demonstrates this philosophy: 23 steps for a 1-hour project. Each concept (project creation, imports, parsing, type annotations, conversions, error handling) gets its own step. This granularity reduces cognitive load and makes learning easier.
+- **Explanations** in a collapsible "Learn more" (use **explanation** and **what_you_learned**).
 - **Starter code** via **starterCode** when needed; otherwise a single generic fallback is used.
 - **Validation:** Prefer **validation** rules in step data over adding hardcoded branches in `step-validator.ts`.
 - **Step numbers:** Unique; no duplicates. Renumber if you insert/remove steps.

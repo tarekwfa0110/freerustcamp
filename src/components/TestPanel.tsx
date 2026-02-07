@@ -2,7 +2,7 @@ import { Test } from '@/types/challenge';
 import { TestResult } from '@/lib/test-runner';
 import { CheckCircle2, XCircle, Clock, ChevronDown, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { Button } from '@/components/ui/button';
 
 interface TestPanelProps {
@@ -14,7 +14,7 @@ interface TestPanelProps {
   onReset?: () => void;
 }
 
-export function TestPanel({ tests, results, isRunning, onRunTests, onCancelTests }: TestPanelProps) {
+function TestPanelComponent({ tests, results, isRunning, onRunTests, onCancelTests }: TestPanelProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const getTestResult = (testName: string): TestResult | undefined => {
@@ -155,3 +155,5 @@ export function TestPanel({ tests, results, isRunning, onRunTests, onCancelTests
     </div>
   );
 }
+
+export const TestPanel = memo(TestPanelComponent);

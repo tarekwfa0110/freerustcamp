@@ -20,7 +20,9 @@ Put teaching and the task in **instruction** and **task**. Don’t put test desc
 2. **Example** — Code snippet that shows the **pattern** with **different** names/values from the task.
 3. **Task** — One clear action. Last paragraph of instruction or the `task` field.
 
-Rule: Explanation and example first; exact thing to type/implement last. Don’t lead with the solution.
+Rule: Explanation and example first; exact thing to type/implement last. Don't lead with the solution.
+
+**Philosophy: Granular steps are encouraged.** Break down concepts into small, digestible steps. Each step should teach one concept or require one clear action. Don't combine multiple concepts into a single step. Reference Project 1 (Temperature Converter) as the target: it has 23 steps for a 1-hour project, breaking down every concept (project creation, imports, parsing, type annotations, conversions, error handling) into individual steps. This granularity makes learning easier and reduces cognitive load.
 
 Exception: Single-sentence steps are ok when the action is trivial and the user has already seen the pattern.
 
@@ -35,6 +37,7 @@ Exception: Single-sentence steps are ok when the action is trivial and the user 
 - **Length:** 1–3 sentences for intro; keep the step scannable (linter warns if >5 sentences).
 - **Action-oriented:** Start with verbs (create, add, set, implement).
 - **One concept per step:** One snippet that teaches the pattern; optional bullets for terms.
+- **Granularity:** Prefer more steps over fewer. It's better to have 20 small steps than 10 large ones. Each step should feel achievable and focused. See Project 1 for reference: creating a project, entering the folder, and running it are three separate steps, not one.
 
 ## Validation (data-driven)
 
@@ -65,8 +68,10 @@ Other types: `code_contains`, `code_matches`, `function_exists`, `struct_exists`
 
 ## Quality checklist
 
-- [ ] Each step has one clear action.
+- [ ] Each step has one clear action (granular steps are encouraged).
 - [ ] Example uses different names/values than the task.
 - [ ] Step numbers unique per challenge.
 - [ ] Validation rules or hardcoded logic for each step (no auto-pass).
-- [ ] “What you learned” and hints in data, not in instruction body.
+- [ ] "What you learned" and hints in data, not in instruction body.
+- [ ] Steps are broken down granularly (reference Project 1: ~20–25 steps for a 1-hour project is the target).
+- [ ] Each concept (imports, parsing, type annotations, etc.) gets its own step when first introduced.
