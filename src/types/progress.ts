@@ -7,6 +7,7 @@ export interface ChallengeProgress {
   code?: string; // Last submitted code
   completedSteps?: number[]; // Array of completed step numbers
   terminalCommands?: Record<number, string[]>; // Terminal commands per step: step number -> commands array
+  createdDirectories?: string[]; // Directories created via cargo new (persists across terminal remounts)
 }
 
 export interface SectionProgress {

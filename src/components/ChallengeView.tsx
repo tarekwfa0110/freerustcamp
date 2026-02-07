@@ -10,10 +10,11 @@ import { CompletionModal } from './CompletionModal';
 import { triggerConfetti } from '@/lib/confetti';
 import { runTests } from '@/lib/test-runner';
 import { markChallengeComplete, updateChallengeAttempt, loadProgress, addTerminalCommand, markStepComplete, resetChallengeProgress, saveChallengeCode, getTerminalCommandsForStep, isStepAccessible } from '@/lib/progress';
+import type { ChallengeProgress } from '@/types/progress';
 import { validateStep } from '@/lib/step-validator';
 import { TestResult } from '@/lib/test-runner';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, CheckCircle2, X, RotateCcw, Lightbulb, Eye } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CheckCircle2, X, RotateCcw, Lightbulb, Eye, BookOpen, ChevronUp, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -82,6 +83,7 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
   const [isRunning, setIsRunning] = useState(false);
   const [timeSpent, setTimeSpent] = useState(0);
   const [isTestSidebarOpen, setIsTestSidebarOpen] = useState(false);
+  const [expandedExplanations, setExpandedExplanations] = useState<Map<number, boolean>>(new Map());
   const [terminalHeight, setTerminalHeight] = useState(300); // Default expanded height
   const [isTerminalCollapsed, setIsTerminalCollapsed] = useState(true); // Closed by default
   const [messageBoxWidth, setMessageBoxWidth] = useState(400); // Default message box width
@@ -100,6 +102,7 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
   const [stepValidation, setStepValidation] = useState<{ completed: boolean; message?: string; hints?: string[] } | null>(null);
   const [showStepGrid, setShowStepGrid] = useState(false);
   const [progress, setProgress] = useState(() => loadProgress());
+  const prevProgressRef = useRef<ChallengeProgress | undefined>(progress.challengeProgress[challenge.id]);
   const [hintLevels, setHintLevels] = useState<Record<number, number>>({}); // Track hint visibility per step
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [isMessageBoxVisible, setIsMessageBoxVisible] = useState(true);
@@ -122,7 +125,7 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
       if (inline || !language) {
         return (
           <code
-            className="inline font-mono bg-metal-800/50 text-foreground px-1 py-0.5 rounded-sm text-sm border border-metal-700/50"
+            className="inline font-mono bg-amber-950/60 text-amber-100 px-1 py-0.5 rounded-sm text-sm border border-amber-900/50"
             style={{ display: 'inline' }}
             {...rest}
           >
@@ -172,8 +175,23 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
 
   // Reload progress when needed
   const reloadProgress = useCallback(() => {
-    setProgress(loadProgress());
-  }, []);
+    const newProgress = loadProgress();
+    setProgress(newProgress);
+    
+    // Update progress ref
+    prevProgressRef.current = newProgress.challengeProgress[challenge.id];
+    
+    // Also reload terminal commands for current step when progress changes
+    // This ensures terminalCommands state stays in sync with progress
+    if (isPracticeProject(challenge) && challenge.steps[currentStep]) {
+      const stepNum = challenge.steps[currentStep]?.step;
+      if (stepNum) {
+        const savedCommands = getTerminalCommandsForStep(challenge.id, stepNum);
+        setTerminalCommands(savedCommands);
+        prevTerminalCommandsRef.current = [...savedCommands];
+      }
+    }
+  }, [challenge, currentStep]);
   
   // Use ref to track if we've loaded the initial code for this challenge
   const loadedChallengeIdRef = useRef<string | null>(null);
@@ -293,8 +311,10 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
       if (currentStepNum) {
         const savedCommands = getTerminalCommandsForStep(challenge.id, currentStepNum);
         setTerminalCommands(savedCommands);
+        prevTerminalCommandsRef.current = [...savedCommands];
       } else {
         setTerminalCommands([]);
+        prevTerminalCommandsRef.current = [];
       }
       
       // Reset terminal to collapsed state when switching challenges
@@ -302,6 +322,8 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
       setTerminalHeight(300); // Reset to default expanded height
       
       loadedChallengeIdRef.current = challenge.id;
+      // Initialize progress ref for this challenge
+      prevProgressRef.current = progress.challengeProgress[challenge.id];
       // Reset flag after a brief delay to allow state to update
       setTimeout(() => {
         isLoadingCodeRef.current = false;
@@ -344,9 +366,13 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
       if (stepNum) {
         const savedCommands = getTerminalCommandsForStep(challenge.id, stepNum);
         setTerminalCommands(savedCommands);
+        prevTerminalCommandsRef.current = [...savedCommands];
       } else {
         setTerminalCommands([]);
+        prevTerminalCommandsRef.current = [];
       }
+      // Initialize progress ref when step changes
+      prevProgressRef.current = progress.challengeProgress[challenge.id];
       // Reset flag after a brief delay
       setTimeout(() => {
         isLoadingCodeRef.current = false;
@@ -499,8 +525,10 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
         const stepNum = challenge.steps[0].step;
         const savedCommands = getTerminalCommandsForStep(challenge.id, stepNum);
         setTerminalCommands(savedCommands);
+        prevTerminalCommandsRef.current = [...savedCommands];
       } else {
         setTerminalCommands([]);
+        prevTerminalCommandsRef.current = [];
       }
       setTestResults(null);
       setStepValidation(null);
@@ -513,54 +541,80 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
   };
 
 
+  // Track previous terminal commands to detect changes
+  const prevTerminalCommandsRef = useRef<string[]>([]);
+
+  const validateCurrentStep = useCallback((revealHints: boolean) => {
+    if (!isPracticeProject(challenge) || !challenge.steps[currentStep]) return;
+    const step = challenge.steps[currentStep];
+    const validation = validateStep(step, code, terminalCommands, step.step, challenge.id);
+    setStepValidation(validation);
+
+    if (validation.completed) {
+      const completedSteps = progress.challengeProgress[challenge.id]?.completedSteps || [];
+      if (isStepAccessible(challenge, currentStep, completedSteps)) {
+        if (!completedSteps.includes(step.step)) {
+          markStepComplete(challenge.id, step.step);
+          const newProgress = loadProgress();
+          setProgress(newProgress);
+          prevProgressRef.current = newProgress.challengeProgress[challenge.id];
+        }
+      }
+    } else if (revealHints) {
+      setHintLevels(prev => ({
+        ...prev,
+        [step.step]: 1,
+      }));
+    }
+  }, [challenge, currentStep, code, terminalCommands, progress]);
+
   // Validate current step whenever code or terminal commands change (with debouncing)
   useEffect(() => {
-    // Clear existing timeout
     if (validationTimeoutRef.current) {
       clearTimeout(validationTimeoutRef.current);
     }
-    
-    const performValidation = () => {
-      if (isPracticeProject(challenge) && challenge.steps[currentStep]) {
-        const step = challenge.steps[currentStep];
-        // Use terminal commands for this specific step
-        const stepCommands = terminalCommands;
-        const validation = validateStep(step, code, stepCommands, step.step, challenge.id);
-        setStepValidation(validation);
-        
-        // Auto-mark step as complete if validation passes AND all previous steps are completed
-        if (validation.completed) {
-          const completedSteps = progress.challengeProgress[challenge.id]?.completedSteps || [];
-          
-          // Check if all previous steps are completed before marking this step complete
-          if (isStepAccessible(challenge, currentStep, completedSteps)) {
-            // All prerequisites met - can mark step complete
-            if (!completedSteps.includes(step.step)) {
-              markStepComplete(challenge.id, step.step);
-              reloadProgress();
-              
-              // Check if this is the last step - trigger project completion!
-              // We don't auto-complete anymore - wait for the user to click the "Complete Project" button
-              // This prevents double-counting time/attempts and accidental completions
-            }
-          }
-          // If prerequisites not met, don't mark complete (step is locked)
-        }
-      } else {
-        setStepValidation(null);
-      }
-    };
 
-    // Debounce validation for code/terminal command changes (300ms delay)
-    // But run immediately for step/challenge changes
-    if (currentStep !== prevStepRef.current || challenge.id !== prevChallengeRef.current) {
-      // Step or challenge changed - validate immediately
+    const terminalCommandsChanged =
+      prevTerminalCommandsRef.current.length !== terminalCommands.length ||
+      prevTerminalCommandsRef.current.some((cmd, i) => cmd !== terminalCommands[i]);
+
+    if (terminalCommandsChanged) {
+      prevTerminalCommandsRef.current = [...terminalCommands];
+    }
+
+    const progressChanged =
+      prevProgressRef.current !== progress.challengeProgress[challenge.id];
+
+    if (progressChanged && !terminalCommandsChanged && isPracticeProject(challenge)) {
+      const stepNum = challenge.steps[currentStep]?.step;
+      if (stepNum) {
+        const savedCommands = getTerminalCommandsForStep(challenge.id, stepNum);
+        if (
+          savedCommands.length !== terminalCommands.length ||
+          savedCommands.some((cmd, i) => cmd !== terminalCommands[i])
+        ) {
+          setTerminalCommands(savedCommands);
+          prevTerminalCommandsRef.current = [...savedCommands];
+          prevProgressRef.current = progress.challengeProgress[challenge.id];
+          return;
+        }
+      }
+      prevProgressRef.current = progress.challengeProgress[challenge.id];
+    }
+
+    if (
+      currentStep !== prevStepRef.current ||
+      challenge.id !== prevChallengeRef.current ||
+      terminalCommandsChanged
+    ) {
       prevStepRef.current = currentStep;
       prevChallengeRef.current = challenge.id;
-      performValidation();
+      if (progressChanged) {
+        prevProgressRef.current = progress.challengeProgress[challenge.id];
+      }
+      validateCurrentStep(false);
     } else {
-      // Code or terminal commands changed - debounce
-      validationTimeoutRef.current = setTimeout(performValidation, 300);
+      validationTimeoutRef.current = setTimeout(() => validateCurrentStep(false), 300);
     }
 
     return () => {
@@ -569,7 +623,7 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reloadProgress is stable
-  }, [code, terminalCommands, currentStep, challenge, progress.challengeProgress]);
+  }, [code, terminalCommands, currentStep, challenge, progress.challengeProgress, validateCurrentStep]);
 
   // Terminal is closed by default - user can open it when needed
   // We don't auto-open it anymore, even for steps that require terminal commands
@@ -623,32 +677,10 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
     // Don't mark as seen - we want it to show every time step 1 is opened
   }, []);
 
-  // Handle submit step (Ctrl+Enter / Submit button) - FCC-style hint reveal
+  // Handle submit step (Ctrl+Enter / Submit button) - run validation and show hints
   const handleSubmitStep = useCallback(() => {
-    if (isPracticeProject(challenge) && challenge.steps[currentStep]) {
-      const step = challenge.steps[currentStep];
-      
-      if (stepValidation?.completed) {
-        // Step is complete - advance to next step
-        if (currentStep < challenge.steps.length - 1) {
-          const nextStep = currentStep + 1;
-          const completedSteps = progress.challengeProgress[challenge.id]?.completedSteps || [];
-          if (isStepAccessible(challenge, nextStep, completedSteps)) {
-            setCurrentStep(nextStep);
-            setStepValidation(null);
-            // Reset hint visibility for new step
-            setHintLevels(prev => ({ ...prev, [step.step]: 0 }));
-          }
-        }
-      } else {
-        // Step is not complete - reveal hints (contextual to current failure)
-        setHintLevels(prev => ({
-          ...prev,
-          [step.step]: 1, // Show hints for this step
-        }));
-      }
-    }
-  }, [challenge, currentStep, stepValidation, progress]);
+    validateCurrentStep(true);
+  }, [validateCurrentStep]);
 
   // Handle moving to next step (for Next button)
   const handleNextStep = useCallback(() => {
@@ -679,19 +711,18 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
         // Save to progress first (synchronous operation)
         addTerminalCommand(challenge.id, stepNumber, command);
         
-        // Update state with the new command - this will trigger validation effect
-        setTerminalCommands((prev) => {
-          if (!prev.includes(command)) {
-            return [...prev, command];
-          }
-          return prev;
-        });
+        // Update state with the new command - this will trigger validation effect immediately
+        // (no debounce for terminal command changes)
+        const updatedCommands = [...terminalCommands, command];
+        setTerminalCommands(updatedCommands);
         
-        // Reload progress after state update is queued
-        // Use requestAnimationFrame to ensure state update is processed first
-        requestAnimationFrame(() => {
-          reloadProgress();
-        });
+        // Update ref immediately to prevent false change detection
+        prevTerminalCommandsRef.current = [...updatedCommands];
+        
+        // Reload progress synchronously to ensure state is in sync
+        // This ensures progress state is updated, but we've already updated terminalCommands state
+        // so validation will use the correct state
+        reloadProgress();
       }
     }
   };
@@ -803,9 +834,40 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
                       {step.instruction}
                     </ReactMarkdown>
 
+                    {/* Explanation - Collapsible */}
+                    {step.explanation && (
+                      <div className="mt-4 border border-metal-600 rounded-lg overflow-hidden">
+                        <button
+                          onClick={() => {
+                            const currentExpanded = expandedExplanations.get(step.step) || false;
+                            expandedExplanations.set(step.step, !currentExpanded);
+                            setExpandedExplanations(new Map(expandedExplanations));
+                          }}
+                          className="w-full flex items-center justify-between p-3 bg-metal-800/50 hover:bg-metal-800 transition-colors"
+                        >
+                          <div className="flex items-center gap-2">
+                            <BookOpen className="h-4 w-4 text-rust-400" />
+                            <span className="font-semibold text-foreground">Learn More</span>
+                          </div>
+                          {(expandedExplanations.get(step.step) || false) ? (
+                            <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                          )}
+                        </button>
+                        {(expandedExplanations.get(step.step) || false) && (
+                          <div className="p-4 bg-metal-800/30 markdown-content">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponentsForStep}>
+                              {step.explanation}
+                            </ReactMarkdown>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     {/* Task as normal text at the end (FCC-style) */}
                     {step.task && (
-                      <div className="mt-4 pt-4 border-t border-metal-700/30">
+                      <div className="mt-6 pt-6 border-t-2 border-metal-600/50">
                         <ReactMarkdown
                           key={`${stepKey}-task`}
                           remarkPlugins={[remarkGfm]}
@@ -837,7 +899,7 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
                     Previous
                   </Button>
                   <Button
-                    variant={currentStep === challenge.steps.length - 1 && stepValidation?.completed ? "default" : "outline"}
+                    variant={stepValidation?.completed ? "default" : "outline"}
                     size="sm"
                     onClick={() => {
                       const isLastStep = currentStep === challenge.steps.length - 1;
@@ -852,13 +914,20 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
                           // Already completed - just show modal again
                           setShowCompletionModal(true);
                         }
-                      } else {
+                      } else if (stepValidation?.completed) {
                         const newStep = Math.min(challenge.steps.length - 1, currentStep + 1);
                         const currentStepData = challenge.steps[currentStep];
                         const isIntroductionStep = currentStepData?.step === 0;
                         
                         // For introduction step (step 0), always allow navigation to step 1
                         if (isIntroductionStep) {
+                          // Mark intro step as complete when moving forward
+                          if (!progress.challengeProgress[challenge.id]?.completedSteps?.includes(currentStepData.step)) {
+                            markStepComplete(challenge.id, currentStepData.step);
+                            const newProgress = loadProgress();
+                            setProgress(newProgress);
+                            prevProgressRef.current = newProgress.challengeProgress[challenge.id];
+                          }
                           setCurrentStep(newStep);
                           setStepValidation(null);
                         } else {
@@ -869,6 +938,8 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
                             setStepValidation(null);
                           }
                         }
+                      } else {
+                        handleSubmitStep();
                       }
                     }}
                     disabled={
@@ -891,9 +962,9 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
                           return !isStepAccessible(challenge, nextStep, completedSteps);
                         }
                         
-                        // For steps with validation, require completion
+                        // For steps with validation, allow submit even if not completed
                         if (!stepValidation?.completed) {
-                          return true; // Disabled if not completed
+                          return false;
                         }
                         
                         // Check if next step is accessible
@@ -907,18 +978,28 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
                         return false; // Last step, allow
                       })()
                     }
-                    className={cn("flex-1", currentStep === challenge.steps.length - 1 && stepValidation?.completed && "bg-green-600 hover:bg-green-700 text-white border-green-600")}
+                    className={cn(
+                      "flex-1",
+                      stepValidation?.completed && "bg-green-600 hover:bg-green-700 text-white border-green-600"
+                    )}
                   >
                     {currentStep === challenge.steps.length - 1 ? (
                       <>
                         <CheckCircle2 className="h-4 w-4 mr-1" />
-                        Complete Project
+                        {stepValidation?.completed ? 'Complete Project' : 'Submit'}
                       </>
                     ) : (
-                      <>
-                        Next
-                        <ChevronRight className="h-4 w-4 ml-1" />
-                      </>
+                      stepValidation?.completed ? (
+                        <>
+                          Next
+                          <ChevronRight className="h-4 w-4 ml-1" />
+                        </>
+                      ) : (
+                        <>
+                          Submit
+                          <ChevronRight className="h-4 w-4 ml-1" />
+                        </>
+                      )
                     )}
                   </Button>
                 </div>
@@ -1112,7 +1193,7 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
             )}
 
             {/* Message Box - Right side, resizable */}
-            {isPracticeProject(challenge) && challenge.steps[currentStep] && isMessageBoxVisible && !isTerminalCollapsed && (
+            {isPracticeProject(challenge) && challenge.steps[currentStep] && isMessageBoxVisible && (
               <div 
                 className="bg-metal-800 border-l border-metal-600 flex flex-col overflow-hidden flex-shrink-0"
                 style={{ 
@@ -1122,7 +1203,7 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
               >
                 {/* Message Box Header */}
                 <div className="flex items-center justify-between px-3 py-2 border-b border-metal-600 bg-metal-700 flex-shrink-0">
-                  <span className="text-xs font-semibold text-foreground">Checks</span>
+                  <span className="text-sm font-semibold text-foreground">Checks</span>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -1135,7 +1216,7 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
 
                 {/* Message Box Content */}
                 <div className="flex-1 overflow-y-auto p-3">
-                  <div className="space-y-2 text-sm">
+                  <div className="space-y-2 text-base">
                     {/* Validation/Completion Status - Only show the message, not test items */}
                     {stepValidation && (
                       <>
@@ -1165,9 +1246,9 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
                                 <div className="pt-2 border-t border-metal-600/50">
                                   <div className="flex items-center gap-2 mb-1">
                                     <Lightbulb className="h-3.5 w-3.5 text-yellow-400" />
-                                    <span className="text-xs font-semibold text-yellow-200">Hints</span>
+                                    <span className="text-sm font-semibold text-yellow-200">Hints</span>
                                   </div>
-                                  <ul className="list-disc list-inside space-y-0.5 text-xs text-yellow-200/80 ml-5">
+                                  <ul className="list-disc list-inside space-y-0.5 text-sm text-yellow-200/80 ml-5">
                                     {hints.map((hint: string, idx: number) => (
                                       <li key={idx}>{hint}</li>
                                     ))}
@@ -1183,7 +1264,7 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
                     {/* What You Learned - Show when completed, subtle */}
                     {stepValidation?.completed && challenge.steps[currentStep].what_you_learned && (
                       <div className="pt-2 border-t border-metal-600/50">
-                        <p className="text-xs text-muted-foreground leading-relaxed italic">
+                        <p className="text-sm text-muted-foreground leading-relaxed italic">
                           {challenge.steps[currentStep].what_you_learned}
                         </p>
                       </div>

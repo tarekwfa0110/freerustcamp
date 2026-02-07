@@ -1,0 +1,479 @@
+# FreeRustCamp Content Authoring Rules
+
+## Core Philosophy
+
+**Granular, step-by-step guidance** is the core philosophy. Each step should teach one concept or require one clear action. Project 1 (Temperature Converter) demonstrates this: 23 steps for a 1-hour project, breaking down every concept into individual steps. This granularity makes learning easier and reduces cognitive load.
+
+## Rule Maintenance (CRITICAL)
+
+**Every mistake must be documented in this rules file.** When a user encounters an error, a validation fails, a hint is unhelpful, or any issue occurs that could have been prevented by better rules or validation, it must be added to this file. This ensures the rules file grows more comprehensive over time and prevents the same mistakes from recurring.
+
+- ✅ **When a user reports an issue**, document it in the appropriate section
+- ✅ **When validation fails to catch an error**, add it to "Common Error Patterns to Check"
+- ✅ **When a hint is unhelpful**, improve it and document the pattern in "Hints" section
+- ✅ **When a common mistake pattern emerges**, add it to the validation strategy
+- ✅ **When a writing pattern causes confusion**, add it to "Common Mistakes to Avoid"
+
+## Step Structure
+
+### Order (CRITICAL)
+1. **Explain** — Short explanation (1–3 sentences). Why it matters, how it works.
+2. **Example** — Code snippet that shows the **pattern** with **different** names/values from the task.
+3. **Task** — One clear action. Last paragraph of instruction or the `task` field.
+
+**Rule: Explanation and example first; exact thing to type/implement last. Don't lead with the solution.**
+
+### Content Fields
+
+- **instruction**: Teaching content (markdown). Explain the concept, show an example, then state what to do.
+- **task**: Specific goal (what the user must do). State exact variable names, types, indices. **DO NOT include exact code blocks** - describe what to add/write instead.
+- **test**: Short descriptions shown in checks (string array, e.g. `['add() exists']`)
+- **what_you_learned**: Shown when step completes (string, e.g. `"Functions help organize code into reusable pieces."`)
+- **starterCode**: Starting code for the editor (optional). If not provided, a generic fallback is used.
+- **highlightLine**: Optional line number to highlight in starter code (1-indexed)
+- **editableRegion**: Optional range `[startLine, endLine]` to mark editable region (1-indexed, inclusive) - FCC-style
+- **explanation**: Optional collapsible "Learn more" content (not commonly used)
+- **validation**: Data-driven validation rules (optional). If missing, hardcoded validator runs.
+
+## Examples vs Tasks - CRITICAL RULES
+
+### Examples (in instruction)
+- ✅ **MUST use different variable names or values** than the task
+- ✅ Show the **pattern** without giving away the solution
+- ✅ Example: `let first_item = &my_vec[0];` when task is "store `args[1]` in `temp_str`"
+- ❌ **NEVER mirror the task** - don't use the same identifiers or exact same code
+- ❌ **NEVER include exact code the user needs to write** in the example
+
+### Tasks
+- ✅ State the **exact goal** (variable names, types, indices)
+- ✅ Describe what to do: "Add `use std::env;` at the top"
+- ❌ **NEVER include code blocks with exact code** - describe it instead
+- ❌ **NEVER repeat the example** - if example would repeat task, skip the example
+
+### Terminal Commands
+- ❌ **NEVER include examples for terminal commands** - they would just repeat the task
+- ✅ Task should state: "Run `cargo new temp_converter` in the terminal"
+- ❌ Task should NOT include an example block showing the same command
+
+## Validation Rules
+
+### Function Signatures - CRITICAL
+- ❌ **NEVER use `code_contains` with exact function signature strings** - fails if user writes `a:f64` instead of `a: f64`
+- ✅ **ALWAYS use `code_matches` with regex** for function signatures to allow flexible whitespace
+
+**Good pattern:**
+```ts
+{
+  type: 'code_matches',
+  regex: 'fn\\s+add\\s*\\(\\s*a\\s*:\\s*f64\\s*,\\s*b\\s*:\\s*f64\\s*\\)',
+  hints: ['Check spacing: a: f64 (space after colon) or a:f64 (no space) both work'],
+}
+```
+
+**Bad pattern:**
+```ts
+{
+  type: 'code_contains',
+  patterns: ['fn add(a: f64, b: f64)'], // ❌ Too strict!
+}
+```
+
+### Regex Guidelines
+- Use `\\s*` (zero or more whitespace) around colons and commas for flexible spacing
+- Use `\\s+` (one or more whitespace) for required spaces (like after `fn`)
+- Escape special regex characters: `\\(`, `\\)`, `\\+`, `\\*`, etc.
+
+### Validation Types
+- **`code_matches`**: Use for structural checks (function signatures, type annotations). Requires `regex` and optional `flags`.
+- **`code_contains`**: Use for simple substring checks (keywords, specific strings). Requires `patterns` array and optional `allRequired` (default: false).
+- **`function_exists`**: Check if function name exists. Requires `functionName`.
+- **`struct_exists`**: Check if struct exists. Requires `structName` and optional `fields` array.
+- **`terminal_command`**: Check if command was run. Requires `command` and optional `projectSpecific` (for project-specific commands like `cargo new temp_converter`).
+- **`code_compiles`**: Reserved for future use (not implemented yet)
+- **`custom`**: Reserved for future use (not implemented yet)
+
+### Validation Fallback
+- ✅ **If `validation` is missing**: Hardcoded validator in `step-validator.ts` runs (project/step-specific logic)
+- ✅ **If `validation` exists**: Data-driven validator runs instead
+- ✅ **Prefer data-driven**: Add validation rules to step data rather than hardcoded logic
+
+### Validation Config
+- **`validation.message`**: Optional completion message shown when all rules pass
+- **`validation.rules`**: Array of validation rule objects, each with `type`, `hints` (string[]), and type-specific fields
+
+### Hints
+- ✅ **MUST be error-focused, not advisory** - say "Missing semicolon" not "Add semicolon"
+- ✅ Always provide helpful hints that mention spacing flexibility when relevant
+- ✅ Be specific about what's missing or wrong
+- ✅ Provide multiple hints for different error scenarios (e.g., typo, missing colon, wrong type)
+- ✅ **Split complex validations** into multiple rules for better error messages
+- ✅ **Check common mistakes** - if users frequently make a specific error (like missing spaces in strings), add a specific check with a helpful hint
+
+### Learning from Mistakes
+
+**CRITICAL: Every mistake must be documented in this rules file.**
+
+- ✅ **When a validation fails to catch a user error**, add it to the cursor rules file immediately
+- ✅ **When a hint is unhelpful**, improve it and document the pattern in this file
+- ✅ **When users make the same mistake**, add a specific validation rule with a clear hint and document it here
+- ✅ **Document common error patterns** in the validation section of cursor rules
+- ✅ **Split complex validations** into multiple rules so each error gets a specific hint
+- ✅ **Check for common typos** - if users frequently misspell something, add a check and document it
+- ✅ **Validate exact strings carefully** - if a message must match exactly (like usage strings), check for spacing issues and document the pattern
+- ✅ **When a user reports "this doesn't pass"**, investigate, fix the validation, and add the pattern to prevent recurrence
+- ✅ **When a step's instruction is unclear**, improve it and document what made it unclear
+- ✅ **When examples are too similar to tasks**, fix them and document the anti-pattern
+
+### Common Error Patterns to Check
+- **Missing spaces in strings**: Usage messages, error messages (e.g., `<num1><operator>` vs `<num1> <operator>`)
+- **Function name typos**: Check function exists separately from signature validation
+- **Missing semicolons**: Use semicolon detection in validator
+- **Wrong index**: If using `args[1]` vs `args[2]`, validate the correct index
+- **Missing wrapping**: If `Some(...)` is needed, check for it specifically
+- **Missing exit calls**: If `process::exit(1)` is required, check it exists
+- **Missing type annotations**: If `: f64` or `: Vec<String>` is required, check for it **specifically** - don't just check if `: f64` appears anywhere, check that it appears in the right place (e.g., `let num1: f64`)
+- **Missing method calls**: If `.parse()` or `.expect()` is needed, check each separately
+- **Wrong variable names**: If specific names like `num1`, `op`, `result` are required, check each
+- **Error messages**: Only validate exact error message text if the instruction explicitly specifies it. If the instruction just says "use `.expect()`" or shows an example, don't require the exact message from the example
+- **Type annotation placement**: Use positive checks (e.g., `let num1: f64`) rather than negative checks (e.g., `let num1[^:]*=`) - negative regex patterns are error-prone and can cause false positives
+- **Avoid negative regex patterns**: Don't use patterns like `[^:]*` to check for absence - they can match incorrectly. Use positive checks instead
+
+### Comprehensive Validation Strategy
+- ✅ **Split complex checks** into multiple rules - one rule per concept
+- ✅ **Check prerequisites first** - e.g., check function exists before checking signature
+- ✅ **Provide progressive hints** - start general, get more specific
+- ✅ **Validate each component** - if `let num1: f64 = args[1].parse().expect(...)`, check:
+  1. Variable name exists
+  2. Type annotation exists
+  3. Correct index used
+  4. Parse method called
+  5. Expect method called
+- ✅ **Check for common mistakes** - add specific rules for frequent errors
+- ✅ **Use multiple validation types** - combine `code_contains`, `code_matches`, `function_exists` for comprehensive coverage
+
+## Instruction Writing Rules
+
+### Length & Structure
+- **1–3 sentences** for intro explanation
+- Keep steps scannable (linter warns if >5 sentences)
+- **Action-oriented**: Start with verbs (create, add, set, implement)
+- **One concept per step**: One snippet that teaches the pattern
+
+### Granularity
+- ✅ **Prefer more steps over fewer** - 20 small steps > 10 large ones
+- ✅ Each concept (imports, parsing, type annotations, etc.) gets its own step when first introduced
+- ✅ Reference Project 1: ~20–25 steps for a 1-hour project is the target
+- ✅ Creating a project, entering the folder, and running it are **three separate steps**, not one
+
+### Content Separation
+- ✅ Put teaching and task in **instruction** and **task**
+- ❌ **NEVER put test descriptions or "what you learned" in instruction** - app shows those in message box
+- ❌ **NEVER put hints in instruction body** - they go in validation rules
+
+## Common Mistakes to Avoid
+
+### ❌ DON'T:
+1. **Give exact code in task** - describe what to add instead
+2. **Use same identifiers in example and task** - example must be different
+3. **Include code blocks in task field** - describe the goal instead
+4. **Use exact string matching for function signatures** - use regex with flexible spacing
+5. **Repeat terminal commands in example** - skip example for terminal steps
+6. **Put hints/test descriptions in instruction** - they belong in validation/message box
+7. **Combine multiple concepts in one step** - break them down
+8. **Use advisory language in hints** - use error-focused language ("Missing X" not "Add X")
+9. **Lead with the solution** - explain and example first, task last
+10. **Make examples mirror tasks** - examples must teach pattern with different code
+
+### ✅ DO:
+1. **Describe what to do** in task, not exact code
+2. **Use different names/values in examples** than the task
+3. **Use regex for function signatures** to allow flexible spacing
+4. **Break down concepts** into individual steps
+5. **Make hints error-focused** ("Missing semicolon" not "Add semicolon")
+6. **Put explanation first, then example, then task**
+7. **Skip examples for terminal commands** to avoid duplication
+8. **One concept per step** - granular steps are encouraged
+9. **State exact goal** in task (variable names, types, indices) but describe it, don't show code
+10. **Reference Project 1** as the target for granularity and style
+
+## Step Numbering
+
+- ✅ **Must be unique** within each challenge (no duplicates)
+- ✅ **Sequential**: Use 0, 1, 2, 3... (0 is typically introduction step)
+- ✅ **Step 0**: Introduction step explaining the project. No validation needed, can navigate freely.
+- ❌ **Don't skip numbers** (0, 1, 3, 4 is bad - use 0, 1, 2, 3)
+- ✅ **Renumber if inserting/removing** steps to maintain sequence
+
+## Introduction Steps (Step 0)
+
+- **Purpose**: Explain what the project is, why it matters, what concepts are taught
+- **No validation**: Introduction steps don't need validation rules
+- **Can navigate**: Users can click "Next" without completing validation
+- **Preview modal**: If project has `preview` config, it appears when step 1 is opened (every time, not just first)
+- **Content**: Use tables, lists, and clear explanations. Don't include code examples that mirror the actual project code.
+
+## Project-Level Fields
+
+### Practice Projects (Step-by-Step Learning)
+- **id**: Unique identifier (e.g. `'project-001'`)
+- **title**: Display name (e.g. `'Learn Variables by Building a Temperature Converter'`)
+- **section**: Section number (e.g. `1`)
+- **type**: `'practice'`
+- **estimated_time**: Number in minutes (e.g. `60`)
+- **difficulty**: `'beginner' | 'intermediate' | 'advanced'`
+- **concepts_taught**: Array of concept strings (e.g. `['variables', 'basic_types', 'arithmetic']`)
+- **project_overview**: Brief description of what user will build
+- **why_this_project**: Why this project is valuable for learning
+- **prerequisites**: Array of prerequisite strings
+- **steps**: Array of `ProjectStep` objects
+- **completion_message**: Message shown when project is completed
+- **extensions**: Optional string with extension ideas/challenges
+- **preview**: Optional modal config shown before step 1
+  - **mode**: `'onLoad'` (shown automatically) or `'onClick'` (manual)
+  - **title**: Modal title
+  - **description**: What the project does (optional)
+  - **example_output**: Example terminal output (optional)
+
+### Starter Code Guidelines
+- ✅ **Provide starterCode** when the step builds on previous code
+- ✅ **Include relevant context** - show what was added in previous steps
+- ✅ **Use highlightLine** to draw attention to specific lines (1-indexed)
+- ✅ **Use editableRegion** for FCC-style editable ranges `[startLine, endLine]` (1-indexed, inclusive)
+- ❌ **Don't include everything** - only show what's relevant to current step
+- ✅ **If no starterCode**: App uses generic fallback (`// Write your code here`)
+- ✅ **Template literals**: Use backticks for multi-line starter code, escape backticks if needed
+
+### Certification Projects (No Steps)
+- **Different structure**: No `steps` array, uses `requirements` and `tests` instead
+- **requirements**: Object with `functional`, `technical`, and optional `quality` arrays
+- **tests**: Array of `Test` objects (compilation, functional, code_quality, etc.)
+- **evaluation**: Array of evaluation criteria strings
+- **No step-by-step guidance**: User builds independently based on requirements
+- **Note**: Cursor rules focus on practice projects; certification projects follow different patterns
+
+## Markdown Formatting in Instructions
+
+- **Inline code**: Use backticks for single identifiers (`fn`, `f64`, `args[1]`)
+- **Code blocks**: Use triple backticks with language tag for examples:
+  ```rust
+  fn example() {
+      // code here
+  }
+  ```
+- **Messages/text to print**: When specifying exact text that should be printed (like error messages, usage strings, or output), use code blocks with `text` language tag for clarity:
+  ```text
+  Usage: calculator <num1> <operator> <num2>
+  ```
+  This makes it clear what the exact output should be.
+- **Bold**: Use `**text**` for emphasis
+- **Lists**: Use `-` for bullet points, `1.` for numbered
+- **Tables**: Use markdown table syntax (supported by `remark-gfm`)
+
+## Quality Checklist
+
+Before finalizing any step:
+- [ ] Each step has one clear action (granular steps are encouraged)
+- [ ] Example uses different names/values than the task
+- [ ] Task describes what to do, NOT exact code blocks
+- [ ] No duplicate instruction blocks (example doesn't repeat task)
+- [ ] Step numbers unique per challenge and sequential (0, 1, 2...)
+- [ ] Step 0 (if present) has no validation rules
+- [ ] Validation rules use flexible regex for function signatures
+- [ ] Hints are error-focused, not advisory
+- [ ] "What you learned" and hints in data, not in instruction body
+- [ ] Steps are broken down granularly (~20–25 steps for 1-hour project)
+- [ ] Each concept gets its own step when first introduced
+- [ ] Terminal command steps don't have example blocks
+- [ ] Instruction follows: explain → example → task order
+- [ ] Starter code includes relevant context from previous steps
+- [ ] highlightLine points to correct line if used
+- [ ] test array has short, descriptive strings
+- [ ] what_you_learned is a complete sentence explaining the concept
+
+## Examples of Good vs Bad
+
+### ❌ BAD Task (includes exact code):
+```ts
+task: `Add these imports at the top of the file:
+
+\`\`\`rust
+use std::env;
+use std::process;
+\`\`\``
+```
+
+### ✅ GOOD Task (describes what to do):
+```ts
+task: `Add \`use std::env;\` and \`use std::process;\` at the top of the file, above your function definitions.`
+```
+
+### ❌ BAD Example (mirrors task):
+```ts
+// Task: "Add fn add(a: f64, b: f64) -> f64"
+instruction: `Example:
+\`\`\`rust
+fn add(a: f64, b: f64) -> f64 {
+    a + b
+}
+\`\`\``
+```
+
+### ✅ GOOD Example (different from task):
+```ts
+// Task: "Add fn add(a: f64, b: f64) -> f64"
+instruction: `Example:
+\`\`\`rust
+fn double(x: f64) -> f64 {
+    x * 2.0
+}
+\`\`\``
+```
+
+### ❌ BAD Validation (exact string):
+```ts
+{
+  type: 'code_contains',
+  patterns: ['fn add(a: f64, b: f64)'],
+}
+```
+
+### ✅ GOOD Validation (flexible regex):
+```ts
+{
+  type: 'code_matches',
+  regex: 'fn\\s+add\\s*\\(\\s*a\\s*:\\s*f64\\s*,\\s*b\\s*:\\s*f64\\s*\\)',
+  hints: ['Check spacing: a: f64 (space after colon) or a:f64 (no space) both work'],
+}
+```
+
+### ❌ BAD Hint (advisory):
+```ts
+hints: ['Add semicolon after let declaration']
+```
+
+### ✅ GOOD Hint (error-focused):
+```ts
+hints: ['Missing semicolon after let declaration']
+```
+
+## Step 0 (Introduction) Example
+
+### ✅ GOOD Step 0:
+```ts
+{
+  step: 0,
+  title: 'Understand what you\'re building',
+  instruction: `Welcome! In this project, you'll build a command-line temperature converter...
+
+**What you're building:**
+A Rust program that reads a temperature and unit from the command line...
+
+**Why this project?**
+Temperature conversion is practical and real-world...
+
+**The conversion formulas:**
+| Formula | Description |
+|---------|-------------|
+| celsius = (fahrenheit - 32) × 5/9 | Fahrenheit to Celsius |
+| fahrenheit = (celsius × 9/5) + 32 | Celsius to Fahrenheit |
+
+Don't worry about memorizing everything. You'll build this step by step.`,
+  task: `Read through this introduction to understand what you'll build. When you're ready, click "Next" to start creating your project!`,
+  starterCode: `// Welcome to your first Rust project!
+// You'll build a temperature converter step by step.
+// Click "Next" when you're ready to begin.`,
+  test: ['Introduction read'],
+  what_you_learned: `You understand what you're building: a practical temperature converter that will teach you Rust fundamentals.`,
+  // Note: No validation field - introduction steps don't need validation
+}
+```
+
+## Terminal Command Validation
+
+### ✅ GOOD Terminal Command Rule:
+```ts
+{
+  type: 'terminal_command',
+  command: 'cargo new',
+  projectSpecific: 'temp_converter', // Optional: makes it project-specific
+  hints: ['Run: cargo new temp_converter in the terminal'],
+}
+```
+
+### Notes:
+- **No example needed** - terminal commands skip examples (would just repeat task)
+- **projectSpecific**: Use when command includes project name (e.g. `cargo new temp_converter`)
+- **Storage**: Commands are stored per (challengeId, stepNumber)
+- **Step-scoped**: Terminal resets when step changes
+
+## Field Format Guidelines
+
+### test (string[])
+- ✅ **Short, descriptive** - e.g. `['add() exists']`, `['Imports added']`
+- ✅ **Action-focused** - describe what should be present/done
+- ❌ **Not full sentences** - keep concise
+- ✅ **Multiple items** - can have multiple checks: `['divide returns Option<f64>', 'None returned for zero']`
+
+### what_you_learned (string)
+- ✅ **Complete sentence** - e.g. `"Functions help organize code into reusable pieces."`
+- ✅ **Concept-focused** - explain the concept learned, not just what was done
+- ✅ **Present tense** - "Functions help..." not "You learned..."
+- ❌ **Not too long** - one sentence, max two
+
+### completion_message (string, project-level)
+- ✅ **Celebratory and informative** - congratulate and summarize what was built
+- ✅ **Include next steps** - suggest how to use or extend the project
+- ✅ **Can be multi-paragraph** - more detailed than step-level messages
+
+## Common Patterns
+
+### Pattern: First Function Definition
+- Step 1: Create empty function (no params, no return)
+- Step 2: Add parameters
+- Step 3: Add return type and return value
+- **Why**: Breaks down function concepts into digestible pieces
+
+### Pattern: Import Steps
+- Step: Import one or two related modules
+- Example: Show different imports (not the ones being added)
+- Task: Describe which imports to add
+- **Why**: Each import concept gets its own step
+
+### Pattern: Error Handling
+- Step 1: Basic operation (may fail)
+- Step 2: Add error handling (Option, Result, or explicit checks)
+- **Why**: Shows progression from naive to robust
+
+### Pattern: Parsing Input
+- Step 1: Read raw input (string)
+- Step 2: Parse to number/type
+- Step 3: Handle parse errors
+- **Why**: Separates I/O from parsing from error handling
+
+## Edge Cases & Gotchas
+
+### Multiple Validation Rules
+- ✅ **Can have multiple rules** - all must pass for step to complete
+- ✅ **Order matters** - check simpler rules first (e.g. `function_exists` before `code_matches`)
+- ✅ **Each rule has its own hints** - provide specific hints for each rule
+
+### Code Contains with allRequired
+- ✅ **Use `allRequired: true`** when ALL patterns must be present
+- ✅ **Use `allRequired: false`** (default) when ANY pattern is sufficient
+- Example: `patterns: ['use std::env;', 'use std::process;'], allRequired: true` - both imports needed
+
+### Regex Flags
+- ✅ **Use `flags: 's'`** for multiline matching (`.` matches newlines)
+- ✅ **Use `flags: 'i'`** for case-insensitive matching (rarely needed for Rust)
+- Example: `regex: 'fn\\s+add...', flags: 's'` for matching across lines
+
+### Starter Code Escaping
+- ✅ **Use template literals** (backticks) for starterCode
+- ✅ **Escape backticks** if needed: `` `use std::env;` ``
+- ✅ **Use `\n`** for line breaks in template literals
+
+### Validation Optionality
+- ✅ **Introduction steps (step 0)**: Typically have no validation - users can navigate freely
+- ✅ **Regular steps**: Should have validation rules (data-driven preferred)
+- ✅ **If no validation**: Hardcoded validator may handle it, but prefer explicit validation rules
+- ❌ **Don't auto-pass**: Never assume a step passes without explicit validation
