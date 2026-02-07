@@ -1543,7 +1543,7 @@ Don't worry about memorizing everything. You'll build this step by step, and eac
       {
         step: 4,
         title: 'Print a header',
-        instruction: `CLI programs often print a short header so output is easy to recognize.\n\nExample:\n\n\`\`\`rust\nprintln!(\"My Tool\");\n\`\`\`\n\nThis is especially helpful once your program prints multiple lines.`,
+        instruction: `CLI programs often print a short header so output is easy to recognize.\n\nExample:\n\n\`\`\`rust\nprintln!("My Tool");\n\`\`\`\n\nThis is especially helpful once your program prints multiple lines.`,
         task: `In \`main\`, print the text "Calculator" using \`println!\`.`,
         starterCode: `fn main() {\n\n}`,
         highlightLine: 2,
@@ -1566,7 +1566,7 @@ Don't worry about memorizing everything. You'll build this step by step, and eac
             },
             {
               type: 'code_matches',
-              regex: 'println!\\("Calculator"\\);',
+              regex: 'println!("Calculator");',
               hints: [
                 'Add: println!("Calculator");',
                 'Make sure you have quotes around Calculator and a semicolon at the end',
@@ -1581,7 +1581,7 @@ Don't worry about memorizing everything. You'll build this step by step, and eac
       {
         step: 5,
         title: 'Define an add function',
-        instruction: `Functions let you name a piece of logic and reuse it. In Rust, you define a function with \`fn\` followed by a name.\n\nExample:\n\n\`\`\`rust\nfn greet() {\n    println!(\"Hello!\");\n}\n\`\`\`\n\nWe'll start with an \`add\` function and grow it into a real calculator. Functions help organize code and make it easier to test and maintain.`,
+        instruction: `Functions let you name a piece of logic and reuse it. In Rust, you define a function with \`fn\` followed by a name.\n\nExample:\n\n\`\`\`rust\nfn greet() {\n    println!("Hello!");\n}\n\`\`\`\n\nWe'll start with an \`add\` function and grow it into a real calculator. Functions help organize code and make it easier to test and maintain.`,
         task: `Above \`main\`, add an empty function named \`add\`.`,
         starterCode: `fn main() {\n    println!("Calculator");\n\n}`,
         highlightLine: 1,
@@ -1601,7 +1601,7 @@ Don't worry about memorizing everything. You'll build this step by step, and eac
       {
         step: 6,
         title: 'Add parameters (a and b)',
-        instruction: `Parameters are inputs to a function. In Rust, every parameter has a name and a type.\n\nExample:\n\n\`\`\`rust\nfn full_name(first: &str, last: &str) {\n    println!(\"{} {}\", first, last);\n}\n\`\`\`\n\nWe'll use \`f64\` (64-bit floating-point) so operations like division can produce decimals. This lets you calculate things like 10 / 3 = 3.33 instead of just 3.`,
+        instruction: `Parameters are inputs to a function. In Rust, every parameter has a name and a type.\n\nExample:\n\n\`\`\`rust\nfn full_name(first: &str, last: &str) {\n    println!("{} {}", first, last);\n}\n\`\`\`\n\nWe'll use \`f64\` (64-bit floating-point) so operations like division can produce decimals. This lets you calculate things like 10 / 3 = 3.33 instead of just 3.`,
         task: `Update \`add\` to accept two parameters: \`a: f64\` and \`b: f64\`.`,
         starterCode: `fn add() {\n\n}\n\nfn main() {\n    println!("Calculator");\n}`,
         highlightLine: 1,
@@ -1800,7 +1800,7 @@ Don't worry about memorizing everything. You'll build this step by step, and eac
       {
         step: 11,
         title: 'Choose an operation with match',
-        instruction: `Your calculator needs to pick which operation to run based on the operator string from the user. \`match\` is Rust's way to check a value against multiple possibilities and run different code for each case.\n\nThe syntax is:\n\n\`\`\`rust\nmatch value {\n    pattern1 => expression1,\n    pattern2 => expression2,\n    _ => default_expression,\n}\n\`\`\`\n\nEach line is called an "arm." The pattern on the left is compared to the value. If it matches, the expression on the right runs. The \`_\` pattern matches anything that hasn't been matched yet, so it's perfect for handling unknown or default cases.\n\nExample:\n\n\`\`\`rust\nfn get_status_code(status: &str) -> u32 {\n    match status {\n        \"ok\" => 200,\n        \"not_found\" => 404,\n        \"error\" => 500,\n        _ => 0,\n    }\n}\n\`\`\`\n\nThis matches a status string and returns the corresponding HTTP code. The \`_\` arm handles any status not listed.\n\n**What you need to do:**\n\nCreate a \`calculate\` function that takes \`op: &str\` and two numbers. Use \`match\` on op to call the right function:\n- "+" → call \`add(a, b)\`\n- "-" → call \`subtract(a, b)\`\n- "*" → call \`multiply(a, b)\`\n- "/" → call \`divide(a, b)\`\n- \`_\` → return \`None\` for unknown operators\n\n**Important:** \`calculate\` must return \`Option<f64>\`. Since \`divide\` already returns \`Option<f64>\`, call it directly. But add, subtract, and multiply return f64, so wrap their results in \`Some(...)\` to convert them to \`Option<f64>\`.`,
+        instruction: `Your calculator needs to pick which operation to run based on the operator string from the user. \`match\` is Rust's way to check a value against multiple possibilities and run different code for each case.\n\nThe syntax is:\n\n\`\`\`rust\nmatch value {\n    pattern1 => expression1,\n    pattern2 => expression2,\n    _ => default_expression,\n}\n\`\`\`\n\nEach line is called an "arm." The pattern on the left is compared to the value. If it matches, the expression on the right runs. The \`_\` pattern matches anything that hasn't been matched yet, so it's perfect for handling unknown or default cases.\n\nExample:\n\n\`\`\`rust\nfn get_status_code(status: &str) -> u32 {\n    match status {\n        "ok" => 200,\n        "not_found" => 404,\n        "error" => 500,\n        _ => 0,\n    }\n}\n\`\`\`\n\nThis matches a status string and returns the corresponding HTTP code. The \`_\` arm handles any status not listed.\n\n**What you need to do:**\n\nCreate a \`calculate\` function that takes \`op: &str\` and two numbers. Use \`match\` on op to call the right function:\n- "+" → call \`add(a, b)\`\n- "-" → call \`subtract(a, b)\`\n- "*" → call \`multiply(a, b)\`\n- "/" → call \`divide(a, b)\`\n- \`_\` → return \`None\` for unknown operators\n\n**Important:** \`calculate\` must return \`Option<f64>\`. Since \`divide\` already returns \`Option<f64>\`, call it directly. But add, subtract, and multiply return f64, so wrap their results in \`Some(...)\` to convert them to \`Option<f64>\`.`,
         task: `Add \`calculate(op: &str, a: f64, b: f64) -> Option<f64>\` above \`main\`. Use \`match op\` with four arms: \`"+"\` calls \`add(a, b)\` wrapped in \`Some(...)\`, \`"-"\` calls \`subtract(a, b)\` wrapped in \`Some(...)\`, \`"*"\` calls \`multiply(a, b)\` wrapped in \`Some(...)\`, and \`"/"\` calls \`divide(a, b)\` directly. Add a \`_\` arm that returns \`None\`.`,
         starterCode: `fn add(a: f64, b: f64) -> f64 {\n    a + b\n}\n\nfn subtract(a: f64, b: f64) -> f64 {\n    a - b\n}\n\nfn multiply(a: f64, b: f64) -> f64 {\n    a * b\n}\n\nfn divide(a: f64, b: f64) -> Option<f64> {\n    if b == 0.0 {\n        None\n    } else {\n        Some(a / b)\n    }\n}\n\nfn main() {\n    println!("Calculator");\n}`,
         highlightLine: 17,
@@ -1972,7 +1972,7 @@ Don't worry about memorizing everything. You'll build this step by step, and eac
       {
         step: 14,
         title: 'Add a usage guard',
-        instruction: `Before indexing args, guard against missing input. If the user does not provide 3 values (num1, operator, num2), print a usage line and exit with a non-zero code.\n\nExample:\n\n\`\`\`rust\nif args.len() < 3 {\n    println!(\"Usage: app <a> <b>\");\n    process::exit(1);\n}\n\`\`\`\n\nThis prevents an "index out of bounds" panic and gives the user a clear fix. Good CLI programs always validate input before using it. Add this guard in \`main\`, right after collecting the args.`,
+        instruction: `Before indexing args, guard against missing input. If the user does not provide 3 values (num1, operator, num2), print a usage line and exit with a non-zero code.\n\nExample:\n\n\`\`\`rust\nif args.len() < 3 {\n    println!("Usage: app <a> <b>");\n    process::exit(1);\n}\n\`\`\`\n\nThis prevents an "index out of bounds" panic and gives the user a clear fix. Good CLI programs always validate input before using it. Add this guard in \`main\`, right after collecting the args.`,
         task: `In \`main\`, right after collecting \`args\`, add an \`if\` statement. If \`args.len() < 4\`, print this usage message and exit with \`process::exit(1)\`:\n\n\`\`\`text\nUsage: calculator <num1> <operator> <num2>\n\`\`\`\n\nThen run \`cargo run\` to test the guard.`,
         starterCode: `use std::env;\nuse std::process;\n\nfn add(a: f64, b: f64) -> f64 {\n    a + b\n}\n\nfn subtract(a: f64, b: f64) -> f64 {\n    a - b\n}\n\nfn multiply(a: f64, b: f64) -> f64 {\n    a * b\n}\n\nfn divide(a: f64, b: f64) -> Option<f64> {\n    if b == 0.0 {\n        None\n    } else {\n        Some(a / b)\n    }\n}\n\nfn calculate(op: &str, a: f64, b: f64) -> Option<f64> {\n    match op {\n        "+" => Some(add(a, b)),\n        "-" => Some(subtract(a, b)),\n        "*" => Some(multiply(a, b)),\n        "/" => divide(a, b),\n        _ => None,\n    }\n}\n\nfn main() {\n    println!("Calculator");\n\n    let args: Vec<String> = env::args().collect();\n\n\n}`,
         highlightLine: 41,

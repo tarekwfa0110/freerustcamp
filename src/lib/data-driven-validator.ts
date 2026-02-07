@@ -35,8 +35,10 @@ function detectMissingSemicolon(code: string): string | null {
       continue;
     }
     
-    // Skip lines that already have semicolons
-    if (line.endsWith(';') || line.endsWith('; //')) {
+    // Skip lines that already have semicolons (check for semicolon before any comment)
+    // Use regex to detect semicolon that appears before comment tokens or end of line
+    const hasSemicolonInLine = /;(?=\s*(\/\/|\/\*|$))/.test(line);
+    if (hasSemicolonInLine) {
       continue;
     }
     
@@ -57,7 +59,7 @@ function detectMissingSemicolon(code: string): string | null {
     // Pattern 2: println! without semicolon (when followed by more statements)
     // Note: println! can be the last expression in a function returning (), so no semicolon needed then
     // Also skip match arms - they don't need semicolons
-    if (line.includes('println!') && !line.endsWith(';')) {
+    if (line.includes('println!') && !hasSemicolonInLine) {
       // Skip if this is a match arm (contains =>)
       if (line.includes('=>')) {
         // Match arms are expressions, not statements - they end with comma or closing brace
@@ -83,7 +85,7 @@ function detectMissingSemicolon(code: string): string | null {
     ];
     
     for (const { pattern, name } of functionCallPatterns) {
-      if (pattern.test(line) && !line.endsWith(';')) {
+      if (pattern.test(line) && !hasSemicolonInLine) {
         // Only flag if there's clearly more code after (not just closing brace)
         if (nextLine && !nextLine.startsWith('}') && !nextLine.startsWith('//') && nextLine.trim()) {
           return `Missing semicolon after \`${name}\``;
@@ -94,7 +96,7 @@ function detectMissingSemicolon(code: string): string | null {
     // Pattern 4: Variable assignment (not let) without semicolon
     // Example: "x = 5" (should be "x = 5;")
     // Skip match arms - they don't need semicolons (they end with commas)
-    if (!line.startsWith('let ') && !line.includes('=>') && /^\w+\s*=\s*[^=]+$/.test(line) && !line.endsWith(';')) {
+    if (!line.startsWith('let ') && !line.includes('=>') && /^\w+\s*=\s*[^=]+$/.test(line) && !hasSemicolonInLine) {
       // Only flag if there's clearly more code after (not just closing brace)
       if (nextLine && !nextLine.startsWith('}') && !nextLine.startsWith('//') && nextLine.trim()) {
         const assignMatch = line.match(/^(\w+)\s*=\s*(.+)$/);
@@ -106,7 +108,7 @@ function detectMissingSemicolon(code: string): string | null {
     
     // Pattern 5: Return statement without semicolon
     // Note: return statements typically need semicolons, but can be last expression
-    if (line.startsWith('return ') && !line.endsWith(';')) {
+    if (line.startsWith('return ') && !hasSemicolonInLine) {
       // Only flag if there's clearly more code after (not just closing brace)
       if (nextLine && !nextLine.startsWith('}') && !nextLine.startsWith('//') && nextLine.trim()) {
         return `Missing semicolon after \`return ...\``;

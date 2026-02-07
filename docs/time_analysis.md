@@ -128,7 +128,7 @@
 
 ### Section 1: Fundamentals & CLI Tools
 - **Optimized:** 70-75 hours (down from 80-100h)
-- **Savings:** 15-25 hours
+- **Savings:** 10-25 hours
 
 ### Section 2: Data Structures & Systems Programming
 - **Current:** 90-110 hours

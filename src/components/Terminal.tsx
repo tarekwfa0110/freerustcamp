@@ -280,7 +280,7 @@ export function Terminal({
                     }
                   });
                   output.push({ type: 'error', content: '' });
-                  output.push({ type: 'error', content: 'error: could not compile `temp_project` (exit code: 1)' });
+                  output.push({ type: 'error', content: `error: could not compile \`${projectName}\` (exit code: 1)` });
                 } else {
                   // Compilation succeeded
                   output.push(
@@ -341,7 +341,7 @@ export function Terminal({
                   { type: 'error', content: `${line} | ${code.split('\n')[line - 1] || ''}` },
                   { type: 'error', content: `  | ${' '.repeat(column - 1)}^` },
                   { type: 'error', content: '' },
-                  { type: 'error', content: 'error: could not compile `temp_project` (exit code: 1)' },
+                  { type: 'error', content: `error: could not compile \`${projectName}\` (exit code: 1)` },
                   { type: 'error', content: '' },
                 );
               } else {
@@ -394,13 +394,13 @@ export function Terminal({
                 { type: 'error', content: '  |' },
                 { type: 'error', content: `${line} | ${code.split('\n')[line - 1] || ''}` },
                 { type: 'error', content: `  | ${' '.repeat(column - 1)}^` },
-                { type: 'error', content: '' },
-                { type: 'error', content: 'error: could not compile `temp_project` (exit code: 1)' },
-                { type: 'error', content: '' },
-              );
-            } else {
-              output.push(
-                { type: 'output', content: '    Finished dev [unoptimized + debuginfo] target(s) in 0.3s' },
+                  { type: 'error', content: '' },
+                  { type: 'error', content: `error: could not compile \`${projectName}\` (exit code: 1)` },
+                  { type: 'error', content: '' },
+                );
+              } else {
+                output.push(
+                  { type: 'output', content: '    Finished dev [unoptimized + debuginfo] target(s) in 0.3s' },
                 { type: 'output', content: '' },
               );
             }
