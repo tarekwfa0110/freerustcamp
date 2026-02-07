@@ -58,6 +58,8 @@ export function Terminal({
       if (persistedDirs.length > 0) {
         setCreatedDirectories(new Set(persistedDirs));
       }
+    }).catch((error) => {
+      console.error('Failed to load persisted directories:', error);
     });
   }, [projectName]);
 
