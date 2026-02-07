@@ -201,17 +201,17 @@
 
 ## Risk Assessment
 
-### Low Risk Optimizations ✅
+### Low-Risk Optimizations ✅
 - Merging Documentation into Modules
 - Reducing certification projects from 5 → 4
-- Trimming 0.5-1h from medium projects
+- Trimming 0.5-1h from medium-risk projects
 
-### Medium Risk Optimizations ⚠️
+### Medium-Risk Optimizations ⚠️
 - Reducing Section 2-4 estimates without detailed project lists
 - Trimming too aggressively from core concepts
 
-### High Risk Optimizations ❌
-- Reducing step granularity (this is your strength!)
+### High-Risk Optimizations ❌
+- Reducing step-granularity (this is your strength!)
 - Removing essential practice projects
 - Cutting core concepts
 

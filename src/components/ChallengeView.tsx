@@ -839,9 +839,12 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
                       <div className="mt-4 border border-metal-600 rounded-lg overflow-hidden">
                         <button
                           onClick={() => {
-                            const currentExpanded = expandedExplanations.get(step.step) || false;
-                            expandedExplanations.set(step.step, !currentExpanded);
-                            setExpandedExplanations(new Map(expandedExplanations));
+                            setExpandedExplanations(prev => {
+                              const next = new Map(prev);
+                              const current = next.get(step.step) || false;
+                              next.set(step.step, !current);
+                              return next;
+                            });
                           }}
                           className="w-full flex items-center justify-between p-3 bg-metal-800/50 hover:bg-metal-800 transition-colors"
                         >
@@ -856,7 +859,7 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
                           )}
                         </button>
                         {(expandedExplanations.get(step.step) || false) && (
-                          <div className="p-4 bg-metal-800/30 markdown-content">
+                          <div className="p-4 bg-gradient-to-br from-metal-800/40 to-metal-800/20 markdown-content shadow-md animate-in slide-in-from-top-2 fade-in duration-200">
                             <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponentsForStep}>
                               {step.explanation}
                             </ReactMarkdown>
@@ -1022,7 +1025,7 @@ export function ChallengeView({ challenge, initialStep }: ChallengeViewProps) {
                         
                         if (inline || !language) {
                           return (
-                            <code className="inline font-mono bg-metal-700 text-accent px-1.5 py-0.5 rounded text-sm font-semibold border border-metal-600" {...rest}>
+                            <code className="inline font-mono bg-amber-950/60 text-amber-100 px-1.5 py-0.5 rounded text-sm font-semibold border border-amber-900/50" {...rest}>
                               {children}
                             </code>
                           );

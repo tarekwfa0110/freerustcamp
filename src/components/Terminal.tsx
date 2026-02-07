@@ -55,11 +55,11 @@ export function Terminal({
     // Import here to avoid circular dependency
     import('@/lib/progress').then(({ getCreatedDirectories }) => {
       const persistedDirs = getCreatedDirectories(challengeId);
-      if (persistedDirs.length > 0) {
-        setCreatedDirectories(new Set(persistedDirs));
-      }
+      // Always set createdDirectories, even if empty, to clear prior state when switching projects
+      setCreatedDirectories(new Set(persistedDirs));
     }).catch((error) => {
       console.error('Failed to load persisted directories:', error);
+      setCreatedDirectories(new Set());
     });
   }, [projectName]);
 
@@ -114,10 +114,25 @@ export function Terminal({
       // Check for println! without semicolon
       const printlnMatch = trimmedLine.match(/println!\s*\([^)]*\)/);
       if (printlnMatch) {
-        // Skip match arms - they don't need semicolons (they end with commas)
+        // Check if this is a match arm (contains =>)
         if (trimmedLine.includes('=>')) {
-          // This is a match arm, skip semicolon check
+          // Match arms should NOT end with semicolons - they end with commas
+          // If a match arm ends with semicolon, that's an error
+          if (trimmedLine.endsWith(';')) {
+            const matchIndex = line.indexOf(printlnMatch[0]);
+            const closingParenIndex = line.indexOf(')', matchIndex);
+            return {
+              isValid: false,
+              error: {
+                message: 'error: expected `,`, found `;`',
+                line: lineNum,
+                column: (closingParenIndex >= 0 ? closingParenIndex + 2 : line.length + 1)
+              }
+            };
+          }
+          // Match arm without semicolon is correct (ends with comma), skip further checks
         } else {
+          // Not a match arm - check for missing semicolon
           const hasSemicolon = trimmedLine.endsWith(';');
           if (!hasSemicolon) {
             // Check if next line is a closing brace (last statement in function)
@@ -253,47 +268,46 @@ export function Terminal({
                 output.push(
                   { type: 'error', content: `Execution server error (${response.status}): ${text || response.statusText}` },
                 );
-                return;
-              }
-              
-              const result = await response.json();
-              
-              if (result.compilationError) {
-                // Compilation failed
-                const errorLines = result.compilationError.split('\n');
-                errorLines.forEach((line: string) => {
-                  if (line.trim()) {
-                    output.push({ type: 'error', content: line });
-                  }
-                });
-                output.push({ type: 'error', content: '' });
-                output.push({ type: 'error', content: 'error: could not compile `temp_project` (exit code: 1)' });
               } else {
-                // Compilation succeeded
-                output.push(
-                  { type: 'output', content: '    Finished dev [unoptimized + debuginfo] target(s) in 0.5s' },
-                  { type: 'output', content: `     Running \`target/debug/${projectName}${runArgs.length > 0 ? ' ' + runArgs.join(' ') : ''}\`` },
-                  { type: 'output', content: '' },
-                );
+                const result = await response.json();
                 
-                // Print stdout
-                if (result.stdout) {
-                  const stdoutLines = result.stdout.split('\n');
-                  stdoutLines.forEach((line: string) => {
-                    if (line.trim() || stdoutLines.indexOf(line) === stdoutLines.length - 1) {
-                      output.push({ type: 'output', content: line });
-                    }
-                  });
-                }
-                
-                // Print stderr if any
-                if (result.stderr) {
-                  const stderrLines = result.stderr.split('\n');
-                  stderrLines.forEach((line: string) => {
+                if (result.compilationError) {
+                  // Compilation failed
+                  const errorLines = result.compilationError.split('\n');
+                  errorLines.forEach((line: string) => {
                     if (line.trim()) {
                       output.push({ type: 'error', content: line });
                     }
                   });
+                  output.push({ type: 'error', content: '' });
+                  output.push({ type: 'error', content: 'error: could not compile `temp_project` (exit code: 1)' });
+                } else {
+                  // Compilation succeeded
+                  output.push(
+                    { type: 'output', content: '    Finished dev [unoptimized + debuginfo] target(s) in 0.5s' },
+                    { type: 'output', content: `     Running \`target/debug/${projectName}${runArgs.length > 0 ? ' ' + runArgs.join(' ') : ''}\`` },
+                    { type: 'output', content: '' },
+                  );
+                  
+                  // Print stdout
+                  if (result.stdout) {
+                    const stdoutLines = result.stdout.split('\n');
+                    stdoutLines.forEach((line: string) => {
+                      if (line.trim() || stdoutLines.indexOf(line) === stdoutLines.length - 1) {
+                        output.push({ type: 'output', content: line });
+                      }
+                    });
+                  }
+                  
+                  // Print stderr if any
+                  if (result.stderr) {
+                    const stderrLines = result.stderr.split('\n');
+                    stderrLines.forEach((line: string) => {
+                      if (line.trim()) {
+                        output.push({ type: 'error', content: line });
+                      }
+                    });
+                  }
                 }
               }
             } catch (err) {

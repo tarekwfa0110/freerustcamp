@@ -2470,13 +2470,13 @@ Don't worry about memorizing everything. You'll build this step by step, and eac
         instruction: `Your calculator is ready! It's a real command-line tool you can use.
 
 Try these real-world scenarios:
-- Calculate a tip: \`cargo run -- 50 * 0.15\` (15% tip on $50)
+- Calculate a tip: \`cargo run -- 50 '*' 0.15\` (15% tip on $50)
 - Split a bill: \`cargo run -- 120 / 4\` (split $120 among 4 people)
-- Convert units: \`cargo run -- 100 * 1.609\` (100 miles to kilometers)
+- Convert units: \`cargo run -- 100 '*' 1.609\` (100 miles to kilometers)
 - Calculate discounts: \`cargo run -- 200 - 50\` (original price minus discount)
 
 You've built something useful. That's what programming is all about!`,
-        task: `Run your program with a few different real-world inputs. For example, try calculating a 15% tip on $50 using \`cargo run -- 50 * 0.15\`.`,
+        task: `Run your program with a few different real-world inputs. For example, try calculating a 15% tip on $50 using \`cargo run -- 50 '*' 0.15\`.`,
         starterCode: `// Your completed calculator code is here!
 // Feel free to experiment with it.`,
         validation: {
@@ -2484,8 +2484,8 @@ You've built something useful. That's what programming is all about!`,
             {
               type: 'terminal_command',
               command: 'cargo run',
-              projectSpecific: '50 * 0.15',
-              hints: ['Run: cargo run -- 50 * 0.15'],
+              projectSpecific: "50 '*' 0.15",
+              hints: ["Run: cargo run -- 50 '*' 0.15"],
             },
           ],
           message: 'Run your program with a real-world input.',

@@ -19,7 +19,7 @@ function escapeRegExp(s: string): string {
  * Detects common missing semicolon patterns in Rust code
  * Returns a specific hint if a missing semicolon is detected, null otherwise
  */
-function detectMissingSemicolon(code: string, regex: RegExp): string | null {
+function detectMissingSemicolon(code: string): string | null {
   // Split code into lines for better analysis
   const lines = code.split('\n');
   
@@ -262,7 +262,7 @@ function validateRule(
           }
           
           // Check for missing semicolon first
-          const semicolonHint = detectMissingSemicolon(code, regex);
+          const semicolonHint = detectMissingSemicolon(code);
           if (semicolonHint) {
             return {
               completed: false,
