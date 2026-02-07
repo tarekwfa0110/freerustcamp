@@ -203,7 +203,7 @@ export function ChallengeDescription({
   
   return (
     <div className="space-y-4">
-      <div className="font-sans text-base font-semibold text-foreground leading-relaxed markdown-content">
+      <div className="font-body text-base font-normal text-foreground leading-relaxed markdown-content">
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           components={markdownComponents}
@@ -211,7 +211,7 @@ export function ChallengeDescription({
           {certChallenge.description}
         </ReactMarkdown>
       </div>
-      <div className="space-y-3 font-sans text-base font-semibold text-foreground">
+      <div className="space-y-3 font-body text-base font-normal text-foreground">
         {certChallenge.requirements.functional.map((req: string, idx: number) => (
           <div key={idx} className="leading-relaxed">
             <ReactMarkdown

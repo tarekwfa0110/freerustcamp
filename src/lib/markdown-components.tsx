@@ -80,6 +80,32 @@ export function getMarkdownComponents(options: MarkdownComponentsOptions = {}): 
         {children}
       </blockquote>
     ),
+    table: ({ children }: ChildProps) => (
+      <div className="my-6 overflow-x-auto">
+        <table className="w-full border-collapse border border-metal-700 rounded-lg">
+          {children}
+        </table>
+      </div>
+    ),
+    thead: ({ children }: ChildProps) => (
+      <thead className="bg-metal-700/50">{children}</thead>
+    ),
+    tbody: ({ children }: ChildProps) => (
+      <tbody className="bg-metal-800/30">{children}</tbody>
+    ),
+    tr: ({ children }: ChildProps) => (
+      <tr className="border-b border-metal-700/50">{children}</tr>
+    ),
+    th: ({ children }: ChildProps) => (
+      <th className="px-4 py-3 text-left font-semibold text-foreground border-r border-metal-700/50 last:border-r-0">
+        {children}
+      </th>
+    ),
+    td: ({ children }: ChildProps) => (
+      <td className="px-4 py-3 text-foreground border-r border-metal-700/50 last:border-r-0">
+        {children}
+      </td>
+    ),
   };
 }
 

@@ -100,7 +100,8 @@ export default {
       },
       fontFamily: {
         display: ["Orbitron", "sans-serif"],
-        body: ["Rajdhani", "sans-serif"],
+        body: ["Source Sans Pro", "sans-serif"],
+        ui: ["Rajdhani", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
       borderRadius: {

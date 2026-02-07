@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap');
+/* Optimized font loading: only load weights we actually use */
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -99,7 +100,8 @@
 
     /* Typography */
     --font-display: 'Orbitron', sans-serif;
-    --font-body: 'Rajdhani', sans-serif;
+    --font-body: 'Source Sans Pro', sans-serif;
+    --font-ui: 'Rajdhani', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
   }
 }
@@ -234,3 +236,51 @@
     }
   }
 }
+
+/* Monaco Editor Line Highlighting (FCC-inspired) */
+/* These styles are applied via Monaco's decoration API */
+
+/* Single line highlight - for showing where to add code */
+.highlight-line {
+  background-color: rgba(255, 193, 7, 0.12) !important; /* Subtle amber tint */
+}
+
+.highlight-line-decoration {
+  background-color: #ffc107 !important; /* Amber bar in margin */
+  width: 4px !important;
+  margin-left: 3px !important;
+  border-radius: 2px;
+}
+
+/* Editable region - for highlighting a range of lines (FCC-style) */
+.editable-region {
+  background-color: rgba(30, 144, 255, 0.08) !important; /* Subtle blue tint */
+  z-index: -1;
+}
+
+.editable-line-decoration {
+  background-color: hsl(var(--rust-400)) !important; /* Rust-colored bar */
+  width: 4px !important;
+  margin-left: 3px !important;
+  border-radius: 2px;
+}
+
+/* Success state - when tests pass (like FCC) */
+.editable-line-decoration.tests-passed {
+  background-color: #4caf50 !important;
+}
+
+/* Pulsing animation for highlighted lines */
+@keyframes highlight-pulse {
+  0%, 100% {
+    background-color: rgba(255, 193, 7, 0.12);
+  }
+  50% {
+    background-color: rgba(255, 193, 7, 0.22);
+  }
+}
+
+.highlight-line {
+  animation: highlight-pulse 2s ease-in-out infinite;
+}
+

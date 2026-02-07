@@ -12,7 +12,7 @@ High-level curriculum structure. For the full detailed plan (all sections, all p
 
 1. Project-based: learn by building real applications  
 2. Progressive: small projects (30 min) → large (20+ hours)  
-3. Step-by-step guidance with explanations  
+3. **Granular step-by-step guidance:** Break down every concept into small, digestible steps. Each step teaches one concept or action. Reference Project 1 (Temperature Converter) as the target: 20+ steps for a 1-hour project is expected and encouraged.
 4. Practice projects have full steps; certification projects have requirements + tests only  
 
 **Structure:** Sections 1–4 = core (~350 h); Section 5 = specialization (30–60 h).
@@ -32,29 +32,31 @@ Naming: practice = “Learn X by Building Y”; certification = “Build a X Pro
 
 ### Practice projects (15–20, ~60–70 h)
 
-**Tiny (30 min – 1 h, 5–8 steps)**  
-1. Learn Variables by Building a Temperature Converter (1 h)  
-2. Learn Functions by Building a Calculator (1 h)  
-3. Learn Ownership by Building a Text Adventure (1.5 h)  
-4. Learn Structs by Building a Student Manager (1.5 h)  
-5. Learn Enums by Building a Traffic Light Simulator (1 h)  
+**Note on step counts:** Step counts are not fixed targets. The philosophy is **granular, step-by-step guidance** where each step teaches one concept or action. Project 1 (Temperature Converter) demonstrates this: 23 steps for a 1-hour project, breaking down every concept (creating a project, importing modules, parsing, type annotations, etc.) into individual steps. This granularity is the target for all projects.
 
-**Small (1–3 h, 8–15 steps)**  
-6. Learn Error Handling by Building a File Processor (4 h)  
-7. Learn Collections by Building a Contact Manager (3 h)  
-8. Learn Iterators by Building a Word Counter (2 h)  
-9. Learn Borrowing by Building a Text Editor (3 h)  
-10. Learn Lifetimes by Building a String Pool (2 h)  
-11. Learn File I/O by Building a Note-Taking App (4 h)  
-12. Learn CLI Arguments by Building a Todo List (3 h)  
+**Tiny (30 min – 1 h)**  
+1. Learn Variables by Building a Temperature Converter (1 h, ~20–25 steps)  
+2. Learn Functions by Building a Calculator (1 h, ~20–25 steps)  
+3. Learn Ownership by Building a Text Adventure (1.5 h, ~25–30 steps)  
+4. Learn Structs by Building a Student Manager (1.5 h, ~25–30 steps)  
+5. Learn Enums by Building a Traffic Light Simulator (1 h, ~20–25 steps)  
 
-**Medium (3–6 h, 12–20 steps)**  
-13. Learn Regex by Building a Log Parser (5 h)  
-14. Learn Serialization by Building a Config Manager (4 h)  
-15. Learn Error Types by Building a Database Client (5 h)  
-16. Learn Modules by Building a CLI Framework (6 h)  
-17. Learn Testing by Building a Test Suite (4 h)  
-18. Learn Documentation by Building a Library (3 h)  
+**Small (1–3 h)**  
+6. Learn Error Handling by Building a File Processor (4 h, ~40–50 steps)  
+7. Learn Collections by Building a Contact Manager (3 h, ~35–45 steps)  
+8. Learn Iterators by Building a Word Counter (2 h, ~25–35 steps)  
+9. Learn Borrowing by Building a Text Editor (3 h, ~35–45 steps)  
+10. Learn Lifetimes by Building a String Pool (2 h, ~25–35 steps)  
+11. Learn File I/O by Building a Note-Taking App (4 h, ~40–50 steps)  
+12. Learn CLI Arguments by Building a Todo List (3 h, ~35–45 steps)  
+
+**Medium (3–6 h)**  
+13. Learn Regex by Building a Log Parser (5 h, ~50–60 steps)  
+14. Learn Serialization by Building a Config Manager (4 h, ~45–55 steps)  
+15. Learn Error Types by Building a Database Client (5 h, ~50–60 steps)  
+16. Learn Modules by Building a CLI Framework (6 h, ~60–70 steps)  
+17. Learn Testing by Building a Test Suite (4 h, ~45–55 steps)  
+18. Learn Documentation by Building a Library (3 h, ~35–45 steps)  
 
 ### Certification projects (5, ~20–30 h)
 

@@ -22,6 +22,8 @@ export interface ProjectStep {
   explanation?: string; // Educational explanation of concepts
   task?: string; // Fun, experimental task related to the step
   starterCode?: string; // Code that should appear in editor for this step (like FCC's --seed--)
+  highlightLine?: number; // Line number to highlight in the editor (1-indexed) - shows where to make changes
+  editableRegion?: [number, number]; // Range of lines to highlight [startLine, endLine] (1-indexed, inclusive) - FCC-style
   test: string[]; // Test descriptions
   what_you_learned: string; // Summary of what was learned
   validation?: StepValidationConfig; // Data-driven validation rules (replaces hardcoded logic)
