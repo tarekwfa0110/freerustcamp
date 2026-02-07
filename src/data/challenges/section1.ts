@@ -1579,7 +1579,7 @@ Don't worry about memorizing everything. You'll build this step by step, and eac
       {
         step: 5,
         title: 'Define an add function',
-        instruction: `Functions let you name a piece of logic and reuse it. In Rust, you define a function with \`fn\` and a name.\n\nWe'll start with an \`add\` function and grow it into a real calculator.`,
+        instruction: `Functions let you name a piece of logic and reuse it. In Rust, you define a function with \`fn\` followed by a name.\n\nWe'll start with an \`add\` function and grow it into a real calculator. Functions help organize code and make it easier to test and maintain.`,
         task: `Above \`main\`, add an empty function named \`add\`.`,
         starterCode: `fn main() {\n    println!("Calculator");\n\n}`,
         highlightLine: 1,
@@ -1599,7 +1599,7 @@ Don't worry about memorizing everything. You'll build this step by step, and eac
       {
         step: 6,
         title: 'Add parameters (a and b)',
-        instruction: `Parameters are inputs to a function. In Rust, every parameter has a name and a type.\n\nWe'll use \`f64\` so operations like division can produce decimals.`,
+        instruction: `Parameters are inputs to a function. In Rust, every parameter has a name and a type.\n\nWe'll use \`f64\` (64-bit floating-point) so operations like division can produce decimals. This lets you calculate things like 10 / 3 = 3.33 instead of just 3.`,
         task: `Update \`add\` to accept two parameters: \`a: f64\` and \`b: f64\`.`,
         starterCode: `fn add() {\n\n}\n\nfn main() {\n    println!("Calculator");\n}`,
         highlightLine: 1,
@@ -1620,7 +1620,7 @@ Don't worry about memorizing everything. You'll build this step by step, and eac
       {
         step: 7,
         title: 'Return a value from add()',
-        instruction: `Rust function return types use \`->\`. Inside the body, the last expression becomes the return value if it does not end with a semicolon.\n\nThat means \`a + b\` can be returned directly.`,
+        instruction: `Rust function return types use \`->\` followed by the type. Inside the body, the last expression becomes the return value if it does not end with a semicolon.\n\nThat means \`a + b\` can be returned directly without a \`return\` keyword. This is Rust's expression-based syntax.`,
         task: `Make \`add\` return an \`f64\`, and return \`a + b\` from the function body.`,
         starterCode: `fn add(a: f64, b: f64) {\n\n}\n\nfn main() {\n    println!("Calculator");\n}`,
         highlightLine: 2,
@@ -1641,7 +1641,7 @@ Don't worry about memorizing everything. You'll build this step by step, and eac
       {
         step: 8,
         title: 'Add subtract and multiply',
-        instruction: `Once you have one operation, you can repeat the same pattern to build a small toolbox of functions. Keeping the same signature makes the functions easy to use together.`,
+        instruction: `Once you have one operation working, you can repeat the same pattern to build a small toolbox of functions. Keeping the same signature (same parameter types and return type) makes the functions easy to swap and combine.`,
         task: `Add two functions above \`main\`: \`subtract\` and \`multiply\`. Each should take \`(a: f64, b: f64)\` and return an \`f64\`.`,
         starterCode: `fn add(a: f64, b: f64) -> f64 {\n    a + b\n}\n\nfn main() {\n    println!("Calculator");\n}`,
         highlightLine: 5,
@@ -1662,7 +1662,7 @@ Don't worry about memorizing everything. You'll build this step by step, and eac
       {
         step: 9,
         title: 'Add a safe divide function',
-        instruction: `Division has an extra edge case: dividing by zero.\n\n\`Option<T>\` is Rust's simple way to represent "a value might be missing". We'll return \`Some(result)\` for normal division and \`None\` when \`b\` is 0.`,
+        instruction: `Division has an extra edge case: dividing by zero is mathematically undefined.\n\n\`Option<T>\` is Rust's simple way to represent "a value might be missing". We'll return \`Some(result)\` for normal division and \`None\` when \`b\` is 0. This prevents crashes and lets the caller handle the error gracefully.`,
         task: `Add \`divide\` that returns \`Option<f64>\`. Return \`None\` when \`b == 0.0\`, otherwise return \`Some(a / b)\`.`,
         starterCode: `fn add(a: f64, b: f64) -> f64 {\n    a + b\n}\n\nfn subtract(a: f64, b: f64) -> f64 {\n    a - b\n}\n\nfn multiply(a: f64, b: f64) -> f64 {\n    a * b\n}\n\nfn main() {\n    println!("Calculator");\n}`,
         highlightLine: 13,
@@ -1683,7 +1683,7 @@ Don't worry about memorizing everything. You'll build this step by step, and eac
       {
         step: 10,
         title: 'Choose an operation with match',
-        instruction: `A calculator needs to pick which operation to run based on user input. \`match\` is Rust's go-to tool for this.\n\nWe'll create \`calculate\` that returns \`Option<f64>\`. It returns \`Some(value)\` for known operators and \`None\` for unknown ones.`,
+        instruction: `A calculator needs to pick which operation to run based on user input. \`match\` is Rust's go-to tool for this kind of branching.\n\nWe'll create \`calculate\` that returns \`Option<f64>\`. It returns \`Some(value)\` for known operators (+,-,*,/) and \`None\` for unknown ones. This centralizes the operation selection logic.`,
         task: `Add \`calculate\` that matches \`op\` and calls \`add\`, \`subtract\`, \`multiply\`, or \`divide\`. Return \`None\` for anything else.`,
         starterCode: `fn add(a: f64, b: f64) -> f64 {\n    a + b\n}\n\nfn subtract(a: f64, b: f64) -> f64 {\n    a - b\n}\n\nfn multiply(a: f64, b: f64) -> f64 {\n    a * b\n}\n\nfn divide(a: f64, b: f64) -> Option<f64> {\n    if b == 0.0 {\n        None\n    } else {\n        Some(a / b)\n    }\n}\n\nfn main() {\n    println!("Calculator");\n}`,
         highlightLine: 17,
@@ -1725,7 +1725,7 @@ Don't worry about memorizing everything. You'll build this step by step, and eac
       {
         step: 12,
         title: 'Collect command-line arguments',
-        instruction: `\`env::args()\` returns an iterator of strings. Collecting into a \`Vec<String>\` stores them so you can access by index.\n\nIndex 0 is the program name. User input starts at index 1.`,
+        instruction: `\`env::args()\` returns an iterator of strings. Collecting into a \`Vec<String>\` stores them so you can access by index.\n\nIndex 0 is the program name (like "calculator"). User input starts at index 1. So \`args[1]\` is the first number, \`args[2]\` is the operator, and \`args[3]\` is the second number.`,
         task: `In \`main\`, collect the args into a \`Vec<String>\` named \`args\`.`,
         starterCode: `use std::env;\nuse std::process;\n\nfn add(a: f64, b: f64) -> f64 {\n    a + b\n}\n\nfn subtract(a: f64, b: f64) -> f64 {\n    a - b\n}\n\nfn multiply(a: f64, b: f64) -> f64 {\n    a * b\n}\n\nfn divide(a: f64, b: f64) -> Option<f64> {\n    if b == 0.0 {\n        None\n    } else {\n        Some(a / b)\n    }\n}\n\nfn calculate(op: &str, a: f64, b: f64) -> Option<f64> {\n    match op {\n        "+" => Some(add(a, b)),\n        "-" => Some(subtract(a, b)),\n        "*" => Some(multiply(a, b)),\n        "/" => divide(a, b),\n        _ => None,\n    }\n}\n\nfn main() {\n    println!("Calculator");\n\n\n}`,
         highlightLine: 39,
@@ -1746,7 +1746,7 @@ Don't worry about memorizing everything. You'll build this step by step, and eac
       {
         step: 13,
         title: 'Add a usage guard',
-        instruction: `Before indexing args, guard against missing input. If the user does not provide 3 values (num1, operator, num2), print a usage line and exit with a non-zero code.\n\nThis prevents an "index out of bounds" panic and gives the user a clear fix.`,
+        instruction: `Before indexing args, guard against missing input. If the user does not provide 3 values (num1, operator, num2), print a usage line and exit with a non-zero code.\n\nThis prevents an "index out of bounds" panic and gives the user a clear fix. Good CLI programs always validate input before using it.`,
         task: `If \`args.len() < 4\`, print this usage line and exit with \`process::exit(1)\`:\n\n\`\`\`text\nUsage: calculator <num1> <operator> <num2>\n\`\`\`\n\nThen run:\n\n\`\`\`bash\ncargo run\n\`\`\``,
         starterCode: `use std::env;\nuse std::process;\n\nfn add(a: f64, b: f64) -> f64 {\n    a + b\n}\n\nfn subtract(a: f64, b: f64) -> f64 {\n    a - b\n}\n\nfn multiply(a: f64, b: f64) -> f64 {\n    a * b\n}\n\nfn divide(a: f64, b: f64) -> Option<f64> {\n    if b == 0.0 {\n        None\n    } else {\n        Some(a / b)\n    }\n}\n\nfn calculate(op: &str, a: f64, b: f64) -> Option<f64> {\n    match op {\n        "+" => Some(add(a, b)),\n        "-" => Some(subtract(a, b)),\n        "*" => Some(multiply(a, b)),\n        "/" => divide(a, b),\n        _ => None,\n    }\n}\n\nfn main() {\n    println!("Calculator");\n\n    let args: Vec<String> = env::args().collect();\n\n\n}`,
         highlightLine: 41,
@@ -1883,8 +1883,8 @@ Don't worry about memorizing everything. You'll build this step by step, and eac
       {
         step: 19,
         title: 'Handle errors and exit',
-        instruction: `When \`calculate\` returns \`None\`, something went wrong. It could be an unknown operator, or it could be division by zero.\n\nClear error messages are part of good CLI UX. Exiting with a non-zero code stops the program and signals failure.`,
-        task: `In the \`None\` case, print a message and exit:\n\n- If \`op == "/"\` and \`num2 == 0.0\`, print:\n\n\`\`\`text\nError: Division by zero.\n\`\`\`\n\n- Otherwise, print this pattern (with the actual operator):\n\n\`\`\`text\nError: Invalid operation '^'. Use +, -, *, or /.\n\`\`\`\n\nThen run:\n\n\`\`\`bash\ncargo run -- 10 / 0\n\`\`\``,
+        instruction: `When \`calculate\` returns \`None\`, something went wrong. It could be an unknown operator, or it could be division by zero.\n\nClear error messages are part of good CLI UX. Exiting with a non-zero code stops the program and signals failure. Try dividing 100 by 0 to see your error handling in action!`,
+        task: `In the \`None\` case, print a message and exit:\n\n- If \`op == "/"\` and \`num2 == 0.0\`, print:\n\n\`\`\`text\nError: Division by zero.\n\`\`\`\n\n- Otherwise, print this pattern (with the actual operator):\n\n\`\`\`text\nError: Invalid operation '^'. Use +, -, *, or /.\n\`\`\`\n\nThen run:\n\n\`\`\`bash\ncargo run -- 100 / 0\n\`\`\``,
         starterCode: `use std::env;\nuse std::process;\n\nfn add(a: f64, b: f64) -> f64 {\n    a + b\n}\n\nfn subtract(a: f64, b: f64) -> f64 {\n    a - b\n}\n\nfn multiply(a: f64, b: f64) -> f64 {\n    a * b\n}\n\nfn divide(a: f64, b: f64) -> Option<f64> {\n    if b == 0.0 {\n        None\n    } else {\n        Some(a / b)\n    }\n}\n\nfn calculate(op: &str, a: f64, b: f64) -> Option<f64> {\n    match op {\n        "+" => Some(add(a, b)),\n        "-" => Some(subtract(a, b)),\n        "*" => Some(multiply(a, b)),\n        "/" => divide(a, b),\n        _ => None,\n    }\n}\n\nfn main() {\n    println!("Calculator");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 4 {\n        println!("Usage: calculator <num1> <operator> <num2>");\n        process::exit(1);\n    }\n\n    let num1: f64 = args[1].parse().expect("Invalid number");\n    let op = &args[2];\n    let num2: f64 = args[3].parse().expect("Invalid number");\n\n    let result = calculate(op, num1, num2);\n\n    match result {\n        Some(value) => println!("{} {} {} = {:.2}", num1, op, num2, value),\n        None => {\n\n        }\n    }\n}`,
         highlightLine: 54,
         validation: {
@@ -1916,8 +1916,8 @@ Don't worry about memorizing everything. You'll build this step by step, and eac
             {
               type: 'terminal_command',
               command: 'cargo run',
-              projectSpecific: '10 / 0',
-              hints: ['Run: cargo run -- 10 / 0'],
+              projectSpecific: '100 / 0',
+              hints: ['Run: cargo run -- 100 / 0'],
             },
           ],
           message: 'Handle errors and test / 0',
@@ -1928,7 +1928,7 @@ Don't worry about memorizing everything. You'll build this step by step, and eac
       {
         step: 20,
         title: 'Test invalid operators',
-        instruction: `Error paths are part of normal program behavior. Testing them makes sure your messages and exits stay correct.`,
+        instruction: `Error paths are part of normal program behavior. Testing them makes sure your messages and exits stay correct. Try using an invalid operator like ^ (power) to see how your program handles unknown operations.`,
         task: `Run:\n\n\`\`\`bash\ncargo run -- 5 ^ 2\n\`\`\``,
         starterCode: `use std::env;\nuse std::process;\n\nfn add(a: f64, b: f64) -> f64 {\n    a + b\n}\n\nfn subtract(a: f64, b: f64) -> f64 {\n    a - b\n}\n\nfn multiply(a: f64, b: f64) -> f64 {\n    a * b\n}\n\nfn divide(a: f64, b: f64) -> Option<f64> {\n    if b == 0.0 {\n        None\n    } else {\n        Some(a / b)\n    }\n}\n\nfn calculate(op: &str, a: f64, b: f64) -> Option<f64> {\n    match op {\n        "+" => Some(add(a, b)),\n        "-" => Some(subtract(a, b)),\n        "*" => Some(multiply(a, b)),\n        "/" => divide(a, b),\n        _ => None,\n    }\n}\n\nfn main() {\n    println!("Calculator");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 4 {\n        println!("Usage: calculator <num1> <operator> <num2>");\n        process::exit(1);\n    }\n\n    let num1: f64 = args[1].parse().expect("Invalid number");\n    let op = &args[2];\n    let num2: f64 = args[3].parse().expect("Invalid number");\n\n    let result = calculate(op, num1, num2);\n\n    match result {\n        Some(value) => println!("{} {} {} = {:.2}", num1, op, num2, value),\n        None => {\n            if op == "/" && num2 == 0.0 {\n                println!("Error: Division by zero.");\n            } else {\n                println!("Error: Invalid operation '{}'. Use +, -, *, or /.", op);\n            }\n            process::exit(1);\n        }\n    }\n}`,
         highlightLine: 1,
