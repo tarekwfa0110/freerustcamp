@@ -1446,6 +1446,58 @@ Ready for the next challenge? Let's build a calculator next!`,
     },
     steps: [
       {
+        step: 0,
+        title: 'Understand what you\'re building',
+        instruction: `Welcome! In this project, you'll build a command-line calculator that performs basic arithmetic operations.
+
+**What you're building:**
+A Rust program that reads two numbers and an operator from the command line, performs the calculation, and prints the result. For example:
+- Input: \`cargo run -- 10 + 5\` → Output: \`10 + 5 = 15.00\`
+- Input: \`cargo run -- 20 / 4\` → Output: \`20 / 4 = 5.00\`
+- Input: \`cargo run -- 10 / 0\` → Output: \`Error: Division by zero.\`
+
+**Why this project?**
+Functions are the building blocks of Rust programs. By building a calculator, you'll learn:
+- How to define functions with parameters and return types
+- How to organize code into reusable pieces
+- Pattern matching with \`match\` expressions
+- Handling edge cases with \`Option<T>\`
+- Reading and parsing command-line arguments
+- Error handling and user-friendly messages
+
+**What you'll learn:**
+- **Functions**: Define reusable code blocks with \`fn\`
+- **Parameters**: Pass values into functions with types
+- **Return types**: Specify what functions return with \`->\`
+- **Match expressions**: Choose behavior based on values
+- **Option<T>**: Handle "might not have a value" cases safely
+- **Command-line input**: Read user input from terminal arguments
+- **Error handling**: Provide clear messages when things go wrong
+
+**Calculator operations:**
+Your calculator will support four basic operations:
+
+| Operation | Symbol | Example | Result |
+|-----------|--------|---------|--------|
+| Addition | + | 10 + 5 | 15.00 |
+| Subtraction | - | 20 - 8 | 12.00 |
+| Multiplication | * | 6 * 7 | 42.00 |
+| Division | / | 20 / 4 | 5.00 |
+
+**Special cases:**
+- Division by zero returns an error (not a crash)
+- Invalid operators show a helpful error message
+- Missing arguments show usage instructions
+
+Don't worry about memorizing everything. You'll build this step by step, and each step will explain the concepts as you use them.`,
+        task: `Read through this introduction to understand what you'll build. When you're ready, click "Next" to start creating your project!`,
+        starterCode: `// Welcome to your calculator project!
+// You'll build a functional calculator step by step.
+// Click "Next" when you're ready to begin.`,
+        test: ['Introduction read'],
+        what_you_learned: `You understand what you're building: a practical calculator that will teach you Rust functions and pattern matching.`,
+      },
+      {
         step: 1,
         title: 'Create the project',
         instruction: `Cargo is Rust's standard build tool. It creates a working project layout so you can focus on code instead of setup.\n\nWhen you run \`cargo new\`, Cargo creates \`src/main.rs\` (your program) and \`Cargo.toml\` (project metadata).`,
@@ -1719,30 +1771,93 @@ Ready for the next challenge? Let's build a calculator next!`,
       },
       {
         step: 14,
-        title: 'Parse inputs and compute',
-        instruction: `Command-line arguments arrive as strings. Parsing turns those strings into numbers you can use for math.\n\nWe'll parse the two numbers, read the operator, and call \`calculate\`.`,
-        task: `Create \`num1\`, \`op\`, and \`num2\` from \`args\`, call \`calculate\`, and store the returned value in \`result\`.`,
+        title: 'Parse the first number',
+        instruction: `Command-line arguments arrive as strings. To use them for math, you need to convert them to numbers.\n\nThe \`parse()\` method converts a string into a number type. We'll use \`f64\` for floating-point numbers so division works correctly.`,
+        task: `Parse \`args[1]\` into an \`f64\` and store it in \`num1\`. Use \`parse().expect()\` to handle parsing errors.`,
         starterCode: `use std::env;\nuse std::process;\n\nfn add(a: f64, b: f64) -> f64 {\n    a + b\n}\n\nfn subtract(a: f64, b: f64) -> f64 {\n    a - b\n}\n\nfn multiply(a: f64, b: f64) -> f64 {\n    a * b\n}\n\nfn divide(a: f64, b: f64) -> Option<f64> {\n    if b == 0.0 {\n        None\n    } else {\n        Some(a / b)\n    }\n}\n\nfn calculate(op: &str, a: f64, b: f64) -> Option<f64> {\n    match op {\n        "+" => Some(add(a, b)),\n        "-" => Some(subtract(a, b)),\n        "*" => Some(multiply(a, b)),\n        "/" => divide(a, b),\n        _ => None,\n    }\n}\n\nfn main() {\n    println!("Calculator");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 4 {\n        println!("Usage: calculator <num1> <operator> <num2>");\n        process::exit(1);\n    }\n\n\n}`,
+        highlightLine: 41,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let num1: f64 = args[1].parse().expect'],
+              allRequired: true,
+              hints: ['Add: let num1: f64 = args[1].parse().expect("Invalid number");'],
+            },
+          ],
+          message: 'Parse the first number',
+        },
+        test: ['First number parsed'],
+        what_you_learned: `parse() converts strings into numbers. expect() handles errors by printing a message and exiting.`,
+      },
+      {
+        step: 15,
+        title: 'Read the operator',
+        instruction: `The operator is a string that tells us which calculation to perform. We don't need to parse it since \`match\` works with strings.\n\nWe'll read it directly from \`args[2]\` as a string slice.`,
+        task: `Read the operator from \`args[2]\` and store it in \`op\`. Use \`&args[2]\` to get a string slice.`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn add(a: f64, b: f64) -> f64 {\n    a + b\n}\n\nfn subtract(a: f64, b: f64) -> f64 {\n    a - b\n}\n\nfn multiply(a: f64, b: f64) -> f64 {\n    a * b\n}\n\nfn divide(a: f64, b: f64) -> Option<f64> {\n    if b == 0.0 {\n        None\n    } else {\n        Some(a / b)\n    }\n}\n\nfn calculate(op: &str, a: f64, b: f64) -> Option<f64> {\n    match op {\n        "+" => Some(add(a, b)),\n        "-" => Some(subtract(a, b)),\n        "*" => Some(multiply(a, b)),\n        "/" => divide(a, b),\n        _ => None,\n    }\n}\n\nfn main() {\n    println!("Calculator");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 4 {\n        println!("Usage: calculator <num1> <operator> <num2>");\n        process::exit(1);\n    }\n\n    let num1: f64 = args[1].parse().expect("Invalid number");\n\n\n}`,
+        highlightLine: 43,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let op = &args[2];'],
+              allRequired: true,
+              hints: ['Add: let op = &args[2];'],
+            },
+          ],
+          message: 'Read the operator',
+        },
+        test: ['Operator read'],
+        what_you_learned: `String slices (&str) work directly with match expressions.`,
+      },
+      {
+        step: 16,
+        title: 'Parse the second number',
+        instruction: `Just like the first number, we need to parse the second number from a string into an \`f64\`.\n\nThis follows the same pattern as parsing \`num1\`.`,
+        task: `Parse \`args[3]\` into an \`f64\` and store it in \`num2\`.`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn add(a: f64, b: f64) -> f64 {\n    a + b\n}\n\nfn subtract(a: f64, b: f64) -> f64 {\n    a - b\n}\n\nfn multiply(a: f64, b: f64) -> f64 {\n    a * b\n}\n\nfn divide(a: f64, b: f64) -> Option<f64> {\n    if b == 0.0 {\n        None\n    } else {\n        Some(a / b)\n    }\n}\n\nfn calculate(op: &str, a: f64, b: f64) -> Option<f64> {\n    match op {\n        "+" => Some(add(a, b)),\n        "-" => Some(subtract(a, b)),\n        "*" => Some(multiply(a, b)),\n        "/" => divide(a, b),\n        _ => None,\n    }\n}\n\nfn main() {\n    println!("Calculator");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 4 {\n        println!("Usage: calculator <num1> <operator> <num2>");\n        process::exit(1);\n    }\n\n    let num1: f64 = args[1].parse().expect("Invalid number");\n    let op = &args[2];\n\n\n}`,
+        highlightLine: 45,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let num2: f64 = args[3].parse().expect'],
+              allRequired: true,
+              hints: ['Add: let num2: f64 = args[3].parse().expect("Invalid number");'],
+            },
+          ],
+          message: 'Parse the second number',
+        },
+        test: ['Second number parsed'],
+        what_you_learned: `Parsing follows the same pattern for both numbers.`,
+      },
+      {
+        step: 17,
+        title: 'Call calculate with the inputs',
+        instruction: `Now that you have all three inputs parsed, you can call your \`calculate\` function.\n\nPass the operator and both numbers to \`calculate\`, and store the result in a variable.`,
+        task: `Call \`calculate(op, num1, num2)\` and store the result in \`result\`.`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn add(a: f64, b: f64) -> f64 {\n    a + b\n}\n\nfn subtract(a: f64, b: f64) -> f64 {\n    a - b\n}\n\nfn multiply(a: f64, b: f64) -> f64 {\n    a * b\n}\n\nfn divide(a: f64, b: f64) -> Option<f64> {\n    if b == 0.0 {\n        None\n    } else {\n        Some(a / b)\n    }\n}\n\nfn calculate(op: &str, a: f64, b: f64) -> Option<f64> {\n    match op {\n        "+" => Some(add(a, b)),\n        "-" => Some(subtract(a, b)),\n        "*" => Some(multiply(a, b)),\n        "/" => divide(a, b),\n        _ => None,\n    }\n}\n\nfn main() {\n    println!("Calculator");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 4 {\n        println!("Usage: calculator <num1> <operator> <num2>");\n        process::exit(1);\n    }\n\n    let num1: f64 = args[1].parse().expect("Invalid number");\n    let op = &args[2];\n    let num2: f64 = args[3].parse().expect("Invalid number");\n\n\n}`,
         highlightLine: 47,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['let num1: f64', 'let op = &args[2];', 'let num2: f64', 'let result = calculate(op, num1, num2);'],
+              patterns: ['let result = calculate(op, num1, num2);'],
               allRequired: true,
-              hints: ['Parse num1 and num2, read op, then call calculate(op, num1, num2)'],
+              hints: ['Add: let result = calculate(op, num1, num2);'],
             },
           ],
-          message: 'Parse inputs and call calculate()',
+          message: 'Call calculate() with the inputs',
         },
-        test: ['Inputs parsed and result computed'],
-        what_you_learned: `Parsing converts strings into typed values you can calculate with.`,
+        test: ['calculate() called'],
+        what_you_learned: `Functions let you organize logic and reuse it with different inputs.`,
       },
       {
-        step: 15,
+        step: 18,
         title: 'Print the result',
-        instruction: `Printing is where your program becomes usable. Consistent formatting makes it easier to read outputs for different operations.\n\nWe'll print the result with two decimal places so division looks consistent.`,
-        task: `If \`result\` is \`Some(value)\`, print the calculation in this format:\n\n\`\`\`text\n<num1> <op> <num2> = <result>\n\`\`\`\n\nThen run:\n\n\`\`\`bash\ncargo run -- 10 + 5\n\`\`\``,
+        instruction: `Printing is where your program becomes usable. Consistent formatting makes it easier to read outputs for different operations.\n\nWe'll print the result with two decimal places so division looks consistent. Try calculating something practical: 25 + 17 (adding two numbers together).`,
+        task: `If \`result\` is \`Some(value)\`, print the calculation in this format:\n\n\`\`\`text\n<num1> <op> <num2> = <result>\n\`\`\`\n\nThen run:\n\n\`\`\`bash\ncargo run -- 25 + 17\n\`\`\``,
         starterCode: `use std::env;\nuse std::process;\n\nfn add(a: f64, b: f64) -> f64 {\n    a + b\n}\n\nfn subtract(a: f64, b: f64) -> f64 {\n    a - b\n}\n\nfn multiply(a: f64, b: f64) -> f64 {\n    a * b\n}\n\nfn divide(a: f64, b: f64) -> Option<f64> {\n    if b == 0.0 {\n        None\n    } else {\n        Some(a / b)\n    }\n}\n\nfn calculate(op: &str, a: f64, b: f64) -> Option<f64> {\n    match op {\n        "+" => Some(add(a, b)),\n        "-" => Some(subtract(a, b)),\n        "*" => Some(multiply(a, b)),\n        "/" => divide(a, b),\n        _ => None,\n    }\n}\n\nfn main() {\n    println!("Calculator");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 4 {\n        println!("Usage: calculator <num1> <operator> <num2>");\n        process::exit(1);\n    }\n\n    let num1: f64 = args[1].parse().expect("Invalid number");\n    let op = &args[2];\n    let num2: f64 = args[3].parse().expect("Invalid number");\n\n    let result = calculate(op, num1, num2);\n\n\n}`,
         highlightLine: 55,
         validation: {
@@ -1756,8 +1871,8 @@ Ready for the next challenge? Let's build a calculator next!`,
             {
               type: 'terminal_command',
               command: 'cargo run',
-              projectSpecific: '10 + 5',
-              hints: ['Run: cargo run -- 10 + 5'],
+              projectSpecific: '25 + 17',
+              hints: ['Run: cargo run -- 25 + 17'],
             },
           ],
           message: 'Print the result and test it',
@@ -1766,7 +1881,7 @@ Ready for the next challenge? Let's build a calculator next!`,
         what_you_learned: `Formatting output makes CLI programs easier to read.`,
       },
       {
-        step: 16,
+        step: 19,
         title: 'Handle errors and exit',
         instruction: `When \`calculate\` returns \`None\`, something went wrong. It could be an unknown operator, or it could be division by zero.\n\nClear error messages are part of good CLI UX. Exiting with a non-zero code stops the program and signals failure.`,
         task: `In the \`None\` case, print a message and exit:\n\n- If \`op == "/"\` and \`num2 == 0.0\`, print:\n\n\`\`\`text\nError: Division by zero.\n\`\`\`\n\n- Otherwise, print this pattern (with the actual operator):\n\n\`\`\`text\nError: Invalid operation '^'. Use +, -, *, or /.\n\`\`\`\n\nThen run:\n\n\`\`\`bash\ncargo run -- 10 / 0\n\`\`\``,
@@ -1811,7 +1926,7 @@ Ready for the next challenge? Let's build a calculator next!`,
         what_you_learned: `Non-zero exits and clear messages make your program predictable.`,
       },
       {
-        step: 17,
+        step: 20,
         title: 'Test invalid operators',
         instruction: `Error paths are part of normal program behavior. Testing them makes sure your messages and exits stay correct.`,
         task: `Run:\n\n\`\`\`bash\ncargo run -- 5 ^ 2\n\`\`\``,
@@ -1831,8 +1946,51 @@ Ready for the next challenge? Let's build a calculator next!`,
         test: ['Invalid operator tested'],
         what_you_learned: `Testing error paths keeps your CLI user-friendly.`,
       },
+      {
+        step: 21,
+        title: 'Use your calculator in real life',
+        instruction: `Your calculator is ready! It's a real command-line tool you can use.
+
+Try these real-world scenarios:
+- Calculate a tip: \`cargo run -- 50 * 0.15\` (15% tip on $50)
+- Split a bill: \`cargo run -- 120 / 4\` (split $120 among 4 people)
+- Convert units: \`cargo run -- 100 * 1.609\` (100 miles to kilometers)
+- Calculate discounts: \`cargo run -- 200 - 50\` (original price minus discount)
+
+You've built something useful. That's what programming is all about!`,
+        task: `Run your program with a few different real-world inputs. For example, try: \`cargo run -- 50 * 0.15\`.`,
+        starterCode: `// Your completed calculator code is here!
+// Feel free to experiment with it.`,
+        validation: {
+          rules: [
+            {
+              type: 'terminal_command',
+              command: 'cargo run',
+              projectSpecific: '50 * 0.15',
+              hints: ['Run: cargo run -- 50 * 0.15'],
+            },
+          ],
+          message: 'Run your program with a real-world input.',
+        },
+        test: ['Real-world usage tested'],
+        what_you_learned: `You've built a practical tool that can be used in everyday life.`,
+      },
     ],
-    completion_message: `Nice work! You built a calculator that uses small, focused functions and a match expression to select behavior based on user input.`,
+    completion_message: `🎉 Congratulations! You've built your first Rust calculator!
+
+You've transformed from someone who writes simple programs to someone who organizes code into reusable functions.
+
+What you accomplished:
+✓ Created a Rust project with Cargo
+✓ Learned about functions, parameters, and return types
+✓ Used pattern matching with \`match\` expressions
+✓ Handled edge cases with \`Option<T>\`
+✓ Parsed command-line arguments
+✓ Built error handling that's user-friendly
+
+This calculator is now YOURS. Use it whenever you need quick calculations—you built it, you understand it, you own it.
+
+Ready for the next challenge? Let's build a text adventure next!`,
     extensions: `Try extending your calculator:\n- Add a modulo operator (and decide how it should behave for floats)\n- Improve error handling by returning Result instead of Option\n- Add a --help flag and more detailed usage\n- Support multi-step expressions (requires parsing)`,
   },
   // Project 3: Learn Ownership by Building a Text Adventure
