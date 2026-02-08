@@ -6,16 +6,16 @@ Single-source docs for the FreeRustCamp codebase. Everything here is aligned wit
 
 | Doc | Purpose |
 |-----|--------|
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | How the app is built: routes, data, validation, content sources |
-| [DEVELOPMENT.md](./DEVELOPMENT.md) | Run, build, lint, test; project structure; patterns and lessons |
-| [CONTENT.md](./CONTENT.md) | Adding and editing challenges (data model, steps, validation) |
-| [CURRICULUM.md](./CURRICULUM.md) | Complete curriculum plan: all sections, projects, learning objectives |
-| [REFERENCE.md](./REFERENCE.md) | Quick reference: validation types, progress, key files |
+| [architecture.md](./architecture.md) | How the app is built: routes, data, validation, content sources |
+| [development.md](./development.md) | Run, build, lint, test; project structure; patterns and lessons |
+| [content.md](./content.md) | Adding and editing challenges (data model, steps, validation) |
+| [curriculum.md](./curriculum.md) | Complete curriculum plan: all sections, projects, learning objectives |
+| [reference.md](./reference.md) | Quick reference: validation types, progress, key files |
 | [curriculum_assessment.md](./curriculum_assessment.md) | Section 1 production readiness assessment |
 | [time_analysis.md](./time_analysis.md) | Time estimates and optimization strategies |
 | [quality.md](./quality.md) | Pre-push checklist and quality guidelines |
 | [dependencies.md](./dependencies.md) | Unused dependencies and future loaders |
-| [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) | Common issues, debugging patterns, and lessons learned |
+| [troubleshooting.md](./troubleshooting.md) | Common issues, debugging patterns, and lessons learned |
 
 ## Stack (current)
 
@@ -50,4 +50,4 @@ src/
   content/         # Markdown challenges (for future use; see ARCHITECTURE)
 ```
 
-For more detail, see [ARCHITECTURE.md](./ARCHITECTURE.md) and [DEVELOPMENT.md](./DEVELOPMENT.md).
+For more detail, see [architecture.md](./architecture.md) and [development.md](./development.md).

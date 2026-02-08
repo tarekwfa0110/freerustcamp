@@ -1,4 +1,4 @@
-# Architecture
+# Architecture: App Structure and Data Flow
 
 How the app is structured and how data flows. This reflects the **current** codebase: curriculum is loaded from TypeScript; markdown loaders exist but are not used at runtime.
 
@@ -18,7 +18,7 @@ User → Routes (TanStack Router)
 
 - **Routes** define pages: `/`, `/challenges`, `/challenges/:challengeId`, `/progress`.
 - **Data** comes from `@/data/challenges`: `sections`, `getChallenge(id)`, `getSectionById(id)`. No other module is used by the UI for challenge/section data.
-- **Progress** is read/written in `src/lib/progress.ts` (localStorage). It can throw on quota; see [REFERENCE.md](./REFERENCE.md).
+- **Progress** is read/written in `src/lib/progress.ts` (localStorage). It can throw on quota; see [reference.md](./reference.md).
 
 ## Content sources (current vs future)
 

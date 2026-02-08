@@ -62,7 +62,7 @@ freerustcamp/
 │   ├── data/           # Challenge and curriculum data
 │   └── App.tsx         # Main app component
 ├── public/             # Static assets
-├── CURRICULUM.md       # Complete curriculum plan
+├── curriculum.md       # Complete curriculum plan
 └── package.json        # Dependencies and scripts
 ```
 

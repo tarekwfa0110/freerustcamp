@@ -1,4 +1,4 @@
-# Reference: Quick Lookup Guide
+# Reference
 
 Quick reference for validation types, progress, and key files. Details are in the code and in [ARCHITECTURE.md](./ARCHITECTURE.md) / [DEVELOPMENT.md](./DEVELOPMENT.md).
 
