@@ -172,7 +172,7 @@ export function SectionPreview({ section, onStart }: SectionPreviewProps) {
                           {challenge.concepts_taught.map((concept, idx) => (
                             <span
                               key={idx}
-                              className="px-2 py-1 rounded bg-metal-700/50 text-xs font-mono text-accent border border-metal-600"
+                              className="px-2 py-1 rounded bg-amber-950/60 text-xs font-mono text-amber-100 border border-amber-900/50"
                             >
                               {concept}
                             </span>

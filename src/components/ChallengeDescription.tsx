@@ -222,7 +222,7 @@ export function ChallengeDescription({
                   const { className, children, ...rest } = props;
                   const inline = !className || !/language-(\w+)/.exec(className || '');
                   return inline ? (
-                    <code className="font-mono bg-metal-700 text-accent px-1.5 py-0.5 rounded text-sm font-semibold border border-metal-600" {...rest}>
+                    <code className="font-mono bg-amber-950/60 text-amber-100 px-1.5 py-0.5 rounded text-sm font-semibold border border-amber-900/50" {...rest}>
                       {children}
                     </code>
                   ) : null;
@@ -243,7 +243,7 @@ export function ChallengeDescription({
                   const { className, children, ...rest } = props;
                   const inline = !className || !/language-(\w+)/.exec(className || '');
                   return inline ? (
-                    <code className="font-mono bg-metal-700 text-accent px-1.5 py-0.5 rounded text-sm font-semibold border border-metal-600" {...rest}>
+                    <code className="font-mono bg-amber-950/60 text-amber-100 px-1.5 py-0.5 rounded text-sm font-semibold border border-amber-900/50" {...rest}>
                       {children}
                     </code>
                   ) : null;
@@ -264,7 +264,7 @@ export function ChallengeDescription({
                   const { className, children, ...rest } = props;
                   const inline = !className || !/language-(\w+)/.exec(className || '');
                   return inline ? (
-                    <code className="font-mono bg-metal-700 text-accent px-1.5 py-0.5 rounded text-sm font-semibold border border-metal-600" {...rest}>
+                    <code className="font-mono bg-amber-950/60 text-amber-100 px-1.5 py-0.5 rounded text-sm font-semibold border border-amber-900/50" {...rest}>
                       {children}
                     </code>
                   ) : null;

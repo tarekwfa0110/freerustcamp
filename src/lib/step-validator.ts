@@ -25,7 +25,7 @@ export function validateStep(
 ): StepValidationResult {
   // Try data-driven validation first (if validation config exists)
   if (step.validation) {
-    const result = validateStepWithConfig(step, code, terminalCommands, step.validation);
+    const result = validateStepWithConfig(step, code, terminalCommands, step.validation, challengeId);
     return result; // Use data-driven validation when available
   }
   

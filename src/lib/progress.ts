@@ -220,6 +220,33 @@ export function getTerminalCommandsForStep(challengeId: string, stepNumber: numb
   return [];
 }
 
+export function addCreatedDirectory(challengeId: string, directoryPath: string): void {
+  const progress = loadProgress();
+  const existing = progress.challengeProgress[challengeId];
+
+  const createdDirectories = existing?.createdDirectories ?? [];
+  if (!createdDirectories.includes(directoryPath)) {
+    const challengeProgress: ChallengeProgress = {
+      ...defaultChallengeProgress(challengeId),
+      ...existing,
+      challengeId,
+      createdDirectories: [...createdDirectories, directoryPath],
+      terminalCommands: existing?.terminalCommands ?? {},
+      completedSteps: existing?.completedSteps ?? [],
+    };
+
+    progress.challengeProgress[challengeId] = challengeProgress;
+    progress.lastActivity = new Date().toISOString();
+    saveProgress(progress);
+  }
+}
+
+export function getCreatedDirectories(challengeId: string): string[] {
+  const progress = loadProgress();
+  const existing = progress.challengeProgress[challengeId];
+  return existing?.createdDirectories ?? [];
+}
+
 export function updateSectionProgress(sectionId: number, total: number): void {
   const progress = loadProgress();
 

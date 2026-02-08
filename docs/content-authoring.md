@@ -31,6 +31,7 @@ Exception: Single-sentence steps are ok when the action is trivial and the user 
 - **Example:** Use different variable names or values than the task (e.g. `let first_item = &my_vec[0];` when the task is “store `args[1]` in `temp_str`”).
 - **Task:** State the exact goal (variable names, types, indices).
 - Don’t give the exact solution in the example so the user can copy-paste without thinking.
+- **Avoid duplicate instructions:** If the example would repeat the task (common for terminal commands), skip the example block. Repeating the same command in an “Example” block and again in the task is a bad design.
 
 ## Instruction rules
 
@@ -61,6 +62,37 @@ validation: {
 
 Other types: `code_contains`, `code_matches`, `function_exists`, `struct_exists`, etc.
 
+### Validation Best Practices
+
+**Function signature validation:**
+- **Never use exact string matching** for function signatures with `code_contains` when checking parameter types. Rust allows flexible spacing (e.g., `a: f64` or `a:f64`), and users may write either style.
+- **Use `code_matches` with regex** instead to allow flexible whitespace. Example:
+
+```ts
+// ❌ BAD - Too strict, fails if user writes a:f64 instead of a: f64
+{
+  type: 'code_contains',
+  patterns: ['fn add(a: f64, b: f64)'],
+}
+
+// ✅ GOOD - Flexible, accepts both a: f64 and a:f64
+{
+  type: 'code_matches',
+  regex: 'fn\\s+add\\s*\\(\\s*a\\s*:\\s*f64\\s*,\\s*b\\s*:\\s*f64\\s*\\)',
+  hints: ['Check spacing: a: f64 (space after colon) or a:f64 (no space) both work'],
+}
+```
+
+**Regex pattern for function signatures:**
+- Use `\\s*` (zero or more whitespace) around colons and commas to allow flexible spacing
+- Use `\\s+` (one or more whitespace) for required spaces (like after `fn`)
+- Escape special regex characters: `\\(`, `\\)`, `\\+`, `\\*`, etc.
+
+**General rules:**
+- Prefer `code_matches` with regex for structural checks (function signatures, type annotations)
+- Use `code_contains` for simple substring checks (like checking for keywords or specific strings)
+- Always provide helpful hints that mention spacing flexibility when relevant
+
 ## Where to edit content
 
 - **Current:** Edit `src/data/challenges/section1.ts`. Each challenge has `steps[]` with `instruction`, `task`, `test`, `what_you_learned`, optional `explanation`, `starterCode`, `validation`.
@@ -75,3 +107,4 @@ Other types: `code_contains`, `code_matches`, `function_exists`, `struct_exists`
 - [ ] "What you learned" and hints in data, not in instruction body.
 - [ ] Steps are broken down granularly (reference Project 1: ~20–25 steps for a 1-hour project is the target).
 - [ ] Each concept (imports, parsing, type annotations, etc.) gets its own step when first introduced.
+- [ ] No duplicate instruction blocks (avoid example text that repeats the task).

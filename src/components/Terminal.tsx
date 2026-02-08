@@ -43,6 +43,25 @@ export function Terminal({
   const [createdDirectories, setCreatedDirectories] = useState<Set<string>>(new Set());
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
+  
+  // Load persisted directories from progress on mount and when projectName changes
+  useEffect(() => {
+    // Extract challengeId from projectName
+    // projectName comes as "002" from ChallengeView, need to convert to "project-002"
+    const challengeId = projectName.startsWith('project-') || projectName.startsWith('cert-') 
+      ? projectName 
+      : `project-${projectName.padStart(3, '0')}`;
+    
+    // Import here to avoid circular dependency
+    import('@/lib/progress').then(({ getCreatedDirectories }) => {
+      const persistedDirs = getCreatedDirectories(challengeId);
+      // Always set createdDirectories, even if empty, to clear prior state when switching projects
+      setCreatedDirectories(new Set(persistedDirs));
+    }).catch((error) => {
+      console.error('Failed to load persisted directories:', error);
+      setCreatedDirectories(new Set());
+    });
+  }, [projectName]);
 
   // Auto-scroll to bottom when new lines are added
   useEffect(() => {
@@ -71,6 +90,11 @@ export function Terminal({
 
     const lines = code.split('\n');
     
+    // Helper function to strip inline comments before checking for semicolons
+    const stripInlineComments = (line: string): string => {
+      return line.replace(/\/\/.*$/, '').trim();
+    };
+    
     // Check for missing semicolons after statements
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -95,22 +119,45 @@ export function Terminal({
       // Check for println! without semicolon
       const printlnMatch = trimmedLine.match(/println!\s*\([^)]*\)/);
       if (printlnMatch) {
-        const hasSemicolon = trimmedLine.endsWith(';');
-        if (!hasSemicolon) {
-          // Check if next line is a closing brace (last statement in function)
-          const nextLine = i < lines.length - 1 ? lines[i + 1].trim() : '';
-          if (nextLine !== '}') {
-            // Missing semicolon - find the position
+        // Strip inline comments before checking for semicolons
+        const lineWithoutComments = stripInlineComments(trimmedLine);
+        
+        // Check if this is a match arm (contains =>)
+        if (trimmedLine.includes('=>')) {
+          // Match arms should NOT end with semicolons - they end with commas
+          // If a match arm ends with semicolon, that's an error
+          if (lineWithoutComments.endsWith(';')) {
             const matchIndex = line.indexOf(printlnMatch[0]);
             const closingParenIndex = line.indexOf(')', matchIndex);
             return {
               isValid: false,
               error: {
-                message: 'error: expected `;`, found newline',
+                message: 'error: expected `,`, found `;`',
                 line: lineNum,
                 column: (closingParenIndex >= 0 ? closingParenIndex + 2 : line.length + 1)
               }
             };
+          }
+          // Match arm without semicolon is correct (ends with comma), skip further checks
+        } else {
+          // Not a match arm - check for missing semicolon
+          const hasSemicolon = lineWithoutComments.endsWith(';');
+          if (!hasSemicolon) {
+            // Check if next line is a closing brace (last statement in function)
+            const nextLine = i < lines.length - 1 ? lines[i + 1].trim() : '';
+            if (nextLine !== '}') {
+              // Missing semicolon - find the position
+              const matchIndex = line.indexOf(printlnMatch[0]);
+              const closingParenIndex = line.indexOf(')', matchIndex);
+              return {
+                isValid: false,
+                error: {
+                  message: 'error: expected `;`, found newline',
+                  line: lineNum,
+                  column: (closingParenIndex >= 0 ? closingParenIndex + 2 : line.length + 1)
+                }
+              };
+            }
           }
         }
       }
@@ -180,7 +227,17 @@ export function Terminal({
         if (args[0] === 'new' && args[1]) {
           // Create the directory in our virtual filesystem
           const newDirPath = `${currentDirectory}/${args[1]}`;
-          setCreatedDirectories((prev) => new Set([...prev, newDirPath]));
+          setCreatedDirectories((prev) => {
+            const updated = new Set([...prev, newDirPath]);
+            // Persist to progress storage
+            const challengeId = projectName.startsWith('project-') || projectName.startsWith('cert-') 
+              ? projectName 
+              : `project-${projectName.padStart(3, '0')}`;
+            import('@/lib/progress').then(({ addCreatedDirectory }) => {
+              addCreatedDirectory(challengeId, newDirPath);
+            });
+            return updated;
+          });
           output = [
             { type: 'output', content: `     Created binary (application) package \`${args[1]}\`` },
             { type: 'output', content: '' },
@@ -193,64 +250,142 @@ export function Terminal({
             { type: 'output', content: '' },
           ];
         } else if (args[0] === 'run') {
-          // Simulate running the code
-          output = [
-            { type: 'output', content: `   Compiling ${projectName} v0.1.0` },
-          ];
-
           // Extract command-line arguments (everything after --)
           const dashDashIndex = args.indexOf('--');
           const runArgs = dashDashIndex >= 0 ? args.slice(dashDashIndex + 1) : [];
 
-          // Check if code compiles
-          if (code) {
-            const validation = validateRustCode(code);
+          // Check if real execution API is available
+          const EXECUTION_API_URL = import.meta.env.VITE_EXECUTION_API_URL as string | undefined;
+          
+          if (EXECUTION_API_URL && code) {
+            // Use real Rust execution
+            output.push(
+              { type: 'output', content: `   Compiling ${projectName} v0.1.0` },
+            );
             
-            if (!validation.isValid && validation.error) {
-              const { message, line, column } = validation.error;
-              output.push(
-                { type: 'error', content: message },
-                { type: 'error', content: ` --> src/main.rs:${line}:${column}` },
-                { type: 'error', content: '  |' },
-                { type: 'error', content: `${line} | ${code.split('\n')[line - 1] || ''}` },
-                { type: 'error', content: `  | ${' '.repeat(column - 1)}^` },
-                { type: 'error', content: '' },
-                { type: 'error', content: 'error: could not compile `temp_project` (exit code: 1)' },
-                { type: 'error', content: '' },
-              );
-            } else {
-              // Code compiles, simulate execution
-              output.push(
-                { type: 'output', content: '    Finished dev [unoptimized + debuginfo] target(s) in 0.5s' },
-                { type: 'output', content: `     Running \`target/debug/${projectName}${runArgs.length > 0 ? ' ' + runArgs.join(' ') : ''}\`` },
-                { type: 'output', content: '' },
-              );
-
-              // Try to extract println! outputs from code
-              const printlnMatches = code.match(/println!\s*\(\s*"([^"]+)"\s*\)/g);
-              if (printlnMatches) {
-                printlnMatches.forEach((match) => {
-                  const content = match.match(/"([^"]+)"/)?.[1] || '';
-                  if (content) {
-                    output.push({ type: 'output', content });
-                  }
-                });
+            try {
+              const base = EXECUTION_API_URL.replace(/\/$/, '');
+              const response = await fetch(`${base}/api/run`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code, args: runArgs }),
+              });
+              
+              if (!response.ok) {
+                const text = await response.text();
+                output.push(
+                  { type: 'error', content: `Execution server error (${response.status}): ${text || response.statusText}` },
+                );
               } else {
-                output.push({ type: 'output', content: '(Program executed - no output)' });
+                const result = await response.json();
+                
+                if (result.compilationError) {
+                  // Compilation failed
+                  const errorLines = result.compilationError.split('\n');
+                  errorLines.forEach((line: string) => {
+                    if (line.trim()) {
+                      output.push({ type: 'error', content: line });
+                    }
+                  });
+                  output.push({ type: 'error', content: '' });
+                  output.push({ type: 'error', content: `error: could not compile \`${projectName}\` (exit code: 1)` });
+                } else {
+                  // Compilation succeeded
+                  output.push(
+                    { type: 'output', content: '    Finished dev [unoptimized + debuginfo] target(s) in 0.5s' },
+                    { type: 'output', content: `     Running \`target/debug/${projectName}${runArgs.length > 0 ? ' ' + runArgs.join(' ') : ''}\`` },
+                    { type: 'output', content: '' },
+                  );
+                  
+                  // Print stdout
+                  if (result.stdout) {
+                    const stdoutLines = result.stdout.split('\n');
+                    stdoutLines.forEach((line: string) => {
+                      if (line.trim() || stdoutLines.indexOf(line) === stdoutLines.length - 1) {
+                        output.push({ type: 'output', content: line });
+                      }
+                    });
+                  }
+                  
+                  // Print stderr if any
+                  if (result.stderr) {
+                    const stderrLines = result.stderr.split('\n');
+                    stderrLines.forEach((line: string) => {
+                      if (line.trim()) {
+                        output.push({ type: 'error', content: line });
+                      }
+                    });
+                  }
+                }
               }
-
-              // Show arguments if provided
-              if (runArgs.length > 0) {
-                output.push({ type: 'output', content: `(Command-line arguments: ${runArgs.join(', ')})` });
+            } catch (err) {
+              if (err instanceof TypeError && err.message.includes('fetch')) {
+                // Network error - server probably not running
+                output.push(
+                  { type: 'error', content: 'Failed to connect to execution server.' },
+                  { type: 'error', content: 'Make sure the server is running: bun run server' },
+                );
+              } else {
+                output.push(
+                  { type: 'error', content: `Error: ${err instanceof Error ? err.message : 'Failed to execute code'}` },
+                );
               }
             }
           } else {
+            // Fallback to simulation if API not available
             output.push(
-              { type: 'output', content: '    Finished dev [unoptimized + debuginfo] target(s) in 0.5s' },
-              { type: 'output', content: `     Running \`target/debug/${projectName}\`` },
-              { type: 'output', content: '' },
-              { type: 'output', content: '(No code to run)' },
+              { type: 'output', content: `   Compiling ${projectName} v0.1.0` },
             );
+
+            if (code) {
+              const validation = validateRustCode(code);
+              
+              if (!validation.isValid && validation.error) {
+                const { message, line, column } = validation.error;
+                output.push(
+                  { type: 'error', content: message },
+                  { type: 'error', content: ` --> src/main.rs:${line}:${column}` },
+                  { type: 'error', content: '  |' },
+                  { type: 'error', content: `${line} | ${code.split('\n')[line - 1] || ''}` },
+                  { type: 'error', content: `  | ${' '.repeat(column - 1)}^` },
+                  { type: 'error', content: '' },
+                  { type: 'error', content: `error: could not compile \`${projectName}\` (exit code: 1)` },
+                  { type: 'error', content: '' },
+                );
+              } else {
+                // Code compiles, simulate execution
+                output.push(
+                  { type: 'output', content: '    Finished dev [unoptimized + debuginfo] target(s) in 0.5s' },
+                  { type: 'output', content: `     Running \`target/debug/${projectName}${runArgs.length > 0 ? ' ' + runArgs.join(' ') : ''}\`` },
+                  { type: 'output', content: '' },
+                );
+
+                // Try to extract println! outputs from code
+                const printlnMatches = code.match(/println!\s*\(\s*"([^"]+)"\s*\)/g);
+                if (printlnMatches) {
+                  printlnMatches.forEach((match) => {
+                    const content = match.match(/"([^"]+)"/)?.[1] || '';
+                    if (content) {
+                      output.push({ type: 'output', content });
+                    }
+                  });
+                } else {
+                  output.push({ type: 'output', content: '(Program executed - no output)' });
+                }
+
+                // Show arguments if provided
+                if (runArgs.length > 0) {
+                  output.push({ type: 'output', content: `(Command-line arguments: ${runArgs.join(', ')})` });
+                }
+              }
+            } else {
+              output.push(
+                { type: 'output', content: '    Finished dev [unoptimized + debuginfo] target(s) in 0.5s' },
+                { type: 'output', content: `     Running \`target/debug/${projectName}\`` },
+                { type: 'output', content: '' },
+                { type: 'output', content: '(No code to run)' },
+              );
+            }
           }
         } else if (args[0] === 'check') {
           output = [
@@ -267,13 +402,13 @@ export function Terminal({
                 { type: 'error', content: '  |' },
                 { type: 'error', content: `${line} | ${code.split('\n')[line - 1] || ''}` },
                 { type: 'error', content: `  | ${' '.repeat(column - 1)}^` },
-                { type: 'error', content: '' },
-                { type: 'error', content: 'error: could not compile `temp_project` (exit code: 1)' },
-                { type: 'error', content: '' },
-              );
-            } else {
-              output.push(
-                { type: 'output', content: '    Finished dev [unoptimized + debuginfo] target(s) in 0.3s' },
+                  { type: 'error', content: '' },
+                  { type: 'error', content: `error: could not compile \`${projectName}\` (exit code: 1)` },
+                  { type: 'error', content: '' },
+                );
+              } else {
+                output.push(
+                  { type: 'output', content: '    Finished dev [unoptimized + debuginfo] target(s) in 0.3s' },
                 { type: 'output', content: '' },
               );
             }
@@ -354,11 +489,29 @@ export function Terminal({
               ? `/${targetDir}` 
               : `${currentDirectory}/${targetDir}`;
             
-            // Check if directory exists (either created by cargo new or is a valid parent)
-            const isValidDir = createdDirectories.has(targetPath) || 
-                              targetDir === 'temp_converter' && currentDirectory === '/home/user';
+            // Check if directory exists in local state
+            let isValidDir = createdDirectories.has(targetPath);
             
-            if (isValidDir || targetDir === 'temp_converter') {
+            // If not found locally, check persisted directories
+            if (!isValidDir) {
+              try {
+                const progress = JSON.parse(localStorage.getItem('freerustcamp-progress') || '{}');
+                const challengeId = projectName.startsWith('project-') || projectName.startsWith('cert-') 
+                  ? projectName 
+                  : `project-${projectName.padStart(3, '0')}`;
+                const challengeProgress = progress.challengeProgress?.[challengeId];
+                const persistedDirs = challengeProgress?.createdDirectories || [];
+                if (persistedDirs.includes(targetPath)) {
+                  // Add to local state if found in persisted
+                  setCreatedDirectories((prev) => new Set([...prev, targetPath]));
+                  isValidDir = true;
+                }
+              } catch {
+                // Ignore errors
+              }
+            }
+            
+            if (isValidDir) {
               newPath = targetPath;
               setCurrentDirectory(newPath);
               output = [];
