@@ -73,7 +73,7 @@ Exception: Single-sentence steps are ok when the action is trivial and the user 
 
 ## Validation (data-driven)
 
-Define rules in step data so the app can validate without hardcoded logic. See `src/types/validation.ts` and [architecture.md](architecture.md#validation).
+Define rules in step data so the app can validate without hardcoded logic. See `src/types/validation.ts` and [ARCHITECTURE.md](./ARCHITECTURE.md#validation).
 
 Example (terminal command):
 
