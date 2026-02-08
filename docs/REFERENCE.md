@@ -1,6 +1,6 @@
 # Reference
 
-Quick reference for validation types, progress, and key files. Details are in the code and in [ARCHITECTURE.md](./ARCHITECTURE.md) / [DEVELOPMENT.md](./DEVELOPMENT.md).
+Quick reference for validation types, progress, and key files. Details are in the code and in [architecture.md](./architecture.md) / [development.md](./development.md).
 
 ## Validation types (`src/types/validation.ts`)
 
