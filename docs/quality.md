@@ -43,4 +43,4 @@ Before pushing to `master`:
 - **Unique IDs:** Step numbers (and any id used for lookup) must be unique per scope.
 - **State and side effects:** Don’t call `loadProgress()` or reload inside a setState callback; do it outside (handler or effect).
 
-See [development.md](development.md) for project-specific patterns and lessons.
+See [DEVELOPMENT.md](./DEVELOPMENT.md) for project-specific patterns and lessons.

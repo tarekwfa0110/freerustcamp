@@ -2,15 +2,20 @@
 
 Single-source docs for the FreeRustCamp codebase. Everything here is aligned with the current app (TypeScript challenges, TanStack Router, progress in localStorage).
 
-## What’s in here
+## What's in here
 
 | Doc | Purpose |
 |-----|--------|
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | How the app is built: routes, data, validation, content sources |
 | [DEVELOPMENT.md](./DEVELOPMENT.md) | Run, build, lint, test; project structure; patterns and lessons |
 | [CONTENT.md](./CONTENT.md) | Adding and editing challenges (data model, steps, validation) |
-| [CURRICULUM.md](./CURRICULUM.md) | Curriculum plan: sections, project types, Section 1 outline |
+| [CURRICULUM.md](./CURRICULUM.md) | Complete curriculum plan: all sections, projects, learning objectives |
 | [REFERENCE.md](./REFERENCE.md) | Quick reference: validation types, progress, key files |
+| [curriculum_assessment.md](./curriculum_assessment.md) | Section 1 production readiness assessment |
+| [time_analysis.md](./time_analysis.md) | Time estimates and optimization strategies |
+| [quality.md](./quality.md) | Pre-push checklist and quality guidelines |
+| [dependencies.md](./dependencies.md) | Unused dependencies and future loaders |
+| [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) | Common issues, debugging patterns, and lessons learned |
 
 ## Stack (current)
 

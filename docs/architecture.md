@@ -28,7 +28,7 @@ User → Routes (TanStack Router)
 | Markdown | No | `src/content/section1/*.md`; parsed by `markdown-parser.ts` |
 | Structure JSON | No (only for future markdown) | `src/data/structure/sections.json`, `section1.json` |
 
-The app does **not** use `hybrid-loader`, `content-loader`, or `structure-loader` at runtime. Those live in `src/lib/` for a future markdown-based curriculum. See `src/lib/LOADERS_README.md` for how to enable them.
+The app does **not** use `hybrid-loader`, `content-loader`, or `structure-loader` at runtime. Those live in `src/lib/` for a future markdown-based curriculum. See [Loaders (future markdown)](#loaders-future-markdown) below.
 
 ## Validation
 
@@ -58,3 +58,28 @@ Navigation uses TanStack Router only (`Link`, `useNavigate`); no raw `<a href>` 
 | Progress (load/save) | `src/lib/progress.ts` |
 | Step validation | `src/lib/step-validator.ts`, `src/lib/data-driven-validator.ts` |
 | Types | `src/types/challenge.ts`, `src/types/progress.ts`, `src/types/validation.ts` |
+
+## Loaders (future markdown)
+
+These modules are **not used by the app** at runtime. Routes and components use `@/data/challenges` (TypeScript) only.
+
+| File | Purpose |
+|------|---------|
+| `src/lib/hybrid-loader.ts` | Switches between markdown and TS (`USE_MARKDOWN = false`). |
+| `src/lib/content-loader.ts` | Loads challenges from markdown under `src/content/`. |
+| `src/lib/structure-loader.ts` | Loads section/challenge order from `src/data/structure/*.json`. |
+
+To enable markdown later: set `USE_MARKDOWN = true` in `hybrid-loader.ts` and have routes/components import from `@/lib/hybrid-loader` (async APIs).
+
+## Dependencies (unused / optional)
+
+- **@tanstack/react-table** — Planned for curriculum/data tables (challenge lists, progress tables).
+- **react-responsive** — Planned for responsive layout or media-query hooks.
+
+Remove from `package.json` if not needed, or keep for upcoming features.
+
+## Server
+
+- **Location:** `server/`. Runs with `bun run server/index.ts`.
+- **Purpose:** Optional backend for running Rust code and tests (e.g. when `VITE_EXECUTION_API_URL` is set).
+- **Docs:** `server/README.md`.
