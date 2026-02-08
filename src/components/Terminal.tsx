@@ -90,6 +90,11 @@ export function Terminal({
 
     const lines = code.split('\n');
     
+    // Helper function to strip inline comments before checking for semicolons
+    const stripInlineComments = (line: string): string => {
+      return line.replace(/\/\/.*$/, '').trim();
+    };
+    
     // Check for missing semicolons after statements
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -114,11 +119,14 @@ export function Terminal({
       // Check for println! without semicolon
       const printlnMatch = trimmedLine.match(/println!\s*\([^)]*\)/);
       if (printlnMatch) {
+        // Strip inline comments before checking for semicolons
+        const lineWithoutComments = stripInlineComments(trimmedLine);
+        
         // Check if this is a match arm (contains =>)
         if (trimmedLine.includes('=>')) {
           // Match arms should NOT end with semicolons - they end with commas
           // If a match arm ends with semicolon, that's an error
-          if (trimmedLine.endsWith(';')) {
+          if (lineWithoutComments.endsWith(';')) {
             const matchIndex = line.indexOf(printlnMatch[0]);
             const closingParenIndex = line.indexOf(')', matchIndex);
             return {
@@ -133,7 +141,7 @@ export function Terminal({
           // Match arm without semicolon is correct (ends with comma), skip further checks
         } else {
           // Not a match arm - check for missing semicolon
-          const hasSemicolon = trimmedLine.endsWith(';');
+          const hasSemicolon = lineWithoutComments.endsWith(';');
           if (!hasSemicolon) {
             // Check if next line is a closing brace (last statement in function)
             const nextLine = i < lines.length - 1 ? lines[i + 1].trim() : '';
