@@ -290,6 +290,19 @@ function validateRule(
       break;
     }
 
+    case 'code_reject_patterns': {
+      const patterns = rule.patterns || [];
+      const foundPatterns = patterns.filter((pattern: string) => code.includes(pattern));
+      if (foundPatterns.length > 0) {
+        return {
+          completed: false,
+          message: `Remove ${foundPatterns.length > 1 ? 'these elements' : 'this element'}: ${foundPatterns.join(', ')}`,
+          hints: rule.hints,
+        };
+      }
+      break;
+    }
+
     case 'code_compiles':
       return {
         completed: false,

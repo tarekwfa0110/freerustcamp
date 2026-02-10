@@ -1,11 +1,11 @@
-# Content: Adding and Editing Challenges
+﻿# Content: Adding and Editing Challenges
 
 How curriculum data is defined today and how to add or change challenges and steps. The app uses **TypeScript** only; markdown is for a future migration.
 
 ## Where content lives (current)
 
-- **Sections and challenge list:** `src/data/challenges/index.ts` — `sections` array and exports `getChallenge`, `getSectionById`, etc.
-- **Section 1 challenges:** `src/data/challenges/section1.ts` — array of practice/certification projects.
+- **Sections and challenge list:** `src/data/challenges/index.ts` â€” `sections` array and exports `getChallenge`, `getSectionById`, etc.
+- **Section 1 challenges:** `src/data/challenges/section1.ts` â€” array of practice/certification projects.
 
 To add a new section: add an entry to `sections` in `index.ts` and a new file (e.g. `section2.ts`) with that section's challenges. To add a challenge to Section 1: add an object to the Section 1 array in `section1.ts` and ensure its `id` is unique and referenced in the section's `challenges` array.
 
@@ -23,15 +23,20 @@ Defined in `src/types/challenge.ts`.
 ### ProjectStep
 
 - **step** (number, unique within challenge), **title**, **instruction**, **test** (string[]), **what_you_learned**
-- Optional: **explanation**, **task**, **starterCode**, **validation** (data-driven rules)
+- Optional: **explanation**, **task**, **starterCode**, **validation** (data-driven rules), **highlightLine**, **editableRegion**
+
+Notes from Project 1 + 2:
+- **Step 0** is a project intro ("Understand what you're building"). It sets context, shows examples, and has a simple "read this" task.
+- **highlightLine** is used heavily to point learners to the exact edit line. Keep it 1-indexed.
+- **editableRegion** is rarely used today but remains available for future FCC-style guided edits.
 
 ### Certification project
 
-- Same top-level fields as practice except **type: 'certification'**; **concepts** → **description**; **requirements** (functional, technical, quality); **tests**, **evaluation**; no steps.
+- Same top-level fields as practice except **type: 'certification'**; **concepts** â†’ **description**; **requirements** (functional, technical, quality); **tests**, **evaluation**; no steps.
 
 ### Validation (data-driven)
 
-In `step.validation` (see `src/types/validation.ts`): **rules** array of validation objects (e.g. `terminal_command`, `code_contains`, `code_matches`, `function_exists`, `struct_exists`), each with **hints** and optional **message**. If `step.validation` is present, `data-driven-validator.ts` runs it; otherwise `step-validator.ts` uses hardcoded logic for that project/step.
+In `step.validation` (see `src/types/validation.ts`): **rules** array of validation objects (e.g. `terminal_command`, `code_contains`, `code_matches`, `code_reject_patterns`, `function_exists`, `struct_exists`), each with **hints** and optional **message**. If `step.validation` is present, `data-driven-validator.ts` runs it; otherwise `step-validator.ts` uses hardcoded logic for that project/step.
 
 ## Where content appears
 
@@ -47,15 +52,17 @@ Put teaching and the task in **instruction** and **task**. Don't put test descri
 
 ## Step structure (per step)
 
-1. **Explain** — Short explanation (1–3 sentences). Why it matters, how it works.
-2. **Example** — Code snippet that shows the **pattern** with **different** names/values from the task.
-3. **Task** — One clear action. Last paragraph of instruction or the `task` field.
+1. **Explain** — Short explanation (1–3 sentences) for simple steps; longer explanations are OK when the concept is heavy. Why it matters, how it works.
+2. **Example** â€” Code snippet that shows the **pattern** with **different** names/values from the task.
+3. **Task** â€” One clear action. Last paragraph of instruction or the `task` field.
 
 Rule: Explanation and example first; exact thing to type/implement last. Don't lead with the solution.
 
-**Philosophy: Granular steps are encouraged.** Break down concepts into small, digestible steps. Each step should teach one concept or require one clear action. Don't combine multiple concepts into a single step. Reference Project 1 (Temperature Converter) as the target: it has 23 steps for a 1-hour project, breaking down every concept (project creation, imports, parsing, type annotations, conversions, error handling) into individual steps. This granularity makes learning easier and reduces cognitive load.
+**Philosophy: Granular steps are encouraged.** Break down concepts into small, digestible steps. Each step should teach one concept or require one clear action. Don't combine multiple concepts into a single step. Reference Project 1 and Project 2 as the target: they use ~20–25 steps for a 1-hour project, breaking down every concept (project creation, imports, parsing, type annotations, conversions, error handling, match, Option) into individual steps. This granularity makes learning easier and reduces cognitive load.
 
 Exception: Single-sentence steps are ok when the action is trivial and the user has already seen the pattern.
+
+**Long explanations are allowed when the concept is heavy.** Project 2 (Option / error handling) uses multi-paragraph explanations with headings and bullets. The instruction body can be longer than 3 sentences when needed, as long as it remains scannable (short paragraphs, clear headings, concrete examples).
 
 ## Code snippets
 
@@ -66,10 +73,10 @@ Exception: Single-sentence steps are ok when the action is trivial and the user 
 
 ## Instruction rules
 
-- **Length:** 1–3 sentences for intro; keep the step scannable (linter warns if >5 sentences).
-- **Action-oriented:** Start with verbs (create, add, set, implement).
+- **Length:** Keep the step scannable. Short steps are preferred, but long, multi-paragraph explanations are acceptable for foundational concepts (see Project 2 Option/error handling steps).
+- **Action-oriented:** The **task** must be explicit. The **instruction** can start with context or explanation; it does not need to start with a verb.
 - **One concept per step:** One snippet that teaches the pattern; optional bullets for terms.
-- **Granularity:** Prefer more steps over fewer. It's better to have 20 small steps than 10 large ones. Each step should feel achievable and focused. See Project 1 for reference: creating a project, entering the folder, and running it are three separate steps, not one.
+- **Granularity:** Prefer more steps over fewer. It's better to have 20 small steps than 10 large ones. Each step should feel achievable and focused. See Project 1 + 2 for reference: creating a project, entering the folder, and running it are three separate steps, not one.
 
 ## Validation (data-driven)
 
@@ -91,7 +98,21 @@ validation: {
 }
 ```
 
-Other types: `code_contains`, `code_matches`, `function_exists`, `struct_exists`, etc.
+Note: `projectSpecific` can be more than a folder name. Project 2 uses it to enforce argument sets (e.g., `cargo run -- 25 + 17`).
+
+Other types: `code_contains`, `code_matches`, `code_reject_patterns`, `function_exists`, `struct_exists`, etc.
+
+Project 1 + 2 also use a **negative rule** pattern to block stale lines:
+
+```ts
+{
+  type: 'code_reject_patterns',
+  patterns: ['let args = env::args();'],
+  hints: ['Replace the iterator line instead of keeping it'],
+}
+```
+
+Use this when a step replaces a previous line and you want to ensure the old line is gone.
 
 ### Validation Best Practices
 
@@ -110,13 +131,13 @@ Other types: `code_contains`, `code_matches`, `function_exists`, `struct_exists`
 - **Use `code_matches` with regex** instead to allow flexible whitespace. Example:
 
 ```ts
-// ❌ BAD - Too strict, fails if user writes a:f64 instead of a: f64
+// âŒ BAD - Too strict, fails if user writes a:f64 instead of a: f64
 {
   type: 'code_contains',
   patterns: ['fn add(a: f64, b: f64)'],
 }
 
-// ✅ GOOD - Flexible, accepts both a: f64 and a:f64
+// âœ… GOOD - Flexible, accepts both a: f64 and a:f64
 {
   type: 'code_matches',
   regex: 'fn\\s+add\\s*\\(\\s*a\\s*:\\s*f64\\s*,\\s*b\\s*:\\s*f64\\s*\\)',
@@ -133,12 +154,13 @@ Other types: `code_contains`, `code_matches`, `function_exists`, `struct_exists`
 - Prefer `code_matches` with regex for structural checks (function signatures, type annotations)
 - Use `code_contains` for simple substring checks (like checking for keywords or specific strings)
 - Always provide helpful hints that mention spacing flexibility when relevant
+- For replacements, use `code_reject_patterns` to prevent the old line from lingering (see Project 1 + 2)
 
 ## Adding a new step (practice project)
 
 1. Add an object to the project's **steps** array in `section1.ts` (or the section file).
 2. Set **step** (unique number), **title**, **instruction**, **test** (short descriptions), **what_you_learned**.
-3. Optionally set **explanation**, **task**, **starterCode**, **validation** (see `validation.ts` and existing steps for examples).
+3. Optionally set **explanation**, **task**, **starterCode**, **validation**, **highlightLine**, **editableRegion** (see `validation.ts` and existing steps for examples).
 4. Ensure no other step in that challenge has the same **step** number.
 
 ## Quality checklist
@@ -148,10 +170,24 @@ Other types: `code_contains`, `code_matches`, `function_exists`, `struct_exists`
 - [ ] Step numbers unique per challenge.
 - [ ] Validation rules or hardcoded logic for each step (no auto-pass).
 - [ ] "What you learned" and hints in data, not in instruction body.
-- [ ] Steps are broken down granularly (reference Project 1: ~20–25 steps for a 1-hour project is the target).
+- [ ] Steps are broken down granularly (reference Project 1 + 2: ~20–25 steps for a 1-hour project is the target).
 - [ ] Each concept (imports, parsing, type annotations, etc.) gets its own step when first introduced.
 - [ ] No duplicate instruction blocks (avoid example text that repeats the task).
 
 ## Future: Markdown content
 
 When markdown is enabled (see `src/lib/LOADERS_README.md`), content can live in `src/content/sectionN/*.md` with frontmatter and step sections. The app does not use markdown at runtime today; curriculum is TypeScript only.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
