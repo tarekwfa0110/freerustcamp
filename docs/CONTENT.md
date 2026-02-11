@@ -25,8 +25,8 @@ Defined in `src/types/challenge.ts`.
 - **step** (number, unique within challenge), **title**, **instruction**, **test** (string[]), **what_you_learned**
 - Optional: **explanation**, **task**, **starterCode**, **validation** (data-driven rules), **highlightLine**, **editableRegion**
 
-Notes from Project 1 + 2:
-- **Step 0** is a project intro ("Understand what you're building"). It sets context, shows examples, and has a simple "read this" task.
+Notes from Projects 1â€“3:
+- **Step 0** is a project intro ("Understand what you're building"). It sets context, shows examples, and can either be a simple "read this" task or a quick environment check (e.g., a version command) before starting.
 - **highlightLine** is used heavily to point learners to the exact edit line. Keep it 1-indexed.
 - **editableRegion** is rarely used today but remains available for future FCC-style guided edits.
 
@@ -52,13 +52,13 @@ Put teaching and the task in **instruction** and **task**. Don't put test descri
 
 ## Step structure (per step)
 
-1. **Explain** — Short explanation (1–3 sentences) for simple steps; longer explanations are OK when the concept is heavy. Why it matters, how it works.
+1. **Explain** — Short explanation (1–3 sentences) for simple steps; longer explanations are OK when the concept is heavy. Use as many short paragraphs as needed to make the explanation better, but do not end the instruction with the explanation.
 2. **Example** â€” Code snippet that shows the **pattern** with names/values that are not the same as the task.
-3. **Task** â€” One clear action. Last paragraph of instruction or the `task` field.
+3. **Task** â€” One clear action. Last paragraph of instruction or the `task` field. After the example, include at least one more paragraph before the task so the explanation does not end immediately after the example.
 
-Rule: Explanation and example first; exact thing to type/implement last. Don't lead with the solution.
+Rule: Explanation and example first; exact thing to type/implement last. Don't lead with the solution. For complex steps, it's ok to include an explicit "What you need to do" paragraph inside the instruction (Projects 1â€“3 do this when the concept is heavy).
 
-**Philosophy: Granular steps are encouraged.** Break down concepts into small, digestible steps. Each step should teach one concept or require one clear action. Don't combine multiple concepts into a single step. Reference Project 1 and Project 2 as the target: they use ~20–25 steps for a 1-hour project, breaking down every concept (project creation, imports, parsing, type annotations, conversions, error handling, match, Option) into individual steps. This granularity makes learning easier and reduces cognitive load.
+**Philosophy: Granular steps are encouraged.** Break down concepts into small, digestible steps. Each step should teach one concept or require one clear action (or two tightly related actions like "run a command, then observe the output"). Don't combine multiple unrelated concepts into a single step. Reference Projects 1â€“3 as the target: they land in the ~20â€“30+ step range for a 1-hour project, breaking down every concept (project creation, imports, parsing, type annotations, conversions, error handling, match, Option, ownership) into individual steps. This granularity makes learning easier and reduces cognitive load.
 
 Exception: Single-sentence steps are ok when the action is trivial and the user has already seen the pattern.
 
@@ -75,11 +75,11 @@ Exception: Single-sentence steps are ok when the action is trivial and the user 
 
 - **Length:** Keep the step scannable. Short steps are preferred, but long, multi-paragraph explanations are acceptable for foundational concepts (see Project 2 Option/error handling steps).
 - **Action-oriented:** The **task** must be explicit. The **instruction** can start with context or explanation; it does not need to start with a verb.
-- **Terminal commands:** Explain why in the instruction, but put the exact command only in the **task**. Do not include the exact command text in the instruction or explanation.
-- **Code to type:** Explain the concept and pattern in the instruction, but do not include the exact line the user must type. The exact code belongs only in the **task**.
-- **Text output strings:** If a step requires printing exact output text (usage, headers, debug lines, errors), include the exact text only in the **task** as a `text` code block. Do not include the exact output text in the instruction or explanation.
+- **Terminal commands:** Explain why in the instruction. Exact commands should appear in the **task**, but Projects 1â€“3 also mention commands in the instruction when that improves clarity. Avoid duplicate "Example" blocks that repeat the exact same command.
+- **Code to type:** Explain the concept and pattern in the instruction. In complex steps, Projects 1â€“3 sometimes include the exact required code in the instruction for clarity; thatâ€™s acceptable when the task is multi-part or has strict requirements.
+- **Text output strings:** If a step requires printing exact output text (usage, headers, debug lines, errors), include the required text in the **task** as a `text` code block. Projects 1–3 sometimes show exact output in the instruction as an example; that’s fine, but the required text still belongs in the task.
 - **One concept per step:** One snippet that teaches the pattern; optional bullets for terms.
-- **Granularity:** Prefer more steps over fewer. It's better to have 20 small steps than 10 large ones. Each step should feel achievable and focused. See Project 1 + 2 for reference: creating a project, entering the folder, and running it are three separate steps, not one.
+- **Granularity:** Prefer more steps over fewer. It's better to have 20 small steps than 10 large ones. Each step should feel achievable and focused. See Projects 1–3 for reference: creating a project, entering the folder, and running it are three separate steps, not one.
 
 ## Validation (data-driven)
 
@@ -105,7 +105,7 @@ Note: `projectSpecific` can be more than a folder name. Project 2 uses it to enf
 
 Other types: `code_contains`, `code_matches`, `code_reject_patterns`, `function_exists`, `struct_exists`, etc.
 
-Project 1 + 2 also use a **negative rule** pattern to block stale lines:
+Projects 1–3 also use a **negative rule** pattern to block stale lines:
 
 ```ts
 {
@@ -157,7 +157,7 @@ Use this when a step replaces a previous line and you want to ensure the old lin
 - Prefer `code_matches` with regex for structural checks (function signatures, type annotations)
 - Use `code_contains` for simple substring checks (like checking for keywords or specific strings)
 - Always provide helpful hints that mention spacing flexibility when relevant
-- For replacements, use `code_reject_patterns` to prevent the old line from lingering (see Project 1 + 2)
+- For replacements, use `code_reject_patterns` to prevent the old line from lingering (see Projects 1–3)
 
 ## Adding a new step (practice project)
 
@@ -173,7 +173,7 @@ Use this when a step replaces a previous line and you want to ensure the old lin
 - [ ] Step numbers unique per challenge.
 - [ ] Validation rules or hardcoded logic for each step (no auto-pass).
 - [ ] "What you learned" and hints in data, not in instruction body.
-- [ ] Steps are broken down granularly (reference Project 1 + 2: ~20–25 steps for a 1-hour project is the target).
+- [ ] Steps are broken down granularly (reference Projects 1â€“3: ~20â€“30+ steps for a 1-hour project is the target).
 - [ ] Each concept (imports, parsing, type annotations, etc.) gets its own step when first introduced.
 - [ ] No duplicate instruction blocks (avoid example text that repeats the task).
 

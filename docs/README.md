@@ -26,7 +26,7 @@ Single-source docs for the FreeRustCamp codebase. Everything here is aligned wit
 
 ## Content Philosophy
 
-**Granular, step-by-step guidance** is the core philosophy. Each step should teach one concept or require one clear action. Project 1 (Temperature Converter) and Project 2 (Calculator) demonstrate this: ~20–25 steps for a 1-hour project, breaking down every concept into individual steps. This granularity makes learning easier and reduces cognitive load. When creating new projects, reference Project 1 + 2’s structure and granularity as the target.
+**Granular, step-by-step guidance** is the core philosophy. Each step should teach one concept or require one clear action (or two tightly related actions like "run a command, then observe the output"). Projects 1–3 demonstrate this: ~20–30+ steps for a 1-hour project, breaking down every concept into individual steps. This granularity makes learning easier and reduces cognitive load. When creating new projects, reference Projects 1–3’s structure and granularity as the target.
 
 ## Quick commands
 
