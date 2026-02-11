@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProgressRouteImport } from './routes/progress'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as CertificatesRouteImport } from './routes/certificates'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ChallengesIndexRouteImport } from './routes/challenges/index'
 import { Route as ChallengesChallengeIdRouteImport } from './routes/challenges/$challengeId'
@@ -17,6 +19,16 @@ import { Route as ChallengesChallengeIdRouteImport } from './routes/challenges/$
 const ProgressRoute = ProgressRouteImport.update({
   id: '/progress',
   path: '/progress',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CertificatesRoute = CertificatesRouteImport.update({
+  id: '/certificates',
+  path: '/certificates',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,12 +49,16 @@ const ChallengesChallengeIdRoute = ChallengesChallengeIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/certificates': typeof CertificatesRoute
+  '/profile': typeof ProfileRoute
   '/progress': typeof ProgressRoute
   '/challenges/$challengeId': typeof ChallengesChallengeIdRoute
   '/challenges/': typeof ChallengesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/certificates': typeof CertificatesRoute
+  '/profile': typeof ProfileRoute
   '/progress': typeof ProgressRoute
   '/challenges/$challengeId': typeof ChallengesChallengeIdRoute
   '/challenges': typeof ChallengesIndexRoute
@@ -50,18 +66,34 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/certificates': typeof CertificatesRoute
+  '/profile': typeof ProfileRoute
   '/progress': typeof ProgressRoute
   '/challenges/$challengeId': typeof ChallengesChallengeIdRoute
   '/challenges/': typeof ChallengesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/progress' | '/challenges/$challengeId' | '/challenges/'
+  fullPaths:
+    | '/'
+    | '/certificates'
+    | '/profile'
+    | '/progress'
+    | '/challenges/$challengeId'
+    | '/challenges/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/progress' | '/challenges/$challengeId' | '/challenges'
+  to:
+    | '/'
+    | '/certificates'
+    | '/profile'
+    | '/progress'
+    | '/challenges/$challengeId'
+    | '/challenges'
   id:
     | '__root__'
     | '/'
+    | '/certificates'
+    | '/profile'
     | '/progress'
     | '/challenges/$challengeId'
     | '/challenges/'
@@ -69,6 +101,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CertificatesRoute: typeof CertificatesRoute
+  ProfileRoute: typeof ProfileRoute
   ProgressRoute: typeof ProgressRoute
   ChallengesChallengeIdRoute: typeof ChallengesChallengeIdRoute
   ChallengesIndexRoute: typeof ChallengesIndexRoute
@@ -81,6 +115,20 @@ declare module '@tanstack/react-router' {
       path: '/progress'
       fullPath: '/progress'
       preLoaderRoute: typeof ProgressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/certificates': {
+      id: '/certificates'
+      path: '/certificates'
+      fullPath: '/certificates'
+      preLoaderRoute: typeof CertificatesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -109,6 +157,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CertificatesRoute: CertificatesRoute,
+  ProfileRoute: ProfileRoute,
   ProgressRoute: ProgressRoute,
   ChallengesChallengeIdRoute: ChallengesChallengeIdRoute,
   ChallengesIndexRoute: ChallengesIndexRoute,

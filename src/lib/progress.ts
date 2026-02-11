@@ -1,4 +1,5 @@
 import { UserProgress, ChallengeProgress } from '@/types/progress';
+import type { PracticeProject, ProjectStep } from '@/types/challenge';
 import { getChallenge } from '@/data/challenges';
 
 const STORAGE_KEY = 'freerustcamp-progress';
@@ -26,7 +27,7 @@ export function loadProgress(): UserProgress {
     return getDefaultProgress();
   }
 
-  // Migrate legacy terminalCommands (string[]) to step-based Record<number, string[]> once per load
+  // Migrate legacy terminalCommands (string[]) to step-based Record<string, string[]> once per load
   let changed = false;
   for (const challengeId of Object.keys(progress.challengeProgress)) {
     const existing = progress.challengeProgress[challengeId];
@@ -35,7 +36,18 @@ export function loadProgress(): UserProgress {
       progress.challengeProgress[challengeId] = {
         ...existing,
         challengeId,
-        terminalCommands: { 1: [...tc] },
+        terminalCommands: { 'step-1': [...tc] },
+      };
+      changed = true;
+    }
+    if (Array.isArray(existing?.completedSteps) && existing.completedSteps.some(step => typeof step === 'number')) {
+      const migrated = (existing.completedSteps as Array<string | number>).map(step =>
+        typeof step === 'number' ? `step-${step}` : step
+      );
+      progress.challengeProgress[challengeId] = {
+        ...progress.challengeProgress[challengeId],
+        challengeId,
+        completedSteps: migrated,
       };
       changed = true;
     }
@@ -89,6 +101,50 @@ function defaultChallengeProgress(challengeId: string): ChallengeProgress {
     completedSteps: [],
     terminalCommands: {},
   };
+}
+
+export function getStepId(step: ProjectStep, index: number): string {
+  if (step.id) return step.id;
+  if (step.step != null) return `step-${step.step}`;
+  return `step-${index + 1}`;
+}
+
+export function getOrderedStepIds(challenge: PracticeProject): string[] {
+  if (Array.isArray(challenge.order) && challenge.order.length > 0) {
+    return challenge.order;
+  }
+  return challenge.steps.map((step, index) => getStepId(step, index));
+}
+
+export function getOrderedSteps(challenge: PracticeProject): ProjectStep[] {
+  const stepEntries = challenge.steps.map((step, index) => ({
+    id: getStepId(step, index),
+    step,
+  }));
+  const stepById = new Map(stepEntries.map(entry => [entry.id, entry.step]));
+
+  const orderedIds = getOrderedStepIds(challenge);
+  const orderedSteps: ProjectStep[] = [];
+  const usedIds = new Set<string>();
+  orderedIds.forEach((id) => {
+    const step = stepById.get(id);
+    if (step) {
+      orderedSteps.push(step);
+      usedIds.add(id);
+    }
+  });
+
+  // Fallback: if order is invalid or missing steps, append remaining
+  if (orderedSteps.length !== challenge.steps.length) {
+    stepEntries.forEach((entry) => {
+      if (!usedIds.has(entry.id)) {
+        orderedSteps.push(entry.step);
+        usedIds.add(entry.id);
+      }
+    });
+  }
+
+  return orderedSteps;
 }
 
 export function markChallengeComplete(
@@ -157,12 +213,12 @@ export function saveChallengeCode(challengeId: string, code: string): void {
   saveProgress(progress);
 }
 
-export function markStepComplete(challengeId: string, stepNumber: number): void {
+export function markStepComplete(challengeId: string, stepId: string): void {
   const progress = loadProgress();
   const existing = progress.challengeProgress[challengeId];
 
   const completedSteps = existing?.completedSteps ?? [];
-  const nextSteps = completedSteps.includes(stepNumber) ? completedSteps : [...completedSteps, stepNumber];
+  const nextSteps = completedSteps.includes(stepId) ? completedSteps : [...completedSteps, stepId];
 
   const challengeProgress: ChallengeProgress = {
     ...defaultChallengeProgress(challengeId),
@@ -178,14 +234,14 @@ export function markStepComplete(challengeId: string, stepNumber: number): void 
   saveProgress(progress);
 }
 
-export function addTerminalCommand(challengeId: string, stepNumber: number, command: string): void {
+export function addTerminalCommand(challengeId: string, stepId: string, command: string): void {
   const progress = loadProgress();
   const existing = progress.challengeProgress[challengeId];
 
   const terminalCommands = { ...(existing?.terminalCommands ?? {}) };
-  const stepCommands = terminalCommands[stepNumber] ?? [];
+  const stepCommands = terminalCommands[stepId] ?? [];
   if (!stepCommands.includes(command)) {
-    terminalCommands[stepNumber] = [...stepCommands, command];
+    terminalCommands[stepId] = [...stepCommands, command];
   }
 
   const challengeProgress: ChallengeProgress = {
@@ -202,19 +258,19 @@ export function addTerminalCommand(challengeId: string, stepNumber: number, comm
   saveProgress(progress);
 }
 
-export function getTerminalCommandsForStep(challengeId: string, stepNumber: number): string[] {
+export function getTerminalCommandsForStep(challengeId: string, stepId: string): string[] {
   const progress = loadProgress();
   const existing = progress.challengeProgress[challengeId];
   const terminalCommands = existing?.terminalCommands;
 
   // Already migrated: step-based shape
   if (terminalCommands && typeof terminalCommands === 'object' && !Array.isArray(terminalCommands)) {
-    return terminalCommands[stepNumber] || [];
+    return terminalCommands[stepId] || [];
   }
 
   // Legacy array format: in-memory conversion only for return value (no mutation, no save)
   if (Array.isArray(terminalCommands)) {
-    return stepNumber === 1 ? [...terminalCommands] : [];
+    return stepId === 'step-1' ? [...terminalCommands] : [];
   }
 
   return [];
@@ -288,21 +344,24 @@ export function resetChallengeProgress(challengeId: string): void {
  * Check if a step is accessible (all previous steps are completed)
  * @param challenge - The challenge/project
  * @param stepIndex - The step index (0-based) to check
- * @param completedSteps - Array of completed step numbers
+ * @param completedSteps - Array of completed step ids
  * @returns true if step is accessible, false if locked
  */
 export function isStepAccessible(
-  challenge: { steps: Array<{ step: number }> },
+  challenge: { steps: Array<ProjectStep>; order?: string[] },
   stepIndex: number,
-  completedSteps: number[]
+  completedSteps: string[]
 ): boolean {
   // First step is always accessible
   if (stepIndex === 0) return true;
   
   // Check if ALL previous steps (by index) are completed
+  const orderedStepIds = Array.isArray(challenge.order) && challenge.order.length > 0
+    ? challenge.order
+    : challenge.steps.map((step, index) => getStepId(step, index));
   for (let i = 0; i < stepIndex; i++) {
-    const prevStep = challenge.steps[i];
-    if (!completedSteps.includes(prevStep.step)) {
+    const prevStepId = orderedStepIds[i];
+    if (!completedSteps.includes(prevStepId)) {
       return false; // Found an incomplete previous step
     }
   }

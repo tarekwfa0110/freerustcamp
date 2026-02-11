@@ -459,8 +459,8 @@ export function getStepCompletionStatus(
   terminalCommands: string[],
   challengeId?: string
 ): boolean[] {
-  return project.steps.map((step) => {
-    const result = validateStep(step, code, terminalCommands, step.step, challengeId);
+  return project.steps.map((step, index) => {
+    const result = validateStep(step, code, terminalCommands, index + 1, challengeId);
     return result.completed;
   });
 }

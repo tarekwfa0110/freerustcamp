@@ -190,7 +190,10 @@ function validateRule(
             const dirPath = `/home/user/${targetDir}`;
             if (!persistedDirs.includes(dirPath)) {
               // Directory doesn't exist - check if cargo new was run
-              const terminalCommandsAll = challengeProgress?.terminalCommands || {};
+              const terminalCommandsAll = (challengeProgress?.terminalCommands || {}) as Record<
+                string,
+                string[]
+              >;
               const allCommands = Object.values(terminalCommandsAll).flat();
               const cargoNewRun = allCommands.some(cmd => 
                 cmd.toLowerCase().includes('cargo new') && cmd.toLowerCase().includes(targetDir.toLowerCase())
@@ -347,21 +350,23 @@ function validateRule(
       break;
     }
 
-    case 'custom':
-      console.warn('Custom validation not yet implemented:', rule.validator);
+    case 'custom': {
+      const customRule = rule as { validator?: string; hints?: string[] };
+      console.warn('Custom validation not yet implemented:', customRule.validator);
       return {
         completed: false,
-        message: `Custom validation not implemented: ${rule.validator}`,
-        hints: rule.hints ?? [],
+        message: `Custom validation not implemented: ${customRule.validator ?? 'unknown'}`,
+        hints: customRule.hints ?? [],
       };
-
+    }
     default: {
       const invalidType = (rule as { type: unknown }).type;
+      const hints: string[] | undefined = undefined;
       console.warn('Unrecognized validation rule type:', invalidType);
       return {
         completed: false,
         message: `Invalid validation rule type: "${String(invalidType)}". Check step config.`,
-        hints: rule.hints,
+        hints,
       };
     }
   }

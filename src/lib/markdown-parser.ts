@@ -57,6 +57,7 @@ export function parseMarkdownChallenge(markdown: string): Challenge {
   const whyProject = extractSection(content, '## Why This Project?', '##');
   
   const steps: ProjectStep[] = stepSections.map(section => ({
+    id: `step-${section.step}`,
     step: section.step,
     title: section.title,
     instruction: section.content,
@@ -78,6 +79,7 @@ export function parseMarkdownChallenge(markdown: string): Challenge {
     project_overview: overview,
     why_this_project: whyProject,
     prerequisites: frontmatter.prerequisites || [],
+    order: steps.map(step => step.id),
     steps,
     completion_message: frontmatter.completion_message || '',
     extensions: frontmatter.extensions || '',

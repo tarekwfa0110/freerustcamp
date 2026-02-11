@@ -4,6 +4,7 @@
  */
 
 import { Challenge, PracticeProject, ProjectStep } from '@/types/challenge';
+import { getOrderedSteps } from '@/lib/progress';
 
 export interface LintIssue {
   severity: 'error' | 'warning' | 'info';
@@ -53,7 +54,8 @@ export function lintChallenge(challenge: Challenge): LintResult {
       });
     }
 
-    practice.steps.forEach((step, index) => {
+    const orderedSteps = getOrderedSteps(practice);
+    orderedSteps.forEach((step, index) => {
       const stepIssues = lintStep(step, index + 1, challenge.id);
       issues.push(...stepIssues);
     });

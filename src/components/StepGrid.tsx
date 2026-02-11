@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { PracticeProject } from '@/types/challenge';
-import { loadProgress, isStepAccessible } from '@/lib/progress';
+import { loadProgress, isStepAccessible, getOrderedSteps, getOrderedStepIds } from '@/lib/progress';
 import { cn } from '@/lib/utils';
 import { CheckCircle2, Lock } from 'lucide-react';
 
@@ -24,9 +24,11 @@ export function StepGrid({ challenge, currentStep, onStepClick, className, progr
   
   const challengeProgress = progress.challengeProgress[challenge.id];
   const completedSteps = challengeProgress?.completedSteps || [];
+  const orderedSteps = getOrderedSteps(challenge);
+  const orderedStepIds = getOrderedStepIds(challenge);
 
-  const isStepCompleted = (stepNumber: number) => {
-    return completedSteps.includes(stepNumber);
+  const isStepCompleted = (stepId: string) => {
+    return completedSteps.includes(stepId);
   };
 
   const isStepLocked = (stepIndex: number) => {
@@ -35,8 +37,8 @@ export function StepGrid({ challenge, currentStep, onStepClick, className, progr
   };
 
   const getStepStatus = (stepIndex: number) => {
-    const step = challenge.steps[stepIndex];
-    const isCompleted = isStepCompleted(step.step);
+    const stepId = orderedStepIds[stepIndex];
+    const isCompleted = stepId ? isStepCompleted(stepId) : false;
     const isLocked = isStepLocked(stepIndex);
     const isActive = stepIndex === currentStep;
 
@@ -49,15 +51,17 @@ export function StepGrid({ challenge, currentStep, onStepClick, className, progr
   return (
     <div className={cn('w-full', className)}>
       <div className="grid grid-cols-10 gap-3">
-        {challenge.steps.map((step, index) => {
+        {orderedSteps.map((step, index) => {
           const status = getStepStatus(index);
           const isCompleted = status === 'completed';
           const isActive = status === 'active';
           const isLocked = status === 'locked';
+          const stepNumber = index + 1;
+          const stepId = orderedStepIds[index] ?? `step-${stepNumber}`;
 
           return (
             <button
-              key={step.step}
+              key={stepId}
               onClick={() => !isLocked && onStepClick(index)}
               disabled={isLocked}
               className={cn(
@@ -81,11 +85,11 @@ export function StepGrid({ challenge, currentStep, onStepClick, className, progr
               }}
               title={
                 isLocked
-                  ? `Step ${step.step}: ${step.title} (Locked - Complete previous step first)`
-                  : `Step ${step.step}: ${step.title}`
+                  ? `Step ${stepNumber}: ${step.title} (Locked - Complete previous step first)`
+                  : `Step ${stepNumber}: ${step.title}`
               }
             >
-              <span className="text-base font-semibold">{step.step}</span>
+              <span className="text-base font-semibold">{stepNumber}</span>
               {isCompleted && (
                 <CheckCircle2 className="absolute top-1 right-1 h-3 w-3 text-green-400" />
               )}

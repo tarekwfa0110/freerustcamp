@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { TaskChecklist } from './TaskChecklist';
 import { getMarkdownComponents } from '@/lib/markdown-components';
+import { getOrderedSteps } from '@/lib/progress';
 
 interface ChallengeDescriptionProps {
   challenge: Challenge;
@@ -15,7 +16,7 @@ interface ChallengeDescriptionProps {
   terminalCommands: string[];
   code: string;
   progress: ReturnType<typeof import('@/lib/progress').loadProgress>;
-  isStepAccessible: (challenge: PracticeProject, stepIndex: number, completedSteps: number[]) => boolean;
+  isStepAccessible: (challenge: PracticeProject, stepIndex: number, completedSteps: string[]) => boolean;
   isExplanationExpanded: boolean;
   setIsExplanationExpanded: (expanded: boolean) => void;
   onStepChange: (newStep: number) => void;
@@ -39,14 +40,16 @@ export function ChallengeDescription({
   const isPractice = challenge.type === 'practice';
   const practiceChallenge = challenge as PracticeProject;
   
-  if (isPractice && practiceChallenge.steps[currentStep]) {
-    const step = practiceChallenge.steps[currentStep];
+  const orderedSteps = isPractice ? getOrderedSteps(practiceChallenge) : [];
+  if (isPractice && orderedSteps[currentStep]) {
+    const step = orderedSteps[currentStep];
+    const stepNumber = currentStep + 1;
     
     return (
       <div className="space-y-4">
         {/* Step Header */}
         <div>
-          <strong className="text-lg font-bold block mb-3">Step {step.step}: {step.title}</strong>
+          <strong className="text-lg font-bold block mb-3">Step {stepNumber}: {step.title}</strong>
         </div>
 
         {/* Instruction */}
@@ -172,18 +175,18 @@ export function ChallengeDescription({
             variant="outline"
             size="sm"
             onClick={() => {
-              const newStep = Math.min(practiceChallenge.steps.length - 1, currentStep + 1);
+              const newStep = Math.min(orderedSteps.length - 1, currentStep + 1);
               const completedSteps = progress.challengeProgress[challenge.id]?.completedSteps || [];
               if (isStepAccessible(practiceChallenge, newStep, completedSteps)) {
                 onStepChange(newStep);
               }
             }}
             disabled={
-              currentStep === practiceChallenge.steps.length - 1 || 
+              currentStep === orderedSteps.length - 1 || 
               !stepValidation?.completed ||
               (() => {
                 const nextStep = currentStep + 1;
-                if (nextStep >= practiceChallenge.steps.length) return true;
+                if (nextStep >= orderedSteps.length) return true;
                 const completedSteps = progress.challengeProgress[challenge.id]?.completedSteps || [];
                 return !isStepAccessible(practiceChallenge, nextStep, completedSteps);
               })()
