@@ -12,6 +12,17 @@ interface ChallengeCardProps {
   type: 'micro' | 'practice' | 'certification';
 }
 
+/**
+ * Renders a challenge card that links to the challenge page and indicates locked or completed states.
+ *
+ * The card navigates to /challenges/$challengeId using the provided `slug`, displays `title`, and
+ * adapts its styling and iconography based on `status`.
+ *
+ * @param slug - The challenge slug to use as the route parameter `challengeId`
+ * @param title - The visible title text shown on the card
+ * @param status - The challenge status; expected values: 'not-started', 'in-progress', 'completed', 'locked'
+ * @returns A JSX element linking to the challenge page with visual state corresponding to `status`
+ */
 export function ChallengeCard({
   slug,
   title,

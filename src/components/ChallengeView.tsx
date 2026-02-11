@@ -46,10 +46,21 @@ function isPracticeProject(challenge: Challenge): challenge is PracticeProject {
   return challenge.type === 'practice';
 }
 
+/**
+ * Narrow a Challenge to a CertificationProject when its type is `'certification'`.
+ *
+ * @returns `true` if the challenge has type 'certification', `false` otherwise.
+ */
 function isCertificationProject(challenge: Challenge): challenge is CertificationProject {
   return challenge.type === 'certification';
 }
 
+/**
+ * Render the interactive challenge workspace that hosts instructions, editor, terminal, validation, and progress controls for a given challenge.
+ *
+ * @param initialStepId - Optional step ID to open initially for practice projects; if omitted or invalid the first accessible step is shown.
+ * @returns The Challenge view JSX element used to interact with the provided challenge.
+ */
 export function ChallengeView({ challenge, initialStepId }: ChallengeViewProps) {
   const navigate = useNavigate();
 

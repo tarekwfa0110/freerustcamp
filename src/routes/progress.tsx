@@ -20,6 +20,15 @@ export const Route = createFileRoute('/progress')({
   component: ProgressPage,
 });
 
+/**
+ * Render the user's progress dashboard page.
+ *
+ * Displays overall stats (streak, time, challenges completed, completion percentage),
+ * a "Continue Learning" list of recent challenges, per-section curriculum progress,
+ * and quick action links.
+ *
+ * @returns A React element representing the progress dashboard page.
+ */
 function ProgressPage() {
   const progress = loadProgress();
 

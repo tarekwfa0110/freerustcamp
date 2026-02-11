@@ -12,6 +12,16 @@ interface StepGridProps {
   progressKey?: string; // Key to force re-render when progress changes
 }
 
+/**
+ * Renders a responsive grid of steps for a practice project, visually indicating completed, active, locked, and available states.
+ *
+ * @param challenge - The practice project whose steps are displayed.
+ * @param currentStep - Index of the currently active step.
+ * @param onStepClick - Callback invoked with the step index when a non-locked step is clicked.
+ * @param className - Optional additional CSS classes applied to the container.
+ * @param progressKey - Optional value that, when changed, forces the component to reload progress.
+ * @returns The rendered step grid element.
+ */
 export function StepGrid({ challenge, currentStep, onStepClick, className, progressKey }: StepGridProps) {
   // Use useState + useEffect to make progress reactive
   const [progress, setProgress] = useState(() => loadProgress());

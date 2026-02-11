@@ -20,7 +20,14 @@ export interface LintResult {
 }
 
 /**
- * Lint a single challenge
+ * Validate a challenge's content against the writing rubric and collect lint issues.
+ *
+ * For practice challenges this inspects project-level fields and each ordered step;
+ * for certification challenges this checks functional requirements. Collected issues
+ * include severity, message, and optional field/step locations.
+ *
+ * @param challenge - The challenge object to lint; behavior depends on `challenge.type`.
+ * @returns The lint result for the challenge, containing `challengeId`, an array of detected `issues`, and `passed` set to `true` when there are no error-level issues. 
  */
 export function lintChallenge(challenge: Challenge): LintResult {
   const issues: LintIssue[] = [];
