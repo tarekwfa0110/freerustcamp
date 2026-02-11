@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { getChallenge, getSectionById } from '@/data/challenges';
+import { getChallengeByIdOrSlug, getChallengeSlug, getSectionById } from '@/data/challenges';
 import { ChallengeView } from '@/components/ChallengeView';
 import { StepGrid } from '@/components/StepGrid';
 import { SectionPreview } from '@/components/SectionPreview';
@@ -24,7 +24,7 @@ function ChallengePage() {
   const { challengeId } = Route.useParams();
   const search = Route.useSearch();
   const navigate = useNavigate();
-  const result = getChallenge(challengeId);
+  const result = getChallengeByIdOrSlug(challengeId);
   const [startedChallenge, setStartedChallenge] = useState(false);
   const [previewDismissed, setPreviewDismissed] = useState(false);
 
@@ -83,7 +83,7 @@ function ChallengePage() {
             // Navigate to first challenge
             navigate({
               to: '/challenges/$challengeId',
-              params: { challengeId: section.challenges[0].id },
+              params: { challengeId: getChallengeSlug(section.challenges[0]) },
               search: { step: undefined },
               replace: true,
             });
@@ -193,7 +193,7 @@ function ChallengePage() {
                 setStartedChallenge(true);
                 navigate({
                   to: '/challenges/$challengeId',
-                  params: { challengeId },
+                  params: { challengeId: getChallengeSlug(challenge) },
                   search: { step: stepId },
                 });
               }}

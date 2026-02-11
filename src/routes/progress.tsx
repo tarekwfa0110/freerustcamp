@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { loadProgress } from '@/lib/progress';
-import { sections } from '@/data/challenges';
+import { sections, getChallengeSlug } from '@/data/challenges';
 import { StatCard } from '@/components/StatCard';
 import { CircularProgress } from '@/components/CircularProgress';
 import { Progress } from '@/components/ui/progress';
@@ -49,6 +49,7 @@ function ProgressPage() {
       const isCompleted = progress.completedChallenges.includes(challenge.id);
       return {
         id: challenge.id,
+        slug: getChallengeSlug(challenge),
         title: challenge.title,
         difficulty: challenge.difficulty,
         estimatedTime: challenge.estimated_time,
@@ -149,7 +150,7 @@ function ProgressPage() {
                   {recentChallenges.map((challenge) => (
                     <ChallengeCard
                       key={challenge.id}
-                      id={challenge.id}
+                      slug={challenge.slug}
                       title={challenge.title}
                       difficulty="beginner"
                       estimatedTime={0}

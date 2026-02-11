@@ -8,6 +8,7 @@ import { StepGrid } from './StepGrid';
 import { ProjectPreviewModal } from './ProjectPreviewModal';
 import { CompletionModal } from './CompletionModal';
 import { triggerConfetti } from '@/lib/confetti';
+import { getChallengeSlug } from '@/data/challenges';
 import { runTests } from '@/lib/test-runner';
 import {
   markChallengeComplete,
@@ -656,7 +657,7 @@ export function ChallengeView({ challenge, initialStepId }: ChallengeViewProps) 
     if (isPracticeProject(challenge) && orderedStepIds[currentStep]) {
       navigate({
         to: '/challenges/$challengeId',
-        params: { challengeId: challenge.id },
+        params: { challengeId: getChallengeSlug(challenge) },
         search: { step: orderedStepIds[currentStep] },
         replace: true,
       });

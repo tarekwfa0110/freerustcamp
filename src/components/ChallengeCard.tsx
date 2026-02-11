@@ -3,7 +3,7 @@ import { Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ChallengeCardProps {
-  id: string;
+  slug: string;
   title: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
   estimatedTime: number; // in minutes
@@ -13,7 +13,7 @@ interface ChallengeCardProps {
 }
 
 export function ChallengeCard({
-  id,
+  slug,
   title,
   status,
 }: ChallengeCardProps) {
@@ -23,7 +23,7 @@ export function ChallengeCard({
   return (
     <Link
       to="/challenges/$challengeId"
-      params={{ challengeId: id }}
+      params={{ challengeId: slug }}
       search={{ step: undefined }}
       className={cn(
         'group relative overflow-hidden rounded-lg border transition-all duration-300 flex items-center justify-center min-h-[80px]',

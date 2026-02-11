@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { sections } from '@/data/challenges';
+import { sections, getChallengeSlug } from '@/data/challenges';
 import { loadProgress } from '@/lib/progress';
 import { ChallengeCard } from '@/components/ChallengeCard';
 import { Badge } from '@/components/ui/badge';
@@ -130,7 +130,7 @@ function ChallengesIndex() {
                           return (
                             <ChallengeCard
                               key={challenge.id}
-                              id={challenge.id}
+                              slug={getChallengeSlug(challenge)}
                               title={challenge.title}
                               difficulty="beginner"
                               estimatedTime={0}

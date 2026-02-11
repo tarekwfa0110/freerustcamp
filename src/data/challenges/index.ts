@@ -1,5 +1,5 @@
 import { section1Challenges } from './section1';
-import { Section } from '@/types/challenge';
+import { Challenge, Section } from '@/types/challenge';
 
 export const sections: Section[] = [
   {
@@ -34,6 +34,32 @@ export function getChallenge(id: string) {
     }
   }
   return null;
+}
+
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+export function getChallengeSlug(challenge: Challenge): string {
+  return slugify(challenge.title);
+}
+
+export function getChallengeBySlug(slug: string) {
+  for (const section of sections) {
+    const challenge = section.challenges.find((c) => getChallengeSlug(c) === slug);
+    if (challenge) {
+      return { challenge, section };
+    }
+  }
+  return null;
+}
+
+export function getChallengeByIdOrSlug(idOrSlug: string) {
+  return getChallenge(idOrSlug) ?? getChallengeBySlug(idOrSlug);
 }
 
 /** Public API: flat list of all challenges with their section. Used for curriculum listing / search. */
