@@ -4,7 +4,7 @@ An interactive online learning platform for Rust programming, modeled after free
 
 ## Tech Stack
 
-- **Bun** - Package manager and runtime (preferred over npm)
+- **Bun** - Package manager and runtime (required)
 - **Vite** - Build tool and dev server
 - **React 18** - UI framework
 - **TypeScript** - Type safety
@@ -19,7 +19,7 @@ An interactive online learning platform for Rust programming, modeled after free
 
 ### Prerequisites
 
-- [Bun](https://bun.sh) installed (recommended)
+- [Bun](https://bun.sh) installed (required)
 - Rust toolchain installed (for running Rust code)
 
 ### Installation
@@ -38,37 +38,28 @@ bun run build
 bun run preview
 ```
 
-### Using npm (portable)
-
-The project is portable and works with npm as well:
-
-```bash
-npm install
-npm run dev
-npm run build
-npm run preview
-```
-
 ## Project Structure
 
 ```
 freerustcamp/
-├── src/
-│   ├── components/     # React components
-│   ├── pages/          # Page components
-│   ├── hooks/          # Custom React hooks
-│   ├── lib/            # Utilities and helpers
-│   ├── types/          # TypeScript type definitions
-│   ├── data/           # Challenge and curriculum data
-│   └── App.tsx         # Main app component
-├── public/             # Static assets
-├── curriculum.md       # Complete curriculum plan
-└── package.json        # Dependencies and scripts
++-- src/
+�   +-- routes/        # TanStack Router routes
+�   +-- components/    # React components
+�   +-- lib/           # Utilities and validators
+�   +-- types/         # TypeScript types
+�   +-- data/          # Challenge data
++-- public/            # Static assets
++-- docs/              # Documentation
++-- package.json       # Dependencies and scripts
 ```
 
 ## Development
 
 The app runs on `http://localhost:5173` by default.
+
+## Contributing
+
+See `CONTRIBUTING.md`.
 
 ## License
 
