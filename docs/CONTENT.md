@@ -53,7 +53,7 @@ Put teaching and the task in **instruction** and **task**. Don't put test descri
 ## Step structure (per step)
 
 1. **Explain** — Short explanation (1–3 sentences) for simple steps; longer explanations are OK when the concept is heavy. Why it matters, how it works.
-2. **Example** â€” Code snippet that shows the **pattern** with **different** names/values from the task.
+2. **Example** â€” Code snippet that shows the **pattern** with names/values that are not the same as the task.
 3. **Task** â€” One clear action. Last paragraph of instruction or the `task` field.
 
 Rule: Explanation and example first; exact thing to type/implement last. Don't lead with the solution.
@@ -75,6 +75,9 @@ Exception: Single-sentence steps are ok when the action is trivial and the user 
 
 - **Length:** Keep the step scannable. Short steps are preferred, but long, multi-paragraph explanations are acceptable for foundational concepts (see Project 2 Option/error handling steps).
 - **Action-oriented:** The **task** must be explicit. The **instruction** can start with context or explanation; it does not need to start with a verb.
+- **Terminal commands:** Explain why in the instruction, but put the exact command only in the **task**. Do not include the exact command text in the instruction or explanation.
+- **Code to type:** Explain the concept and pattern in the instruction, but do not include the exact line the user must type. The exact code belongs only in the **task**.
+- **Text output strings:** If a step requires printing exact output text (usage, headers, debug lines, errors), include the exact text only in the **task** as a `text` code block. Do not include the exact output text in the instruction or explanation.
 - **One concept per step:** One snippet that teaches the pattern; optional bullets for terms.
 - **Granularity:** Prefer more steps over fewer. It's better to have 20 small steps than 10 large ones. Each step should feel achievable and focused. See Project 1 + 2 for reference: creating a project, entering the folder, and running it are three separate steps, not one.
 
@@ -177,6 +180,7 @@ Use this when a step replaces a previous line and you want to ensure the old lin
 ## Future: Markdown content
 
 When markdown is enabled (see `src/lib/LOADERS_README.md`), content can live in `src/content/sectionN/*.md` with frontmatter and step sections. The app does not use markdown at runtime today; curriculum is TypeScript only.
+
 
 
 
