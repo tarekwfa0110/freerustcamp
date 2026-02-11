@@ -20,6 +20,13 @@ export const Route = createFileRoute('/challenges/$challengeId')({
   },
 });
 
+/**
+ * Render the challenge page for a given challengeId, handling section fallbacks, practice project previews, step grid interaction, and navigation to specific steps.
+ *
+ * Renders a SectionPreview when the route contains a numeric section id with available challenges, shows a ProjectPreviewModal for practice projects configured to preview on load, presents a StepGrid to select steps for practice projects before starting, and finally renders ChallengeView with an optional initial step when viewing or after starting a challenge.
+ *
+ * @returns A React element that displays the appropriate challenge-related UI (section preview, project preview modal, step grid, or challenge view) based on the current route, search parameters, and progress state.
+ */
 function ChallengePage() {
   const { challengeId } = Route.useParams();
   const search = Route.useSearch();

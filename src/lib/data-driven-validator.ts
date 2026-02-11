@@ -160,6 +160,17 @@ export function validateStepWithConfig(
   return { completed: true, ...(config.message && { message: config.message }) };
 }
 
+/**
+ * Validates a single step rule against provided source code and terminal history.
+ *
+ * Performs rule-specific checks (terminal commands, code content/regex matches/rejections, function/struct presence, compilation placeholder, and custom rules), and for `cd` terminal checks will inspect persisted progress in localStorage to verify created directories.
+ *
+ * @param rule - The validation rule to evaluate (one entry from a step's `rules` array).
+ * @param code - The current source code to validate against the rule.
+ * @param terminalCommands - Flattened list of terminal commands executed by the user for the current challenge.
+ * @param challengeId - Optional identifier for the current challenge used when validating project-specific terminal commands or persisted directories.
+ * @returns An object with `completed: true` when the rule passes, or `completed: false` plus a human-readable `message` and optional `hints` when the rule fails.
+ */
 function validateRule(
   rule: StepValidationConfig['rules'][0],
   code: string,

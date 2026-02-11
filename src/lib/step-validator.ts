@@ -451,7 +451,13 @@ export function validateStep(
 }
 
 /**
- * Get completion status for all steps in a project
+ * Compute each step's completion status for a practice project.
+ *
+ * @param project - The practice project containing steps to validate
+ * @param code - The user's source code to evaluate against step requirements
+ * @param terminalCommands - Recorded terminal commands to consider during validation
+ * @param challengeId - Optional challenge identifier that may affect validation rules
+ * @returns An array of booleans where each element corresponds to the step at the same index in `project.steps`; `true` if that step is completed, `false` otherwise
  */
 export function getStepCompletionStatus(
   project: PracticeProject,

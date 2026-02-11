@@ -12,6 +12,11 @@ export const Route = createFileRoute('/challenges/')({
   component: ChallengesIndex,
 });
 
+/**
+ * Renders the Rust curriculum challenges index with collapsible sections, per-section progress, and individual challenge cards.
+ *
+ * @returns The React element for the challenges index page.
+ */
 function ChallengesIndex() {
   const progress = loadProgress();
   const [expandedSections, setExpandedSections] = useState<Set<number>>(new Set([1]));

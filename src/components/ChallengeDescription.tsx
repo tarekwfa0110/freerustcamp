@@ -25,6 +25,23 @@ interface ChallengeDescriptionProps {
 
 const markdownComponents = getMarkdownComponents();
 
+/**
+ * Render the challenge description UI, including step-by-step instructions for practice challenges or the full description and requirements for certification projects.
+ *
+ * Renders a single practice step when `challenge.type === 'practice'` and a valid ordered step exists for `currentStep`, showing instruction markdown, an optional collapsible explanation, tests/checks, validation status, hints, and navigation controls. For certification projects it renders the challenge description, categorized requirements, and optional example output.
+ *
+ * @param challenge - The challenge to render (practice or certification).
+ * @param currentStep - Zero-based index of the currently displayed practice step.
+ * @param stepValidation - Validation state for the current step (completed flag, optional message and hints).
+ * @param terminalCommands - Terminal commands shown in task checklists.
+ * @param code - Code snippet shown in task checklists.
+ * @param progress - Progress state used to determine completed steps and navigation availability.
+ * @param isStepAccessible - Function that determines whether a given practice step is accessible given completed steps.
+ * @param isExplanationExpanded - Whether the step explanation panel is currently expanded.
+ * @param setIsExplanationExpanded - Setter to toggle the explanation expansion state.
+ * @param onStepChange - Callback invoked with a new step index when navigation changes.
+ * @returns A React element containing the challenge description or the active practice step UI.
+ */
 export function ChallengeDescription({
   challenge,
   currentStep,
