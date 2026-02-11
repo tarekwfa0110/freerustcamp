@@ -25,9 +25,19 @@ export const challenge_project_003: PracticeProject = {
         id: 'step-0',
         step: 0,
         title: "Understand what you're building",
-        instruction: `Welcome! You'll build a tiny text adventure that runs from the command line and reacts to a player's name and choice.\n\n**What you're building:**\nA Rust program that reads a name and a direction, prints an introduction, and then prints a story outcome based on the choice.\n\nExample pattern:\n\n\`\`\`text\nAdventure Title\nWelcome, {name}!\nYou are in a place. Choose a direction.\n{name}, you move and something happens.\n\`\`\`\n\nThis keeps the output predictable and gives you a concrete place to see how ownership decisions show up in real program flow.\n\n**Why this project?**\nOwnership and borrowing feel abstract until you move real string data around. This project makes those choices visible: you will borrow when you only need to read, and clone only when you truly need ownership.\n\n**What you'll practice:**\n- Moving owned strings into functions\n- Borrowing with string slices\n- Normalizing and validating input\n- Guarding invalid input and exiting cleanly\n\nBy the end, you should be able to explain why each string is owned, borrowed, or cloned.`,
-        task: `Read through the overview. When you're ready, click "Next" to begin.`,
-        starterCode: `// Welcome to Rust Adventure!\n// You'll build a tiny text adventure step by step.\n// Click "Next" when you're ready to begin.`,
+        instruction: `Welcome! You'll build a tiny text adventure that runs from the command line and reacts to a player's name and choice.\n\n**What you're building:**\nA Rust program that reads a name and a direction, prints an introduction, and then prints a story outcome based on the choice.\n\nExample pattern:\n\n\`\`\`text\nTrail Journal\nWelcome, {player_name}!\nYou are at a fork. Choose a direction.\n{player_name}, you take the {direction} path.\n\`\`\`\n\nThat structure keeps the output predictable and gives you a concrete place to see how ownership decisions show up in real program flow.\n\n**Why this project?**\nOwnership and borrowing feel abstract until you move real string data around. This project makes those choices visible: you will borrow when you only need to read, and clone only when you truly need ownership.\n\n**What you'll practice:**\n- Moving owned strings into functions\n- Borrowing with string slices\n- Normalizing and validating input\n- Guarding invalid input and exiting cleanly\n\nBy the end, you should be able to explain why each string is owned, borrowed, or cloned.`,
+        task: `Run the Cargo command that prints your installed version.`,
+        starterCode: `// Welcome to Rust Adventure!\n// You'll build a tiny text adventure step by step.\n// Run the version check, then start the project.`,
+        validation: {
+          rules: [
+            {
+              type: 'terminal_command',
+              command: 'cargo --version',
+              hints: ['Run: cargo --version'],
+            },
+          ],
+          message: 'Check your Cargo version',
+        },
         test: ['Introduction read'],
         what_you_learned: `You understand the goal and why ownership matters in this project.`,
       },
@@ -35,7 +45,7 @@ export const challenge_project_003: PracticeProject = {
         id: 'step-1',
         step: 1,
         title: 'Create the project',
-        instruction: `Cargo starts almost every Rust project. It creates the folder structure, a starter entry file, and the project manifest so builds and runs are consistent.\n\nExample pattern:\n\n\`\`\`bash\ncargo new {project_name}\n\`\`\`\n\nThat consistency matters later when you share code or switch machines: the same workflow works everywhere.\n\nIt also gives you the standard crate layout that Rust tooling expects, which saves you from manual setup later.\n\nThinking in terms of projects (not just single files) is how Rust tooling stays predictable and fast.\n\nYouâ€™re establishing the container that will hold all your code and configuration.`,
+        instruction: `Cargo starts almost every Rust project. It creates the folder structure, a starter entry file, and the project manifest so builds and runs are consistent.\n\nExample pattern:\n\n```bash\ncargo new {project_name}\n```\n\nHere, {project_name} is a placeholder for the crate name you want.\n\nThat consistency matters later when you share code or switch machines: the same workflow works everywhere.\n\nIt also gives you the standard crate layout that Rust tooling expects, which saves you from manual setup later.\n\nThinking in terms of projects (not just single files) is how Rust tooling stays predictable and fast.\n\nYou're establishing the container that will hold all your code and configuration.`,
         task: `Create a new Cargo project named text_adventure.`,
         starterCode: `fn main() {\n\n}`,
         validation: {
@@ -161,10 +171,32 @@ export const challenge_project_003: PracticeProject = {
       {
         id: 'step-7',
         step: 7,
+        title: 'Capture the argument count',
+        instruction: `Before you can guard against missing input, you need a simple way to talk about how many arguments were provided.\n\nExample pattern:\n\n\`\`\`rust\nlet total = items.len();\n\`\`\`\n\nStoring the count in a named variable makes the later guard easier to read and reason about.\n\nIt also makes your intent explicit: you are about to make a decision based on the count, not re-scan the list each time.\n\nThis is a small clarity win that pays off when you revisit the code.\n\nYou are trading one extra line for a clearer mental model.`,
+        task: `Store the number of collected arguments in a variable named arg_count.`,
+        starterCode: `use std::env;\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n\n}`,
+        highlightLine: 7,
+        validation: {
+          rules: [
+            {
+              type: 'code_contains',
+              patterns: ['let arg_count = args.len();'],
+              allRequired: true,
+              hints: ['Add: let arg_count = args.len();'],
+            },
+          ],
+          message: 'Capture the argument count',
+        },
+        test: ['Argument count stored'],
+        what_you_learned: `A named length variable keeps guard logic readable.`,
+      },
+      {
+        id: 'step-8',
+        step: 8,
         title: 'Import process',
         instruction: `You'll exit early when input is missing, and the standard library provides the module for that.\n\nExample pattern:\n\n\`\`\`rust\nuse std::{module};\n\`\`\`\n\nBringing process into scope keeps the exit call clear and consistent.\n\nThis makes your intent obvious when you add early-return guards later.\n\nExit codes are part of CLI contracts, so itâ€™s worth making them explicit.\n\nYouâ€™re preparing to communicate success and failure to the shell.`,
         task: `Import the process module at the top of the file.`,
-        starterCode: `use std::env;\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n\n}`,
+        starterCode: `use std::env;\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    let arg_count = args.len();\n\n\n}`,
         highlightLine: 1,
         validation: {
           rules: [
@@ -181,18 +213,18 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `process provides a clear exit path for CLI programs.`,
       },
       {
-        id: 'step-8',
-        step: 8,
+        id: 'step-9',
+        step: 9,
         title: 'Guard missing input',
         instruction: `A guard prevents out-of-bounds panics and gives users a clear usage message. Good CLIs fail fast and explain how to recover.\n\nExample pattern:\n\n\`\`\`rust\nif inputs.len() < 3 {\n    println!("Usage: {program} <value1> <value2>");\n    std::process::exit(1);\n}\n\`\`\`\n\nThis step is also your first explicit error path. You decide what happens when the input is incomplete, which is a core part of writing reliable tools.\n\nGuards like this are what make CLI tools trustworthy instead of fragile.\n\nThink of this as your programâ€™s â€œfront door check.â€\n\nEvery later step relies on this check to keep indexing safe.`,
         task: `If there are fewer than two user values, print a usage message and exit with a non-zero code.\n\n\`\`\`text\nUsage: text_adventure <name> <north|south|stay>\n\`\`\``,
-        starterCode: `use std::env;\nuse std::process;\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n\n}`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    let arg_count = args.len();\n\n\n}`,
         highlightLine: 9,
         validation: {
           rules: [
             {
               type: 'code_matches',
-              regex: 'if\\s+args\\.len\\(\\)\\s*<\\s*3\\s*\\{[^}]*println!\\("Usage: text_adventure <name> <north\\|south\\|stay>"\\);[^}]*process::exit\\(1\\);[^}]*\\}',
+              regex: 'if\\s+arg_count\\s*<\\s*3\\s*\\{[^}]*println!\\("Usage: text_adventure <name> <north\\|south\\|stay>"\\);[^}]*process::exit\\(1\\);[^}]*\\}',
               flags: 's',
               hints: ['Add the if block with the usage println and process::exit(1)'],
             },
@@ -203,8 +235,8 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `Length checks prevent panics and make tools easier to use.`,
       },
       {
-        id: 'step-9',
-        step: 9,
+        id: 'step-10',
+        step: 10,
         title: 'Run the guard path',
         instruction: `Error paths should be tested. Running with missing input confirms the guard triggers and exits before any story logic.\n\nExample pattern:\n\n\`\`\`text\nUsage: {program} <value1> <value2>\n\`\`\`\n\nThis keeps you from assuming the guard works without seeing it in action.\n\nSeeing the output makes it clear that the program stops before unsafe indexing.\n\nIt also proves the usage message is visible to users.\n\nIf this looks right now, you can trust the guard later.`,
         task: `Run the program with no extra arguments to see the usage message.\n\n\`\`\`text\nUsage: text_adventure <name> <north|south|stay>\n\`\`\``,
@@ -222,12 +254,12 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `Testing error paths verifies the guard behaves as intended.`,
       },
       {
-        id: 'step-10',
-        step: 10,
+        id: 'step-11',
+        step: 11,
         title: 'Create an owned player name',
         instruction: `Command-line args are stored as owned strings inside a vector. Indexing gives you a reference.\n\nExample pattern:\n\n\`\`\`rust\nlet hero_name = inputs[1].clone();\n\`\`\`\n\nSometimes a reference is enough, but here we want an owned value we can pass around freely. Cloning creates a new owned string. That costs an allocation, so it should be intentional.\n\nThis step makes ownership explicit: you are choosing to own a copy of the player name.\n\nThat ownership choice lets you move the value later without borrowing headaches.\n\nYouâ€™re trading a small allocation for simpler ownership rules in later steps.\n\nThis is the first deliberate ownership tradeoff in the project.`,
         task: `Create player_name as an owned String by cloning the first user argument.`,
-        starterCode: `use std::env;\nuse std::process;\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n\n}`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    let arg_count = args.len();\n\n    if arg_count < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n\n}`,
         highlightLine: 15,
         validation: {
           rules: [
@@ -244,12 +276,12 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `Cloning creates a new owned String when you need ownership.`,
       },
       {
-        id: 'step-11',
-        step: 11,
+        id: 'step-12',
+        step: 12,
         title: 'Normalize the choice',
         instruction: `Users might type the direction in different cases. Normalizing input to lowercase gives you one consistent value to match on.\n\nExample pattern:\n\n\`\`\`rust\nlet direction = raw_input.to_lowercase();\n\`\`\`\n\nLowercasing returns a new owned string, so you keep the original argument intact if you ever need it for error messages.\n\nThis cuts down the number of branches your match must handle.\n\nNormalization is a tiny step that prevents a lot of confusing edge cases.\n\nItâ€™s a simple form of input sanitation that keeps your logic small.`,
         task: `Create choice as a lowercase version of the second user argument.`,
-        starterCode: `use std::env;\nuse std::process;\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n\n\n}`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    let arg_count = args.len();\n\n    if arg_count < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n\n\n}`,
         highlightLine: 17,
         validation: {
           rules: [
@@ -266,12 +298,12 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `Normalization reduces the number of cases your logic must handle.`,
       },
       {
-        id: 'step-12',
-        step: 12,
+        id: 'step-13',
+        step: 13,
         title: 'Define the intro function',
         instruction: `Borrowing lets a function read data without taking ownership. A string slice is a lightweight view into a string.\n\nWhen you pass a reference to an owned string, Rust can coerce it to a slice automatically. That lets you write functions that accept borrowed data while keeping ownership in the caller.\n\nExample pattern:\n\n\`\`\`rust\nfn greet(name: &str) {\n    println!("Hello, {}!", name);\n}\n\`\`\`\n\nThis step introduces the core ownership pattern: borrow for read-only use. Once you internalize this, you can build larger programs without cloning everything or fighting the borrow checker.\n\nYou are separating â€œwho owns the dataâ€ from â€œwho reads it.â€\n\nThis is the core rule that makes Rust safe without a garbage collector.\n\nIf you can explain this step, you can explain most borrow-checker messages later.`,
         task: `Define a function named intro that borrows the player name and prints two lines.\n\n\`\`\`text\nWelcome, <name>!\nYou are in a dark forest. Choose a direction.\n\`\`\``,
-        starterCode: `use std::env;\nuse std::process;\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n\n}`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    let arg_count = args.len();\n\n    if arg_count < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n\n}`,
         highlightLine: 3,
         validation: {
           rules: [
@@ -288,12 +320,12 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `Borrowing (&str) lets functions read data without taking ownership.`,
       },
       {
-        id: 'step-13',
-        step: 13,
+        id: 'step-14',
+        step: 14,
         title: 'Call intro',
         instruction: `Once the function exists, call it from \`main\` using a borrow. This keeps ownership in the caller and avoids unnecessary clones.\n\nExample pattern:\n\n\`\`\`rust\ngreet(&person_name);\n\`\`\`\n\nCalling a small helper keeps \`main\` focused on flow instead of details.\n\nThis also makes it obvious where the story starts in your program.\n\nIn larger programs, this style keeps \`main\` readable and testable.\n\nYouâ€™re creating a â€œhigh-level storyboardâ€ in main rather than a wall of prints.`,
         task: `Call intro using a borrowed reference to player_name.`,
-        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n\n}`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    let arg_count = args.len();\n\n    if arg_count < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n\n}`,
         highlightLine: 21,
         validation: {
           rules: [
@@ -310,12 +342,12 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `Borrowed calls let helpers read data without taking ownership.`,
       },
       {
-        id: 'step-14',
-        step: 14,
+        id: 'step-15',
+        step: 15,
         title: 'Write the story outcome function',
         instruction: `Sometimes you want a function to *produce* text rather than print it. Returning a string lets the caller decide when and where to display the text.\n\nA formatting helper can build a string without printing it. That keeps output concerns separate from story logic.\n\nExample pattern:\n\n\`\`\`rust\nlet line = format!("{} found a map.", hero);\n\`\`\`\n\nThis separation becomes important as programs grow: you can test logic that returns strings without relying on terminal output.\n\nIt also keeps \`main\` smaller and easier to read.\n\nThink of it as â€œbuild data first, display it later.â€\n\nThis pattern scales to logs, files, or UI output without changing the logic.`,
         task: `Define a function named outcome that takes a choice and a name as borrowed strings and returns a new String. Use match to return different sentences for north, south, and stay, and include the name in each sentence.`,
-        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    intro(&player_name);\n\n\n}`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    let arg_count = args.len();\n\n    if arg_count < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    intro(&player_name);\n\n\n}`,
         highlightLine: 7,
         validation: {
           rules: [
@@ -332,12 +364,12 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `format! builds a String you can return from a function.`,
       },
       {
-        id: 'step-15',
-        step: 15,
+        id: 'step-16',
+        step: 16,
         title: 'Print the outcome',
         instruction: `Now connect the pieces: call your outcome function, store the returned string, and print it. This keeps data creation and display cleanly separated.\n\nExample pattern:\n\n\`\`\`rust\nlet result = make_line(action, actor);\nprintln!("{}", result);\n\`\`\`\n\nStoring the return value is a useful habit when you might reuse it later (logging, debugging, or branching on content).\n\nThis is a small example of keeping logic and output in different layers.\n\nThe program now has a clear â€œproduce then printâ€ flow.\n\nThis is the same structure youâ€™ll reuse in bigger Rust programs.`,
         task: `Call outcome with borrowed choice and player_name, store the result in story, and print it.`,
-        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n        _ => format!("{}, you hesitate.", name),\n    }\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    intro(&player_name);\n\n\n}`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n        _ => format!("{}, you hesitate.", name),\n    }\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    let arg_count = args.len();\n\n    if arg_count < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    intro(&player_name);\n\n\n}`,
         highlightLine: 30,
         validation: {
           rules: [
@@ -354,8 +386,8 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `Returning a String lets you build text in one function and print it elsewhere.`,
       },
       {
-        id: 'step-16',
-        step: 16,
+        id: 'step-17',
+        step: 17,
         title: 'Test the story output',
         instruction: `Run the program with a sample name and direction to confirm the story flow and the outcome text.\n\nExample pattern:\n\n\`\`\`bash\ncargo run -- {name} {direction}\n\`\`\`\n\nSeeing real output early helps you spot mistakes before adding more logic.\n\nThis is an integration check: youâ€™re exercising multiple functions together.\n\nIt also confirms that your argument parsing works end-to-end.\n\nIf the output reads well now, later changes are easier to validate.`,
         task: `Run the program with a sample name and a valid direction to verify the output.`,
@@ -374,12 +406,12 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `Running the program confirms the current output is correct.`,
       },
       {
-        id: 'step-17',
-        step: 17,
+        id: 'step-18',
+        step: 18,
         title: 'Move ownership into a function',
         instruction: `Passing an owned string into a function moves ownership by default. After a move, you cannot use the original variable.\n\nIf you still need the original value, one option is to clone it. That creates a second owned string. It's a real copy, so treat it as a deliberate tradeoff for clarity and safety.\n\nExample pattern:\n\n\`\`\`rust\nfn take_title(title: String) {\n    println!("(trace) owned title: {}", title);\n}\n\nlet book_title = String::from("Voyage");\ntake_title(book_title.clone());\n\`\`\`\n\nThis step makes the move visible in program behavior. You will see the difference between â€œI gave the value awayâ€ and â€œI kept a copy to keep using.â€\n\nItâ€™s a concrete way to feel how ownership affects what you can do next.\n\nYouâ€™re learning to predict when Rust will block reuse after a move.\n\nThat intuition is what lets you design APIs that are easy to use.`,
         task: `Create consume_name that takes ownership of a String and prints a debug line.\n\n\`\`\`text\n(debug) consumed name: <name>\n\`\`\``,
-        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n        _ => format!("{}, you hesitate.", name),\n    }\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n\n}`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n        _ => format!("{}, you hesitate.", name),\n    }\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    let arg_count = args.len();\n\n    if arg_count < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n\n}`,
         highlightLine: 18,
         validation: {
           rules: [
@@ -396,12 +428,12 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `Owned parameters move data into a function.`,
       },
       {
-        id: 'step-18',
-        step: 18,
+        id: 'step-19',
+        step: 19,
         title: 'Call consume_name with a clone',
         instruction: `Passing a cloned String into the function lets you keep the original value in \`main\`.\n\nExample pattern:\n\n\`\`\`rust\nconsume(label.clone());\n\`\`\`\n\nThis makes the ownership move explicit while keeping a copy for later use.\n\nYouâ€™ll still be able to print the original name in a later step.\n\nThis mirrors real programs where you log or reuse data after passing it around.\n\nYou are choosing clarity over tiny performance costs here.`,
         task: `Call consume_name with a clone of player_name.`,
-        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n        _ => format!("{}, you hesitate.", name),\n    }\n}\n\nfn consume_name(name: String) {\n    println!("(debug) consumed name: {}", name);\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n\n}`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n        _ => format!("{}, you hesitate.", name),\n    }\n}\n\nfn consume_name(name: String) {\n    println!("(debug) consumed name: {}", name);\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    let arg_count = args.len();\n\n    if arg_count < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n\n}`,
         highlightLine: 39,
         validation: {
           rules: [
@@ -418,12 +450,12 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `clone() creates a new owned String so you can move one copy while keeping another.`,
       },
       {
-        id: 'step-19',
-        step: 19,
+        id: 'step-20',
+        step: 20,
         title: 'Use the original String after cloning',
         instruction: `Because you passed a cloned string into the consumer function, you still own the original value in \`main\`. This is the practical difference between moving and borrowing.\n\nExample pattern:\n\n\`\`\`rust\nconsume(label.clone());\nprintln!("still have: {}", label);\n\`\`\`\n\nPrinting one more line makes the ownership effect visible: the program still has access to the original name.\n\nThis is where the earlier clone decision pays off.\n\nIt reinforces that ownership is about *who can use the value next*, not just who created it.\n\nSeeing this in output makes the concept stick.`,
         task: `After the consume call, print a final thanks line using player_name to show you still own it.\n\n\`\`\`text\nThanks for playing, <name>!\n\`\`\``,
-        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n        _ => format!("{}, you hesitate.", name),\n    }\n}\n\nfn consume_name(name: String) {\n    println!("(debug) consumed name: {}", name);\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n    consume_name(player_name.clone());\n\n\n}`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n        _ => format!("{}, you hesitate.", name),\n    }\n}\n\nfn consume_name(name: String) {\n    println!("(debug) consumed name: {}", name);\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    let arg_count = args.len();\n\n    if arg_count < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n    consume_name(player_name.clone());\n\n\n}`,
         highlightLine: 41,
         validation: {
           rules: [
@@ -440,12 +472,12 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `Cloning allowed you to move one copy while keeping the original.`,
       },
       {
-        id: 'step-20',
-        step: 20,
+        id: 'step-21',
+        step: 21,
         title: 'Add name_length',
         instruction: `Sometimes you only need to *read* a string. A borrowed string slice is perfect for that because it avoids extra allocation.\n\nWe'll add a small helper that returns the length of the player's name. This shows how a borrowed value can still produce a useful result, and keeps ownership with the caller.\n\nExample pattern:\n\n\`\`\`rust\nfn label_len(label: &str) -> usize {\n    label.len()\n}\n\`\`\`\n\nBorrowing here keeps the caller in control of the original String.\n\nIt also makes the helper reusable for any string slice.\n\nThis is a safe, zero-copy way to compute with text.\n\nYouâ€™re practicing â€œread-only helpersâ€ that are idiomatic in Rust.`,
         task: `Add name_length that borrows a name and returns its length.`,
-        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n        _ => format!("{}, you hesitate.", name),\n    }\n}\n\nfn consume_name(name: String) {\n    println!("(debug) consumed name: {}", name);\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n    consume_name(player_name.clone());\n\n    println!("Thanks for playing, {}!", player_name);\n\n\n}`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n        _ => format!("{}, you hesitate.", name),\n    }\n}\n\nfn consume_name(name: String) {\n    println!("(debug) consumed name: {}", name);\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    let arg_count = args.len();\n\n    if arg_count < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n    consume_name(player_name.clone());\n\n    println!("Thanks for playing, {}!", player_name);\n\n\n}`,
         highlightLine: 18,
         validation: {
           rules: [
@@ -461,12 +493,12 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `Borrowed strings can be used to compute values without moving ownership.`,
       },
       {
-        id: 'step-21',
-        step: 21,
+        id: 'step-22',
+        step: 22,
         title: 'Print the name length',
         instruction: `Now use the length helper in \`main\` and display the result. This keeps the computation in one place and the output in another.\n\nExample pattern:\n\n\`\`\`rust\nlet size = label_len(&label);\nprintln!("Size: {}", size);\n\`\`\`\n\nCalling helpers like this keeps the output layer simple and readable.\n\nItâ€™s a small example of how borrowing helps compose functions cleanly.\n\nYouâ€™re turning a low-level detail into a named, reusable step.\n\nThat makes later refactors safer because logic is isolated.`,
         task: `Call name_length in main and print the result with a label.\n\n\`\`\`text\nName length: <number>\n\`\`\``,
-        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n        _ => format!("{}, you hesitate.", name),\n    }\n}\n\nfn consume_name(name: String) {\n    println!("(debug) consumed name: {}", name);\n}\n\nfn name_length(name: &str) -> usize {\n    name.len()\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n    consume_name(player_name.clone());\n\n    println!("Thanks for playing, {}!", player_name);\n\n\n}`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n        _ => format!("{}, you hesitate.", name),\n    }\n}\n\nfn consume_name(name: String) {\n    println!("(debug) consumed name: {}", name);\n}\n\nfn name_length(name: &str) -> usize {\n    name.len()\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    let arg_count = args.len();\n\n    if arg_count < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n    consume_name(player_name.clone());\n\n    println!("Thanks for playing, {}!", player_name);\n\n\n}`,
         highlightLine: 43,
         validation: {
           rules: [
@@ -488,12 +520,12 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `Borrowed values can be used safely without moving ownership.`,
       },
       {
-        id: 'step-22',
-        step: 22,
+        id: 'step-23',
+        step: 23,
         title: 'Validate the choice string',
         instruction: `User input is untrusted. Before you build a story, make sure the choice is one of the allowed directions.\n\nA small helper keeps this validation logic separate from \`main\`, which makes the flow easier to read and easier to test.\n\nExample pattern:\n\n\`\`\`rust\nfn is_allowed(action: &str) -> bool {\n    matches!(action, "left" | "right" | "wait")\n}\n\`\`\`\n\nThis step also sets up a clean guard in the next step, so the rest of the program can assume the input is valid.\n\nSeparating validation makes it obvious which inputs are supported.\n\nThis is the start of designing a clear input contract for your program.\n\nOnce you have a contract, every later function can rely on it.`,
         task: `Add is_valid_choice that returns true only for north, south, or stay.`,
-        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n        _ => format!("{}, you hesitate.", name),\n    }\n}\n\nfn consume_name(name: String) {\n    println!("(debug) consumed name: {}", name);\n}\n\nfn name_length(name: &str) -> usize {\n    name.len()\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n    consume_name(player_name.clone());\n\n    println!("Name length: {}", name_length(&player_name));\n    println!("Thanks for playing, {}!", player_name);\n\n\n}`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n        _ => format!("{}, you hesitate.", name),\n    }\n}\n\nfn consume_name(name: String) {\n    println!("(debug) consumed name: {}", name);\n}\n\nfn name_length(name: &str) -> usize {\n    name.len()\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    let arg_count = args.len();\n\n    if arg_count < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n    consume_name(player_name.clone());\n\n    println!("Name length: {}", name_length(&player_name));\n    println!("Thanks for playing, {}!", player_name);\n\n\n}`,
         highlightLine: 21,
         validation: {
           rules: [
@@ -515,12 +547,12 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `Validation helpers keep main flow focused and readable.`,
       },
       {
-        id: 'step-23',
-        step: 23,
+        id: 'step-24',
+        step: 24,
         title: 'Guard invalid choices',
         instruction: `Now that you can validate choices, use that guard before building the story. This makes invalid input fail fast with a clear message.\n\nExiting early avoids printing a misleading story when the choice is wrong, and keeps the rest of the code simpler because it can assume valid input.\n\nExample pattern:\n\n\`\`\`text\nError: Invalid action 'jump'. Use left, right, or wait.\n\`\`\`\n\nThis is a standard CLI pattern: validate, report, exit. It prevents confusing output and reduces error handling later.\n\nYouâ€™re teaching the program to refuse invalid states up front.\n\nThe guard keeps the rest of the code honest and smaller.\n\nIt also prevents subtle bugs where invalid input falls through as if it were valid.`,
         task: `If the choice is invalid, print a clear error message and exit with a non-zero code before continuing.\n\n\`\`\`text\nError: Invalid choice '<choice>'. Use north, south, or stay.\n\`\`\``,
-        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n        _ => format!("{}, you hesitate.", name),\n    }\n}\n\nfn consume_name(name: String) {\n    println!("(debug) consumed name: {}", name);\n}\n\nfn name_length(name: &str) -> usize {\n    name.len()\n}\n\nfn is_valid_choice(choice: &str) -> bool {\n    matches!(choice, "north" | "south" | "stay")\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n    consume_name(player_name.clone());\n\n    println!("Name length: {}", name_length(&player_name));\n    println!("Thanks for playing, {}!", player_name);\n\n\n}`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n        _ => format!("{}, you hesitate.", name),\n    }\n}\n\nfn consume_name(name: String) {\n    println!("(debug) consumed name: {}", name);\n}\n\nfn name_length(name: &str) -> usize {\n    name.len()\n}\n\nfn is_valid_choice(choice: &str) -> bool {\n    matches!(choice, "north" | "south" | "stay")\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    let arg_count = args.len();\n\n    if arg_count < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n    consume_name(player_name.clone());\n\n    println!("Name length: {}", name_length(&player_name));\n    println!("Thanks for playing, {}!", player_name);\n\n\n}`,
         highlightLine: 39,
         validation: {
           rules: [
@@ -537,12 +569,12 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `Validating input early prevents misleading output.`,
       },
       {
-        id: 'step-24',
-        step: 24,
+        id: 'step-25',
+        step: 25,
         title: 'Simplify the outcome match',
         instruction: `Now that invalid inputs are handled up front, the outcome function only needs to cover valid choices.\n\nRemoving the default arm makes the match more precise and easier to read, and it documents that other inputs are not allowed.\n\nExample pattern:\n\n\`\`\`rust\nmatch status {\n    "ok" => "all good",\n    "warn" => "check this",\n    "fail" => "stop",\n}\n\`\`\`\n\nA tighter match makes future edits safer because unexpected inputs stand out sooner.\n\nThis is a simple way to make illegal states unrepresentable.\n\nYouâ€™re relying on earlier validation to keep this match clean.\n\nIt also makes refactors safer because every allowed case is explicit.`,
         task: `Remove the default arm from outcome so it only handles the three valid directions.`,
-        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n        _ => format!("{}, you hesitate.", name),\n    }\n}\n\nfn consume_name(name: String) {\n    println!("(debug) consumed name: {}", name);\n}\n\nfn name_length(name: &str) -> usize {\n    name.len()\n}\n\nfn is_valid_choice(choice: &str) -> bool {\n    matches!(choice, "north" | "south" | "stay")\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    if !is_valid_choice(&choice) {\n        println!("Error: Invalid choice '{}'. Use north, south, or stay.", choice);\n        process::exit(1);\n    }\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n    consume_name(player_name.clone());\n\n    println!("Name length: {}", name_length(&player_name));\n    println!("Thanks for playing, {}!", player_name);\n\n\n}`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n        _ => format!("{}, you hesitate.", name),\n    }\n}\n\nfn consume_name(name: String) {\n    println!("(debug) consumed name: {}", name);\n}\n\nfn name_length(name: &str) -> usize {\n    name.len()\n}\n\nfn is_valid_choice(choice: &str) -> bool {\n    matches!(choice, "north" | "south" | "stay")\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    let arg_count = args.len();\n\n    if arg_count < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    if !is_valid_choice(&choice) {\n        println!("Error: Invalid choice '{}'. Use north, south, or stay.", choice);\n        process::exit(1);\n    }\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n    consume_name(player_name.clone());\n\n    println!("Name length: {}", name_length(&player_name));\n    println!("Thanks for playing, {}!", player_name);\n\n\n}`,
         highlightLine: 9,
         validation: {
           rules: [
@@ -564,12 +596,12 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `When inputs are validated, matches can be stricter and clearer.`,
       },
       {
-        id: 'step-25',
-        step: 25,
+        id: 'step-26',
+        step: 26,
         title: 'Borrow in consume_name',
         instruction: `The consumer function only prints the name, so it doesn't need ownership. Borrowing is cheaper than cloning and keeps your code more efficient.\n\nWe'll change the function to accept a borrowed string.\n\nExample pattern:\n\n\`\`\`rust\nfn show(label: &str) {\n    println!("{}", label);\n}\n\`\`\`\n\nThis is a small but important habit: reach for borrowing first, and only clone when you truly need a second owned value.\n\nRefactors like this are how you tighten ownership over time.\n\nYouâ€™re trading convenience clones for clearer, cheaper borrowing.\n\nIn real projects, this is a common performance and clarity win.`,
         task: `Change consume_name to borrow the name instead of owning it.`,
-        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n    }\n}\n\nfn consume_name(name: String) {\n    println!("(debug) consumed name: {}", name);\n}\n\nfn name_length(name: &str) -> usize {\n    name.len()\n}\n\nfn is_valid_choice(choice: &str) -> bool {\n    matches!(choice, "north" | "south" | "stay")\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    if !is_valid_choice(&choice) {\n        println!("Error: Invalid choice '{}'. Use north, south, or stay.", choice);\n        process::exit(1);\n    }\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n    consume_name(player_name.clone());\n\n    println!("Name length: {}", name_length(&player_name));\n    println!("Thanks for playing, {}!", player_name);\n\n\n}`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n    }\n}\n\nfn consume_name(name: String) {\n    println!("(debug) consumed name: {}", name);\n}\n\nfn name_length(name: &str) -> usize {\n    name.len()\n}\n\nfn is_valid_choice(choice: &str) -> bool {\n    matches!(choice, "north" | "south" | "stay")\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    let arg_count = args.len();\n\n    if arg_count < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    if !is_valid_choice(&choice) {\n        println!("Error: Invalid choice '{}'. Use north, south, or stay.", choice);\n        process::exit(1);\n    }\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n    consume_name(player_name.clone());\n\n    println!("Name length: {}", name_length(&player_name));\n    println!("Thanks for playing, {}!", player_name);\n\n\n}`,
         highlightLine: 17,
         validation: {
           rules: [
@@ -585,12 +617,12 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `Borrowing avoids unnecessary clones when ownership is not needed.`,
       },
       {
-        id: 'step-26',
-        step: 26,
+        id: 'step-27',
+        step: 27,
         title: 'Update the consume_name call',
         instruction: `Now that consume_name borrows, update the call site to pass a borrowed reference instead of a clone.\n\nExample pattern:\n\n\`\`\`rust\nshow(&label);\n\`\`\`\n\nThis keeps the original String in \`main\` while still letting the helper print it.\n\nItâ€™s a small change with a real performance and clarity benefit.\n\nThis also keeps ownership decisions consistent across your functions.\n\nConsistency here reduces surprises when you read the code later.`,
         task: `Update the consume_name call to pass a borrow instead of a clone.`,
-        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n    }\n}\n\nfn consume_name(name: &str) {\n    println!("(debug) consumed name: {}", name);\n}\n\nfn name_length(name: &str) -> usize {\n    name.len()\n}\n\nfn is_valid_choice(choice: &str) -> bool {\n    matches!(choice, "north" | "south" | "stay")\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    if args.len() < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    if !is_valid_choice(&choice) {\n        println!("Error: Invalid choice '{}'. Use north, south, or stay.", choice);\n        process::exit(1);\n    }\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n    consume_name(player_name.clone());\n\n    println!("Name length: {}", name_length(&player_name));\n    println!("Thanks for playing, {}!", player_name);\n\n\n}`,
+        starterCode: `use std::env;\nuse std::process;\n\nfn intro(name: &str) {\n    println!("Welcome, {}!", name);\n    println!("You are in a dark forest. Choose a direction.");\n}\n\nfn outcome(choice: &str, name: &str) -> String {\n    match choice {\n        "north" => format!("{}, you walk north and find a treasure chest.", name),\n        "south" => format!("{}, you head south and meet a friendly traveler.", name),\n        "stay" => format!("{}, you decide to stay put and wait.", name),\n    }\n}\n\nfn consume_name(name: &str) {\n    println!("(debug) consumed name: {}", name);\n}\n\nfn name_length(name: &str) -> usize {\n    name.len()\n}\n\nfn is_valid_choice(choice: &str) -> bool {\n    matches!(choice, "north" | "south" | "stay")\n}\n\nfn main() {\n    println!("Rust Adventure");\n\n    let args: Vec<String> = env::args().collect();\n\n    let arg_count = args.len();\n\n    if arg_count < 3 {\n        println!("Usage: text_adventure <name> <north|south|stay>");\n        process::exit(1);\n    }\n\n    let player_name = args[1].clone();\n    let choice = args[2].to_lowercase();\n\n    if !is_valid_choice(&choice) {\n        println!("Error: Invalid choice '{}'. Use north, south, or stay.", choice);\n        process::exit(1);\n    }\n\n    intro(&player_name);\n\n    let story = outcome(&choice, &player_name);\n    println!("{}", story);\n\n    consume_name(player_name.clone());\n\n    println!("Name length: {}", name_length(&player_name));\n    println!("Thanks for playing, {}!", player_name);\n\n\n}`,
         highlightLine: 41,
         validation: {
           rules: [
@@ -612,8 +644,8 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `Borrowed calls avoid unnecessary allocations.`,
       },
       {
-        id: 'step-27',
-        step: 27,
+        id: 'step-28',
+        step: 28,
         title: 'Test invalid input behavior',
         instruction: `Validating input is only useful if the error path is tested. Run the program with an unsupported direction to confirm the guard triggers and exits early.\n\nThis test ensures your error message and exit path are actually reachable.\n\nIt also confirms the validation logic matches the user-facing error text.\n\nIf this fails, itâ€™s a sign the guard or the message is in the wrong place.`,
         task: `Run the program with an invalid direction to confirm the guard triggers.`,
@@ -632,8 +664,8 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `Error paths are part of normal program behavior.`,
       },
       {
-        id: 'step-28',
-        step: 28,
+        id: 'step-29',
+        step: 29,
         title: 'Test a valid path',
         instruction: `Now run a valid direction to see the full story flow with your latest changes, including the validation and borrow-based helpers.\n\nThis confirms that all the pieces still work together after the refactors.\n\nItâ€™s a final integration check before closing the project.\n\nYou should see the same story output plus the debug and length lines.`,
         task: `Run the program with a valid direction to confirm the full story flow.`,
@@ -652,11 +684,11 @@ export const challenge_project_003: PracticeProject = {
         what_you_learned: `Valid input should pass through all story steps cleanly.`,
       },
       {
-        id: 'step-29',
-        step: 29,
+        id: 'step-30',
+        step: 30,
         title: 'Review ownership decisions',
         instruction: `Take a moment to review where you borrowed and where you cloned.\n\n- Borrowed: name references passed into helper functions\n- Owned: the player name stored in \`main\`\n\nThese choices keep allocations intentional and make ownership explicit.\n\nThis reflection step helps you build an intuition for when ownership is actually required.\n\nUse this mental model in the next project whenever you pass Strings between functions.\n\nIf you can explain each ownership choice, youâ€™ve learned the core lesson.`,
-        task: `Read the summary. If everything makes sense, click "Next" to finish the project.`,
+        task: `Read the summary. When everything makes sense, click "Submit" to finish the project.`,
         starterCode: `// Final review step.\n// No code changes required.`,
         test: ['Ownership decisions reviewed'],
         what_you_learned: `Borrow when you only need to read; own or clone when you need independent data.`,
@@ -665,5 +697,7 @@ export const challenge_project_003: PracticeProject = {
     completion_message: `Nice work! You built a small story program and used it to practice the most important ownership moves: borrowing with &str, creating owned Strings, and cloning when you truly need another owned copy.`,
     extensions: `Try extending your adventure:\n- Add more choices and locations\n- Add a score variable and update it based on the choice\n- Return a custom enum from outcome instead of a String\n- Replace expect/exit with Result and propagate errors`,
   };
+
+
 
 
