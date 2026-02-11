@@ -56,7 +56,7 @@ export function StepGrid({ challenge, currentStep, onStepClick, className, progr
           const isCompleted = status === 'completed';
           const isActive = status === 'active';
           const isLocked = status === 'locked';
-          const stepNumber = index + 1;
+          const stepNumber = typeof step.step === 'number' ? step.step : index + 1;
           const stepId = orderedStepIds[index] ?? `step-${stepNumber}`;
 
           return (

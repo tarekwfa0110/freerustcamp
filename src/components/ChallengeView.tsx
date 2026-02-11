@@ -844,7 +844,7 @@ export function ChallengeView({ challenge, initialStepId }: ChallengeViewProps) 
                 {orderedSteps[currentStep] && (() => {
                   const step = orderedSteps[currentStep]!;
                   const stepId = orderedStepIds[currentStep];
-                  const stepNumber = currentStep + 1;
+                  const stepNumber = typeof step.step === 'number' ? step.step : currentStep + 1;
                   return (
                 <div key={stepKey} className="mb-6 space-y-4">
                   {/* Step Header */}
