@@ -1,6 +1,6 @@
 # Content: Adding and Editing Challenges
 
-How curriculum data is defined today and how to add or change challenges and steps. The app uses **TypeScript** only; markdown is for a future migration.
+How curriculum data is defined today and how to add or change challenges and steps. The app uses **TypeScript** only; Markdown is for a future migration.
 
 ## Where content lives (current)
 
@@ -26,7 +26,7 @@ Defined in `src/types/challenge.ts`.
 - Optional: **explanation**, **task**, **starterCode**, **validation** (data-driven rules), **highlightLine**, **editableRegion**
 
 Notes from Projects 1–3:
-- **Step 0** is a project intro ("Understand what you're building"). It sets context, shows examples, and can either be a simple "read this" task or a quick environment check (e.g., a version command) before starting.
+- **Step 0** is informational only: overview, why it matters, and concepts taught. Optional environment checks may be suggested (e.g., a version command), but they are not validated.
 - **highlightLine** is used heavily to point learners to the exact edit line. Keep it 1-indexed.
 - **editableRegion** is rarely used today but remains available for future FCC-style guided edits.
 
@@ -179,7 +179,7 @@ Use this when a step replaces a previous line and you want to ensure the old lin
 
 ## Future: Markdown content
 
-When markdown is enabled (see `src/lib/LOADERS_README.md`), content can live in `src/content/sectionN/*.md` with frontmatter and step sections. The app does not use markdown at runtime today; curriculum is TypeScript only.
+When Markdown is enabled (see `src/lib/LOADERS_README.md`), content can live in `src/content/sectionN/*.md` with frontmatter and step sections. The app does not use Markdown at runtime today; curriculum is TypeScript only.
 
 
 
