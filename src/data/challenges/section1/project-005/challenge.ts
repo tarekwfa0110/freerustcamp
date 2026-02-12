@@ -276,10 +276,29 @@ Return 30 for Red, 5 for Yellow, and 25 for Green.`,
         validation: {
           rules: [
             {
-              type: 'code_contains',
-              patterns: ['impl TrafficLight', 'fn duration_seconds(&self) -> u32', 'TrafficLight::Red => 30', 'TrafficLight::Yellow => 5', 'TrafficLight::Green => 25'],
-              allRequired: true,
-              hints: ['Implement duration_seconds(&self) -> u32 with a match on self'],
+              type: 'code_matches',
+              regex: 'impl\\s+TrafficLight\\s*\\{',
+              hints: ['Add an impl TrafficLight block'],
+            },
+            {
+              type: 'code_matches',
+              regex: 'fn\\s+duration_seconds\\s*\\(\\s*&self\\s*\\)\\s*->\\s*u32',
+              hints: ['Implement duration_seconds(&self) -> u32 with flexible spacing'],
+            },
+            {
+              type: 'code_matches',
+              regex: 'TrafficLight::Red\\s*=>\\s*30',
+              hints: ['Return 30 seconds for TrafficLight::Red'],
+            },
+            {
+              type: 'code_matches',
+              regex: 'TrafficLight::Yellow\\s*=>\\s*5',
+              hints: ['Return 5 seconds for TrafficLight::Yellow'],
+            },
+            {
+              type: 'code_matches',
+              regex: 'TrafficLight::Green\\s*=>\\s*25',
+              hints: ['Return 25 seconds for TrafficLight::Green'],
             },
           ],
           message: 'Add duration_seconds()',
@@ -330,10 +349,24 @@ Return Green after Red, Yellow after Green, and Red after Yellow.`,
         validation: {
           rules: [
             {
-              type: 'code_contains',
-              patterns: ['fn next(&self) -> TrafficLight', 'TrafficLight::Red => TrafficLight::Green', 'TrafficLight::Green => TrafficLight::Yellow', 'TrafficLight::Yellow => TrafficLight::Red'],
-              allRequired: true,
-              hints: ['Implement next(&self) -> TrafficLight with a match on self'],
+              type: 'code_matches',
+              regex: 'fn\\s+next\\s*\\(\\s*&self\\s*\\)\\s*->\\s*TrafficLight',
+              hints: ['Implement next(&self) -> TrafficLight with flexible spacing'],
+            },
+            {
+              type: 'code_matches',
+              regex: 'TrafficLight::Red\\s*=>\\s*TrafficLight::Green',
+              hints: ['Map Red to Green'],
+            },
+            {
+              type: 'code_matches',
+              regex: 'TrafficLight::Green\\s*=>\\s*TrafficLight::Yellow',
+              hints: ['Map Green to Yellow'],
+            },
+            {
+              type: 'code_matches',
+              regex: 'TrafficLight::Yellow\\s*=>\\s*TrafficLight::Red',
+              hints: ['Map Yellow to Red'],
             },
           ],
           message: 'Add next()',

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { PracticeProject } from '@/types/challenge';
-import { loadProgress, isStepAccessible, getOrderedSteps, getOrderedStepIds } from '@/lib/progress';
+import { loadProgress, isStepAccessible, getOrderedSteps, getOrderedStepIds, getStepId } from '@/lib/progress';
 import { cn } from '@/lib/utils';
 import { CheckCircle2, Lock } from 'lucide-react';
 
@@ -67,7 +67,7 @@ export function StepGrid({ challenge, currentStep, onStepClick, className, progr
           const isActive = status === 'active';
           const isLocked = status === 'locked';
           const stepNumber = typeof step.step === 'number' ? step.step : index + 1;
-          const stepId = orderedStepIds[index] ?? `step-${stepNumber}`;
+          const stepId = orderedStepIds[index] ?? getStepId(step, index);
 
           return (
             <button

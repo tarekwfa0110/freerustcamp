@@ -445,9 +445,7 @@ export function isStepAccessible(
   if (stepIndex === 0) return true;
   
   // Check if ALL previous steps (by index) are completed
-  const orderedStepIds = Array.isArray(challenge.order) && challenge.order.length > 0
-    ? challenge.order
-    : challenge.steps.map((step, index) => getStepId(step, index));
+  const orderedStepIds = getOrderedStepIds(challenge as PracticeProject);
   for (let i = 0; i < stepIndex; i++) {
     const prevStepId = orderedStepIds[i];
     if (!completedSteps.includes(prevStepId)) {

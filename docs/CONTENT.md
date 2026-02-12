@@ -1,13 +1,13 @@
-﻿# Content: Adding and Editing Challenges
+# Content: Adding and Editing Challenges
 
 How curriculum data is defined today and how to add or change challenges and steps. The app uses **TypeScript** only; markdown is for a future migration.
 
 ## Where content lives (current)
 
 - **Sections and challenge list:** `src/data/challenges/index.ts` â€” `sections` array and exports `getChallenge`, `getSectionById`, etc.
-- **Section 1 challenges:** `src/data/challenges/section1.ts` â€” array of practice/certification projects.
+- **Section 1 challenges:** `src/data/challenges/section1/index.ts` - array of practice/certification projects.
 
-To add a new section: add an entry to `sections` in `index.ts` and a new file (e.g. `section2.ts`) with that section's challenges. To add a challenge to Section 1: add an object to the Section 1 array in `section1.ts` and ensure its `id` is unique and referenced in the section's `challenges` array.
+To add a new section: add an entry to `sections` in `index.ts` and a new file (e.g. `section2.ts`) with that section's challenges. To add a challenge to Section 1: add an object to the Section 1 array in `section1/index.ts` and ensure its `id` is unique and referenced in the section's `challenges` array.
 
 ## Data model (types)
 
@@ -161,7 +161,7 @@ Use this when a step replaces a previous line and you want to ensure the old lin
 
 ## Adding a new step (practice project)
 
-1. Add an object to the project's **steps** array in `section1.ts` (or the section file).
+1. Add an object to the project's **steps** array in `section1/index.ts` (or the section file).
 2. Set **step** (unique number), **title**, **instruction**, **test** (short descriptions), **what_you_learned**.
 3. Optionally set **explanation**, **task**, **starterCode**, **validation**, **highlightLine**, **editableRegion** (see `validation.ts` and existing steps for examples).
 4. Ensure no other step in that challenge has the same **step** number.

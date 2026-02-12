@@ -42,15 +42,15 @@ bun run preview
 
 ```
 freerustcamp/
-+-- src/
-�   +-- routes/        # TanStack Router routes
-�   +-- components/    # React components
-�   +-- lib/           # Utilities and validators
-�   +-- types/         # TypeScript types
-�   +-- data/          # Challenge data
-+-- public/            # Static assets
-+-- docs/              # Documentation
-+-- package.json       # Dependencies and scripts
+├── src/
+│   ├── routes/        # TanStack Router routes
+│   ├── components/    # React components
+│   ├── lib/           # Utilities and validators
+│   ├── types/         # TypeScript types
+│   └── data/          # Challenge data
+├── public/            # Static assets
+├── docs/              # Documentation
+└── package.json       # Dependencies and scripts
 ```
 
 ## Development

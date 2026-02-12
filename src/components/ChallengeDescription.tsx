@@ -60,7 +60,7 @@ export function ChallengeDescription({
   const orderedSteps = isPractice ? getOrderedSteps(practiceChallenge) : [];
   if (isPractice && orderedSteps[currentStep]) {
     const step = orderedSteps[currentStep];
-    const stepNumber = currentStep + 1;
+    const stepNumber = typeof step.step === 'number' ? step.step : currentStep + 1;
     
     return (
       <div className="space-y-4">
