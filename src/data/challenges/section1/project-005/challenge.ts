@@ -183,10 +183,9 @@ We will store the current state in a variable named \`light\`.`,
         validation: {
           rules: [
             {
-              type: 'code_contains',
-              patterns: ['let light = TrafficLight::Red;'],
-              allRequired: true,
-              hints: ['Add: let light = TrafficLight::Red;'],
+              type: 'code_matches',
+              regex: 'let\\s+(?:mut\\s+)?light\\s*=\\s*TrafficLight::Red\\s*;',
+              hints: ['Add: let light = TrafficLight::Red; (mut is ok)'],
             },
           ],
           message: 'Create the light variable',
@@ -319,7 +318,7 @@ We will print the duration line using the value from \`light.duration_seconds()\
 Duration: 30 seconds
 \`\`\``,
         starterCode: `#[derive(Debug)]\nenum TrafficLight {\n    Red,\n    Yellow,\n    Green,\n}\n\nimpl TrafficLight {\n    fn duration_seconds(&self) -> u32 {\n        match self {\n            TrafficLight::Red => 30,\n            TrafficLight::Yellow => 5,\n            TrafficLight::Green => 25,\n        }\n    }\n}\n\nfn main() {\n    println!("Traffic Light Simulator");\n\n    let light = TrafficLight::Red;\n\n    match light {\n        TrafficLight::Red => println!("Traffic Light: Red"),\n        TrafficLight::Yellow => println!("Traffic Light: Yellow"),\n        TrafficLight::Green => println!("Traffic Light: Green"),\n    }\n\n}`,
-        highlightLine: 31,
+        highlightLine: 29,
         validation: {
           rules: [
             {
@@ -389,7 +388,7 @@ Next state: Green
 
 Use \`{:?}\` and \`light.next()\`.`,
         starterCode: `#[derive(Debug)]\nenum TrafficLight {\n    Red,\n    Yellow,\n    Green,\n}\n\nimpl TrafficLight {\n    fn duration_seconds(&self) -> u32 {\n        match self {\n            TrafficLight::Red => 30,\n            TrafficLight::Yellow => 5,\n            TrafficLight::Green => 25,\n        }\n    }\n\n    fn next(&self) -> TrafficLight {\n        match self {\n            TrafficLight::Red => TrafficLight::Green,\n            TrafficLight::Green => TrafficLight::Yellow,\n            TrafficLight::Yellow => TrafficLight::Red,\n        }\n    }\n}\n\nfn main() {\n    println!("Traffic Light Simulator");\n\n    let light = TrafficLight::Red;\n\n    match light {\n        TrafficLight::Red => println!("Traffic Light: Red"),\n        TrafficLight::Yellow => println!("Traffic Light: Yellow"),\n        TrafficLight::Green => println!("Traffic Light: Green"),\n    }\n\n    println!("Duration: {} seconds", light.duration_seconds());\n}`,
-        highlightLine: 41,
+        highlightLine: 38,
         validation: {
           rules: [
             {

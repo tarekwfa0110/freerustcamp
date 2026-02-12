@@ -4,7 +4,7 @@ How curriculum data is defined today and how to add or change challenges and ste
 
 ## Where content lives (current)
 
-- **Sections and challenge list:** `src/data/challenges/index.ts` â€” `sections` array and exports `getChallenge`, `getSectionById`, etc.
+- **Sections and challenge list:** `src/data/challenges/index.ts` — `sections` array and exports `getChallenge`, `getSectionById`, etc.
 - **Section 1 challenges:** `src/data/challenges/section1/index.ts` - array of practice/certification projects.
 
 To add a new section: add an entry to `sections` in `index.ts` and a new file (e.g. `section2.ts`) with that section's challenges. To add a challenge to Section 1: add an object to the Section 1 array in `section1/index.ts` and ensure its `id` is unique and referenced in the section's `challenges` array.
@@ -25,14 +25,14 @@ Defined in `src/types/challenge.ts`.
 - **step** (number, unique within challenge), **title**, **instruction**, **test** (string[]), **what_you_learned**
 - Optional: **explanation**, **task**, **starterCode**, **validation** (data-driven rules), **highlightLine**, **editableRegion**
 
-Notes from Projects 1â€“3:
+Notes from Projects 1–3:
 - **Step 0** is a project intro ("Understand what you're building"). It sets context, shows examples, and can either be a simple "read this" task or a quick environment check (e.g., a version command) before starting.
 - **highlightLine** is used heavily to point learners to the exact edit line. Keep it 1-indexed.
 - **editableRegion** is rarely used today but remains available for future FCC-style guided edits.
 
 ### Certification project
 
-- Same top-level fields as practice except **type: 'certification'**; **concepts** â†’ **description**; **requirements** (functional, technical, quality); **tests**, **evaluation**; no steps.
+- Same top-level fields as practice except **type: 'certification'**; **concepts** → **description**; **requirements** (functional, technical, quality); **tests**, **evaluation**; no steps.
 
 ### Validation (data-driven)
 
@@ -53,12 +53,12 @@ Put teaching and the task in **instruction** and **task**. Don't put test descri
 ## Step structure (per step)
 
 1. **Explain** — Short explanation (1–3 sentences) for simple steps; longer explanations are OK when the concept is heavy. Use as many short paragraphs as needed to make the explanation better, but do not end the instruction with the explanation.
-2. **Example** â€” Code snippet that shows the **pattern** with names/values that are not the same as the task.
-3. **Task** â€” One clear action. Last paragraph of instruction or the `task` field. After the example, include at least one more paragraph before the task so the explanation does not end immediately after the example.
+2. **Example** — Code snippet that shows the **pattern** with names/values that are not the same as the task.
+3. **Task** — One clear action. Last paragraph of instruction or the `task` field. After the example, include at least one more paragraph before the task so the explanation does not end immediately after the example.
 
-Rule: Explanation and example first; exact thing to type/implement last. Don't lead with the solution. For complex steps, it's ok to include an explicit "What you need to do" paragraph inside the instruction (Projects 1â€“3 do this when the concept is heavy).
+Rule: Explanation and example first; exact thing to type/implement last. Don't lead with the solution. For complex steps, it's ok to include an explicit "What you need to do" paragraph inside the instruction (Projects 1–3 do this when the concept is heavy).
 
-**Philosophy: Granular steps are encouraged.** Break down concepts into small, digestible steps. Each step should teach one concept or require one clear action (or two tightly related actions like "run a command, then observe the output"). Don't combine multiple unrelated concepts into a single step. Reference Projects 1â€“3 as the target: they land in the ~20â€“30+ step range for a 1-hour project, breaking down every concept (project creation, imports, parsing, type annotations, conversions, error handling, match, Option, ownership) into individual steps. This granularity makes learning easier and reduces cognitive load.
+**Philosophy: Granular steps are encouraged.** Break down concepts into small, digestible steps. Each step should teach one concept or require one clear action (or two tightly related actions like "run a command, then observe the output"). Don't combine multiple unrelated concepts into a single step. Reference Projects 1–3 as the target: they land in the ~20–30+ step range for a 1-hour project, breaking down every concept (project creation, imports, parsing, type annotations, conversions, error handling, match, Option, ownership) into individual steps. This granularity makes learning easier and reduces cognitive load.
 
 Exception: Single-sentence steps are ok when the action is trivial and the user has already seen the pattern.
 
@@ -75,8 +75,8 @@ Exception: Single-sentence steps are ok when the action is trivial and the user 
 
 - **Length:** Keep the step scannable. Short steps are preferred, but long, multi-paragraph explanations are acceptable for foundational concepts (see Project 2 Option/error handling steps).
 - **Action-oriented:** The **task** must be explicit. The **instruction** can start with context or explanation; it does not need to start with a verb.
-- **Terminal commands:** Explain why in the instruction. Exact commands should appear in the **task**, but Projects 1â€“3 also mention commands in the instruction when that improves clarity. Avoid duplicate "Example" blocks that repeat the exact same command.
-- **Code to type:** Explain the concept and pattern in the instruction. In complex steps, Projects 1â€“3 sometimes include the exact required code in the instruction for clarity; thatâ€™s acceptable when the task is multi-part or has strict requirements.
+- **Terminal commands:** Explain why in the instruction. Exact commands should appear in the **task**, but Projects 1–3 also mention commands in the instruction when that improves clarity. Avoid duplicate "Example" blocks that repeat the exact same command.
+- **Code to type:** Explain the concept and pattern in the instruction. In complex steps, Projects 1–3 sometimes include the exact required code in the instruction for clarity; that's acceptable when the task is multi-part or has strict requirements.
 - **Text output strings:** If a step requires printing exact output text (usage, headers, debug lines, errors), include the required text in the **task** as a `text` code block. Projects 1–3 sometimes show exact output in the instruction as an example; that’s fine, but the required text still belongs in the task.
 - **One concept per step:** One snippet that teaches the pattern; optional bullets for terms.
 - **Granularity:** Prefer more steps over fewer. It's better to have 20 small steps than 10 large ones. Each step should feel achievable and focused. See Projects 1–3 for reference: creating a project, entering the folder, and running it are three separate steps, not one.
@@ -134,13 +134,13 @@ Use this when a step replaces a previous line and you want to ensure the old lin
 - **Use `code_matches` with regex** instead to allow flexible whitespace. Example:
 
 ```ts
-// âŒ BAD - Too strict, fails if user writes a:f64 instead of a: f64
+// ❌ BAD - Too strict, fails if user writes a:f64 instead of a: f64
 {
   type: 'code_contains',
   patterns: ['fn add(a: f64, b: f64)'],
 }
 
-// âœ… GOOD - Flexible, accepts both a: f64 and a:f64
+// ✅ GOOD - Flexible, accepts both a: f64 and a:f64
 {
   type: 'code_matches',
   regex: 'fn\\s+add\\s*\\(\\s*a\\s*:\\s*f64\\s*,\\s*b\\s*:\\s*f64\\s*\\)',
@@ -173,7 +173,7 @@ Use this when a step replaces a previous line and you want to ensure the old lin
 - [ ] Step numbers unique per challenge.
 - [ ] Validation rules or hardcoded logic for each step (no auto-pass).
 - [ ] "What you learned" and hints in data, not in instruction body.
-- [ ] Steps are broken down granularly (reference Projects 1â€“3: ~20â€“30+ steps for a 1-hour project is the target).
+- [ ] Steps are broken down granularly (reference Projects 1–3: ~20–30+ steps for a 1-hour project is the target).
 - [ ] Each concept (imports, parsing, type annotations, etc.) gets its own step when first introduced.
 - [ ] No duplicate instruction blocks (avoid example text that repeats the task).
 

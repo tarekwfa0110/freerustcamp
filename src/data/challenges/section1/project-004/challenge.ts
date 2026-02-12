@@ -403,16 +403,16 @@ Average grade: 92.37`,
         step: 18,
         title: 'Compute and print the average grade',
         instruction: `To compute an average, you add up all grades and divide by how many students you have.\n\nOne detail to watch in Rust: \`students.len()\` is a \`usize\` (an integer). To divide an \`f64\` total by it, cast the length to \`f64\` with \`as f64\`.\n\nExample pattern:\n\n\`\`\`rust\nlet average = total / items.len() as f64;\n\`\`\``,
-        task: `After the loop, compute the average grade and print it using this label:\n\n\`\`\`text\nAverage grade:\n\`\`\``,
+        task: `After the loop, compute the average grade and print it formatted to two decimals:\n\n\`\`\`rust\nprintln!("Average grade: {:.2}", average);\n\`\`\``,
         starterCode: `struct Student {\n    name: String,\n    id: u32,\n    grade: f64,\n}\n\nimpl Student {\n    fn new(name: &str, id: u32, grade: f64) -> Student {\n        Student {\n            name: name.to_string(),\n            id,\n            grade,\n        }\n    }\n\n    fn summary(&self) -> String {\n        format!("Student: {} (id: {}, grade: {})", self.name, self.id, self.grade)\n    }\n\n    fn update_grade(&mut self, new_grade: f64) {\n        self.grade = new_grade;\n    }\n}\n\nfn main() {\n    println!("Student Manager");\n\n    let alice = Student::new("Alice", 1, 95.0);\n    let mut bob = Student::new("Bob", 2, 87.5);\n    bob.update_grade(90.0);\n\n    let mut students = vec![alice, bob];\n    students.push(Student::new("Charlie", 3, 92.1));\n\n    for student in &students {\n        println!("{}", student.summary());\n    }\n\n}`,
         highlightLine: 38,
         validation: {
           rules: [
             {
               type: 'code_contains',
-              patterns: ['students.len() as f64', 'println!("Average grade:'],
+              patterns: ['students.len() as f64', 'println!("Average grade:', '{:.2}'],
               allRequired: true,
-              hints: ['Cast students.len() to f64 and print "Average grade:"'],
+              hints: ['Cast students.len() to f64 and format output with two decimals using {:.2}'],
             },
             {
               type: 'code_contains',

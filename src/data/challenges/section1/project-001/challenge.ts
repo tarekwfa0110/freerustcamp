@@ -278,7 +278,7 @@ Right now Rust does not know which collection type to build, so compiling will p
 
 
 \`\`\`rust
-let inputs: Vec<String> = env::args().collect();
+let values = env::args().collect();
 \`\`\``,
         task: `Add \`.collect()\` to the existing \`env::args()\` call. Then run \`cargo run\` and read the type annotation error. If you don't see it, double-check that your \`let args = ...\` line does not have a type annotation yet.`,
         starterCode: `use std::env;
