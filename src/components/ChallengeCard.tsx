@@ -3,7 +3,7 @@ import { Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ChallengeCardProps {
-  id: string;
+  slug: string;
   title: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
   estimatedTime: number; // in minutes
@@ -12,8 +12,19 @@ interface ChallengeCardProps {
   type: 'micro' | 'practice' | 'certification';
 }
 
+/**
+ * Renders a challenge card that links to the challenge page and indicates locked or completed states.
+ *
+ * The card navigates to /challenges/$challengeId using the provided `slug`, displays `title`, and
+ * adapts its styling and iconography based on `status`.
+ *
+ * @param slug - The challenge slug to use as the route parameter `challengeId`
+ * @param title - The visible title text shown on the card
+ * @param status - The challenge status; expected values: 'not-started', 'in-progress', 'completed', 'locked'
+ * @returns A JSX element linking to the challenge page with visual state corresponding to `status`
+ */
 export function ChallengeCard({
-  id,
+  slug,
   title,
   status,
 }: ChallengeCardProps) {
@@ -23,7 +34,7 @@ export function ChallengeCard({
   return (
     <Link
       to="/challenges/$challengeId"
-      params={{ challengeId: id }}
+      params={{ challengeId: slug }}
       search={{ step: undefined }}
       className={cn(
         'group relative overflow-hidden rounded-lg border transition-all duration-300 flex items-center justify-center min-h-[80px]',

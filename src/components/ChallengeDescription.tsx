@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { TaskChecklist } from './TaskChecklist';
 import { getMarkdownComponents } from '@/lib/markdown-components';
+import { getOrderedSteps } from '@/lib/progress';
 
 interface ChallengeDescriptionProps {
   challenge: Challenge;
@@ -15,7 +16,7 @@ interface ChallengeDescriptionProps {
   terminalCommands: string[];
   code: string;
   progress: ReturnType<typeof import('@/lib/progress').loadProgress>;
-  isStepAccessible: (challenge: PracticeProject, stepIndex: number, completedSteps: number[]) => boolean;
+  isStepAccessible: (challenge: PracticeProject, stepIndex: number, completedSteps: string[]) => boolean;
   isExplanationExpanded: boolean;
   setIsExplanationExpanded: (expanded: boolean) => void;
   onStepChange: (newStep: number) => void;
@@ -24,6 +25,23 @@ interface ChallengeDescriptionProps {
 
 const markdownComponents = getMarkdownComponents();
 
+/**
+ * Render the challenge description UI, including step-by-step instructions for practice challenges or the full description and requirements for certification projects.
+ *
+ * Renders a single practice step when `challenge.type === 'practice'` and a valid ordered step exists for `currentStep`, showing instruction markdown, an optional collapsible explanation, tests/checks, validation status, hints, and navigation controls. For certification projects it renders the challenge description, categorized requirements, and optional example output.
+ *
+ * @param challenge - The challenge to render (practice or certification).
+ * @param currentStep - Zero-based index of the currently displayed practice step.
+ * @param stepValidation - Validation state for the current step (completed flag, optional message and hints).
+ * @param terminalCommands - Terminal commands shown in task checklists.
+ * @param code - Code snippet shown in task checklists.
+ * @param progress - Progress state used to determine completed steps and navigation availability.
+ * @param isStepAccessible - Function that determines whether a given practice step is accessible given completed steps.
+ * @param isExplanationExpanded - Whether the step explanation panel is currently expanded.
+ * @param setIsExplanationExpanded - Setter to toggle the explanation expansion state.
+ * @param onStepChange - Callback invoked with a new step index when navigation changes.
+ * @returns A React element containing the challenge description or the active practice step UI.
+ */
 export function ChallengeDescription({
   challenge,
   currentStep,
@@ -39,14 +57,16 @@ export function ChallengeDescription({
   const isPractice = challenge.type === 'practice';
   const practiceChallenge = challenge as PracticeProject;
   
-  if (isPractice && practiceChallenge.steps[currentStep]) {
-    const step = practiceChallenge.steps[currentStep];
+  const orderedSteps = isPractice ? getOrderedSteps(practiceChallenge) : [];
+  if (isPractice && orderedSteps[currentStep]) {
+    const step = orderedSteps[currentStep];
+    const stepNumber = typeof step.step === 'number' ? step.step : currentStep + 1;
     
     return (
       <div className="space-y-4">
         {/* Step Header */}
         <div>
-          <strong className="text-lg font-bold block mb-3">Step {step.step}: {step.title}</strong>
+          <strong className="text-lg font-bold block mb-3">Step {stepNumber}: {step.title}</strong>
         </div>
 
         {/* Instruction */}
@@ -172,18 +192,18 @@ export function ChallengeDescription({
             variant="outline"
             size="sm"
             onClick={() => {
-              const newStep = Math.min(practiceChallenge.steps.length - 1, currentStep + 1);
+              const newStep = Math.min(orderedSteps.length - 1, currentStep + 1);
               const completedSteps = progress.challengeProgress[challenge.id]?.completedSteps || [];
               if (isStepAccessible(practiceChallenge, newStep, completedSteps)) {
                 onStepChange(newStep);
               }
             }}
             disabled={
-              currentStep === practiceChallenge.steps.length - 1 || 
+              currentStep === orderedSteps.length - 1 || 
               !stepValidation?.completed ||
               (() => {
                 const nextStep = currentStep + 1;
-                if (nextStep >= practiceChallenge.steps.length) return true;
+                if (nextStep >= orderedSteps.length) return true;
                 const completedSteps = progress.challengeProgress[challenge.id]?.completedSteps || [];
                 return !isStepAccessible(practiceChallenge, nextStep, completedSteps);
               })()

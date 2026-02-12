@@ -16,7 +16,8 @@ export interface Test {
 import type { StepValidationConfig } from './validation';
 
 export interface ProjectStep {
-  step: number;
+  id: string;
+  step?: number; // Legacy numeric step (optional during migration)
   title: string;
   instruction: string;
   explanation?: string; // Educational explanation of concepts
@@ -47,6 +48,7 @@ export interface PracticeProject {
   project_overview: string;
   why_this_project: string;
   prerequisites: string[];
+  order?: string[]; // Optional explicit ordering of step ids (preferred over numeric step)
   steps: ProjectStep[];
   completion_message: string;
   extensions?: string;

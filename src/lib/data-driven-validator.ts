@@ -160,6 +160,17 @@ export function validateStepWithConfig(
   return { completed: true, ...(config.message && { message: config.message }) };
 }
 
+/**
+ * Validates a single step rule against provided source code and terminal history.
+ *
+ * Performs rule-specific checks (terminal commands, code content/regex matches/rejections, function/struct presence, compilation placeholder, and custom rules), and for `cd` terminal checks will inspect persisted progress in localStorage to verify created directories.
+ *
+ * @param rule - The validation rule to evaluate (one entry from a step's `rules` array).
+ * @param code - The current source code to validate against the rule.
+ * @param terminalCommands - Flattened list of terminal commands executed by the user for the current challenge.
+ * @param challengeId - Optional identifier for the current challenge used when validating project-specific terminal commands or persisted directories.
+ * @returns An object with `completed: true` when the rule passes, or `completed: false` plus a human-readable `message` and optional `hints` when the rule fails.
+ */
 function validateRule(
   rule: StepValidationConfig['rules'][0],
   code: string,
@@ -190,7 +201,10 @@ function validateRule(
             const dirPath = `/home/user/${targetDir}`;
             if (!persistedDirs.includes(dirPath)) {
               // Directory doesn't exist - check if cargo new was run
-              const terminalCommandsAll = challengeProgress?.terminalCommands || {};
+              const terminalCommandsAll = (challengeProgress?.terminalCommands || {}) as Record<
+                string,
+                string[]
+              >;
               const allCommands = Object.values(terminalCommandsAll).flat();
               const cargoNewRun = allCommands.some(cmd => 
                 cmd.toLowerCase().includes('cargo new') && cmd.toLowerCase().includes(targetDir.toLowerCase())
@@ -290,6 +304,19 @@ function validateRule(
       break;
     }
 
+    case 'code_reject_patterns': {
+      const patterns = rule.patterns || [];
+      const foundPatterns = patterns.filter((pattern: string) => code.includes(pattern));
+      if (foundPatterns.length > 0) {
+        return {
+          completed: false,
+          message: `Remove ${foundPatterns.length > 1 ? 'these elements' : 'this element'}: ${foundPatterns.join(', ')}`,
+          hints: rule.hints,
+        };
+      }
+      break;
+    }
+
     case 'code_compiles':
       return {
         completed: false,
@@ -334,21 +361,23 @@ function validateRule(
       break;
     }
 
-    case 'custom':
-      console.warn('Custom validation not yet implemented:', rule.validator);
+    case 'custom': {
+      const customRule = rule as { validator?: string; hints?: string[] };
+      console.warn('Custom validation not yet implemented:', customRule.validator);
       return {
         completed: false,
-        message: `Custom validation not implemented: ${rule.validator}`,
-        hints: rule.hints ?? [],
+        message: `Custom validation not implemented: ${customRule.validator ?? 'unknown'}`,
+        hints: customRule.hints ?? [],
       };
-
+    }
     default: {
       const invalidType = (rule as { type: unknown }).type;
+      const hints: string[] | undefined = undefined;
       console.warn('Unrecognized validation rule type:', invalidType);
       return {
         completed: false,
         message: `Invalid validation rule type: "${String(invalidType)}". Check step config.`,
-        hints: rule.hints,
+        hints,
       };
     }
   }

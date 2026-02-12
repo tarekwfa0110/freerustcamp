@@ -27,6 +27,16 @@ function validateFrontmatter(frontmatter: Record<string, unknown>, context?: str
   }
 }
 
+/**
+ * Parse a markdown challenge (with YAML frontmatter) into a structured Challenge object.
+ *
+ * Accepts markdown containing YAML frontmatter describing a challenge and returns either a
+ * CertificationProject or a PracticeProject representation depending on the frontmatter `type`.
+ *
+ * @param markdown - Markdown text including YAML frontmatter and body content (project description and/or steps)
+ * @returns A `Challenge` object: a `CertificationProject` when `frontmatter.type === 'certification'`, otherwise a `PracticeProject`
+ * @throws Error - If required frontmatter fields are missing or empty
+ */
 export function parseMarkdownChallenge(markdown: string): Challenge {
   const { data: frontmatter, content } = matter(markdown);
   validateFrontmatter(frontmatter as Record<string, unknown>, JSON.stringify(frontmatter, null, 2));
@@ -57,6 +67,7 @@ export function parseMarkdownChallenge(markdown: string): Challenge {
   const whyProject = extractSection(content, '## Why This Project?', '##');
   
   const steps: ProjectStep[] = stepSections.map(section => ({
+    id: `step-${section.step}`,
     step: section.step,
     title: section.title,
     instruction: section.content,
@@ -78,6 +89,7 @@ export function parseMarkdownChallenge(markdown: string): Challenge {
     project_overview: overview,
     why_this_project: whyProject,
     prerequisites: frontmatter.prerequisites || [],
+    order: steps.map(step => step.id),
     steps,
     completion_message: frontmatter.completion_message || '',
     extensions: frontmatter.extensions || '',

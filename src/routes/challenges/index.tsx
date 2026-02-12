@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { sections } from '@/data/challenges';
+import { sections, getChallengeSlug } from '@/data/challenges';
 import { loadProgress } from '@/lib/progress';
 import { ChallengeCard } from '@/components/ChallengeCard';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,11 @@ export const Route = createFileRoute('/challenges/')({
   component: ChallengesIndex,
 });
 
+/**
+ * Renders the Rust curriculum challenges index with collapsible sections, per-section progress, and individual challenge cards.
+ *
+ * @returns The React element for the challenges index page.
+ */
 function ChallengesIndex() {
   const progress = loadProgress();
   const [expandedSections, setExpandedSections] = useState<Set<number>>(new Set([1]));
@@ -130,7 +135,7 @@ function ChallengesIndex() {
                           return (
                             <ChallengeCard
                               key={challenge.id}
-                              id={challenge.id}
+                              slug={getChallengeSlug(challenge)}
                               title={challenge.title}
                               difficulty="beginner"
                               estimatedTime={0}

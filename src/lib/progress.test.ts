@@ -13,7 +13,6 @@ import {
   addTerminalCommand,
   getTerminalCommandsForStep,
   isStepAccessible,
-  getValidStepNumber,
   resetChallengeProgress,
   markPreviewSeen,
   hasPreviewBeenSeen,
@@ -97,32 +96,32 @@ describe('progress', () => {
   test('markStepComplete adds step to completedSteps', () => {
     const progress = getDefaultProgress();
     saveProgress(progress);
-    markStepComplete('project-001', 1);
-    markStepComplete('project-001', 2);
+    markStepComplete('project-001', 'step-1');
+    markStepComplete('project-001', 'step-2');
     const loaded = loadProgress();
     const cp = loaded.challengeProgress['project-001'];
     expect(cp).toBeDefined();
-    expect(cp?.completedSteps).toContain(1);
-    expect(cp?.completedSteps).toContain(2);
+    expect(cp?.completedSteps).toContain('step-1');
+    expect(cp?.completedSteps).toContain('step-2');
   });
 
   test('markStepComplete does not duplicate step number', () => {
     const progress = getDefaultProgress();
     saveProgress(progress);
-    markStepComplete('project-001', 1);
-    markStepComplete('project-001', 1);
+    markStepComplete('project-001', 'step-1');
+    markStepComplete('project-001', 'step-1');
     const loaded = loadProgress();
     const cp = loaded.challengeProgress['project-001'];
-    const ones = cp?.completedSteps?.filter((s) => s === 1) ?? [];
+    const ones = cp?.completedSteps?.filter((s) => s === 'step-1') ?? [];
     expect(ones.length).toBe(1);
   });
 
   test('addTerminalCommand appends command for step', () => {
     const progress = getDefaultProgress();
     saveProgress(progress);
-    addTerminalCommand('project-001', 1, 'cargo new foo');
-    addTerminalCommand('project-001', 1, 'cargo run');
-    const commands = getTerminalCommandsForStep('project-001', 1);
+    addTerminalCommand('project-001', 'step-1', 'cargo new foo');
+    addTerminalCommand('project-001', 'step-1', 'cargo run');
+    const commands = getTerminalCommandsForStep('project-001', 'step-1');
     expect(commands).toContain('cargo new foo');
     expect(commands).toContain('cargo run');
   });
@@ -130,36 +129,36 @@ describe('progress', () => {
   test('addTerminalCommand does not duplicate same command', () => {
     const progress = getDefaultProgress();
     saveProgress(progress);
-    addTerminalCommand('project-001', 1, 'cargo run');
-    addTerminalCommand('project-001', 1, 'cargo run');
-    const commands = getTerminalCommandsForStep('project-001', 1);
+    addTerminalCommand('project-001', 'step-1', 'cargo run');
+    addTerminalCommand('project-001', 'step-1', 'cargo run');
+    const commands = getTerminalCommandsForStep('project-001', 'step-1');
     expect(commands.filter((c) => c === 'cargo run').length).toBe(1);
   });
 
   test('getTerminalCommandsForStep returns empty for unknown challenge', () => {
     const progress = getDefaultProgress();
     saveProgress(progress);
-    const commands = getTerminalCommandsForStep('unknown-challenge', 1);
+    const commands = getTerminalCommandsForStep('unknown-challenge', 'step-1');
     expect(commands).toEqual([]);
   });
 
   test('isStepAccessible: step 0 always accessible', () => {
-    const challenge = { steps: [{ step: 1 }, { step: 2 }, { step: 3 }] };
+    const challenge = { steps: [{ id: 'step-1' }, { id: 'step-2' }, { id: 'step-3' }] };
     expect(isStepAccessible(challenge, 0, [])).toBe(true);
-    expect(isStepAccessible(challenge, 0, [1, 2])).toBe(true);
+    expect(isStepAccessible(challenge, 0, ['step-1', 'step-2'])).toBe(true);
   });
 
   test('isStepAccessible: step 1 requires step 0 completed', () => {
-    const challenge = { steps: [{ step: 1 }, { step: 2 }, { step: 3 }] };
+    const challenge = { steps: [{ id: 'step-1' }, { id: 'step-2' }, { id: 'step-3' }] };
     expect(isStepAccessible(challenge, 1, [])).toBe(false);
-    expect(isStepAccessible(challenge, 1, [1])).toBe(true);
-    expect(isStepAccessible(challenge, 1, [1, 2])).toBe(true);
+    expect(isStepAccessible(challenge, 1, ['step-1'])).toBe(true);
+    expect(isStepAccessible(challenge, 1, ['step-1', 'step-2'])).toBe(true);
   });
 
   test('isStepAccessible: step 2 requires steps 0 and 1 completed', () => {
-    const challenge = { steps: [{ step: 1 }, { step: 2 }, { step: 3 }] };
-    expect(isStepAccessible(challenge, 2, [1])).toBe(false);
-    expect(isStepAccessible(challenge, 2, [1, 2])).toBe(true);
+    const challenge = { steps: [{ id: 'step-1' }, { id: 'step-2' }, { id: 'step-3' }] };
+    expect(isStepAccessible(challenge, 2, ['step-1'])).toBe(false);
+    expect(isStepAccessible(challenge, 2, ['step-1', 'step-2'])).toBe(true);
   });
 
   test('markPreviewSeen and hasPreviewBeenSeen', () => {
@@ -181,15 +180,6 @@ describe('progress', () => {
     expect(cp?.code).toBe('fn main() {}');
   });
 
-  test('getValidStepNumber returns step if it exists on challenge', () => {
-    const challenge = { steps: [{ step: 1 }, { step: 2 }, { step: 3 }] };
-    expect(getValidStepNumber(challenge, 1)).toBe(1);
-    expect(getValidStepNumber(challenge, 2)).toBe(2);
-    expect(getValidStepNumber(challenge, 3)).toBe(3);
-    expect(getValidStepNumber(challenge, 99)).toBeUndefined();
-    expect(getValidStepNumber(challenge, undefined)).toBeUndefined();
-  });
-
   test('resetChallengeProgress removes challenge from completed and challengeProgress', () => {
     const progress = getDefaultProgress();
     progress.completedChallenges.push('project-001');
@@ -198,8 +188,8 @@ describe('progress', () => {
       completed: true,
       attempts: 1,
       timeSpent: 60,
-      completedSteps: [1, 2],
-      terminalCommands: { 1: ['cargo run'] },
+      completedSteps: ['step-1', 'step-2'],
+      terminalCommands: { 'step-1': ['cargo run'] },
     };
     saveProgress(progress);
     resetChallengeProgress('project-001');

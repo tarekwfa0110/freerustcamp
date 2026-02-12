@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { loadProgress } from '@/lib/progress';
-import { sections } from '@/data/challenges';
+import { sections, getChallengeSlug } from '@/data/challenges';
 import { StatCard } from '@/components/StatCard';
 import { CircularProgress } from '@/components/CircularProgress';
 import { Progress } from '@/components/ui/progress';
@@ -20,6 +20,15 @@ export const Route = createFileRoute('/progress')({
   component: ProgressPage,
 });
 
+/**
+ * Render the user's progress dashboard page.
+ *
+ * Displays overall stats (streak, time, challenges completed, completion percentage),
+ * a "Continue Learning" list of recent challenges, per-section curriculum progress,
+ * and quick action links.
+ *
+ * @returns A React element representing the progress dashboard page.
+ */
 function ProgressPage() {
   const progress = loadProgress();
 
@@ -49,6 +58,7 @@ function ProgressPage() {
       const isCompleted = progress.completedChallenges.includes(challenge.id);
       return {
         id: challenge.id,
+        slug: getChallengeSlug(challenge),
         title: challenge.title,
         difficulty: challenge.difficulty,
         estimatedTime: challenge.estimated_time,
@@ -149,7 +159,7 @@ function ProgressPage() {
                   {recentChallenges.map((challenge) => (
                     <ChallengeCard
                       key={challenge.id}
-                      id={challenge.id}
+                      slug={challenge.slug}
                       title={challenge.title}
                       difficulty="beginner"
                       estimatedTime={0}

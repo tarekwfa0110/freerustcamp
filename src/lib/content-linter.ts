@@ -4,12 +4,13 @@
  */
 
 import { Challenge, PracticeProject, ProjectStep } from '@/types/challenge';
+import { getOrderedSteps, getStepId } from '@/lib/progress';
 
 export interface LintIssue {
   severity: 'error' | 'warning' | 'info';
   message: string;
   field?: string;
-  step?: number;
+  step?: string;
 }
 
 export interface LintResult {
@@ -19,7 +20,14 @@ export interface LintResult {
 }
 
 /**
- * Lint a single challenge
+ * Validate a challenge's content against the writing rubric and collect lint issues.
+ *
+ * For practice challenges this inspects project-level fields and each ordered step;
+ * for certification challenges this checks functional requirements. Collected issues
+ * include severity, message, and optional field/step locations.
+ *
+ * @param challenge - The challenge object to lint; behavior depends on `challenge.type`.
+ * @returns The lint result for the challenge, containing `challengeId`, an array of detected `issues`, and `passed` set to `true` when there are no error-level issues. 
  */
 export function lintChallenge(challenge: Challenge): LintResult {
   const issues: LintIssue[] = [];
@@ -53,8 +61,10 @@ export function lintChallenge(challenge: Challenge): LintResult {
       });
     }
 
-    practice.steps.forEach((step, index) => {
-      const stepIssues = lintStep(step, index + 1, challenge.id);
+    const orderedSteps = getOrderedSteps(practice);
+    orderedSteps.forEach((step, index) => {
+      const stepId = getStepId(step, index);
+      const stepIssues = lintStep(step, stepId, challenge.id);
       issues.push(...stepIssues);
     });
   }
@@ -82,7 +92,7 @@ export function lintChallenge(challenge: Challenge): LintResult {
  * Lint a single step
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- challengeId reserved for future step-level context
-function lintStep(step: ProjectStep, stepNumber: number, challengeId: string): LintIssue[] {
+function lintStep(step: ProjectStep, stepId: string, challengeId: string): LintIssue[] {
   const issues: LintIssue[] = [];
 
   // Instruction should be concise (FCC style: 1-3 sentences)
@@ -90,8 +100,8 @@ function lintStep(step: ProjectStep, stepNumber: number, challengeId: string): L
   if (instructionSentences.length > 5) {
     issues.push({
       severity: 'warning',
-      message: `Step ${stepNumber} instruction is too long (${instructionSentences.length} sentences). FCC style: 1-3 sentences maximum.`,
-      step: stepNumber,
+      message: `Step ${stepId} instruction is too long (${instructionSentences.length} sentences). FCC style: 1-3 sentences maximum.`,
+      step: stepId,
       field: 'instruction',
     });
   }
@@ -102,8 +112,8 @@ function lintStep(step: ProjectStep, stepNumber: number, challengeId: string): L
   if (!actionVerbs.some(verb => firstWord.startsWith(verb))) {
     issues.push({
       severity: 'info',
-      message: `Step ${stepNumber} instruction should start with an action verb (create, add, set, etc.)`,
-      step: stepNumber,
+      message: `Step ${stepId} instruction should start with an action verb (create, add, set, etc.)`,
+      step: stepId,
       field: 'instruction',
     });
   }
@@ -112,8 +122,8 @@ function lintStep(step: ProjectStep, stepNumber: number, challengeId: string): L
   if (!step.explanation && instructionSentences.length > 2) {
     issues.push({
       severity: 'info',
-      message: `Step ${stepNumber} might benefit from an explanation section`,
-      step: stepNumber,
+      message: `Step ${stepId} might benefit from an explanation section`,
+      step: stepId,
       field: 'explanation',
     });
   }
@@ -122,8 +132,8 @@ function lintStep(step: ProjectStep, stepNumber: number, challengeId: string): L
   if (!step.validation || !step.validation.rules || step.validation.rules.length === 0) {
     issues.push({
       severity: 'warning',
-      message: `Step ${stepNumber} has no validation config; the step will never pass.`,
-      step: stepNumber,
+      message: `Step ${stepId} has no validation config; the step will never pass.`,
+      step: stepId,
       field: 'validation',
     });
   }
@@ -132,8 +142,8 @@ function lintStep(step: ProjectStep, stepNumber: number, challengeId: string): L
   if (step.test.length === 0) {
     issues.push({
       severity: 'error',
-      message: `Step ${stepNumber} must have at least one test`,
-      step: stepNumber,
+      message: `Step ${stepId} must have at least one test`,
+      step: stepId,
       field: 'test',
     });
   }
@@ -141,8 +151,8 @@ function lintStep(step: ProjectStep, stepNumber: number, challengeId: string): L
   if (step.test.length > 10) {
     issues.push({
       severity: 'warning',
-      message: `Step ${stepNumber} has many tests (${step.test.length}). Consider if all are necessary.`,
-      step: stepNumber,
+      message: `Step ${stepId} has many tests (${step.test.length}). Consider if all are necessary.`,
+      step: stepId,
       field: 'test',
     });
   }
@@ -151,8 +161,8 @@ function lintStep(step: ProjectStep, stepNumber: number, challengeId: string): L
   if (!step.what_you_learned || step.what_you_learned.length < 20) {
     issues.push({
       severity: 'warning',
-      message: `Step ${stepNumber} "what you learned" should mention specific tools/concepts by name`,
-      step: stepNumber,
+      message: `Step ${stepId} "what you learned" should mention specific tools/concepts by name`,
+      step: stepId,
       field: 'what_you_learned',
     });
   }

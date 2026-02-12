@@ -11,6 +11,7 @@ Data-driven rules in `step.validation.rules`:
 | `terminal_command` | User ran a command (e.g. `cargo new`, optional `projectSpecific`) |
 | `code_contains` | Code contains strings; `allRequired` = all or any |
 | `code_matches` | Code matches regex (with optional `flags`) |
+| `code_reject_patterns` | Code must NOT contain specific patterns (used for line replacement steps) |
 | `code_compiles` | Reserved (future) |
 | `function_exists` | Function name present in code |
 | `struct_exists` | Struct name present; optional `fields` |

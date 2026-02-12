@@ -7,6 +7,7 @@ export type ValidationType =
   | 'terminal_command'
   | 'code_contains'
   | 'code_matches'
+  | 'code_reject_patterns'
   | 'code_compiles'
   | 'function_exists'
   | 'struct_exists'
@@ -30,6 +31,12 @@ export interface CodeMatchesValidation {
   type: 'code_matches';
   regex: string; // Regex pattern to match
   flags?: string; // Regex flags (e.g., "i" for case-insensitive)
+  hints: string[];
+}
+
+export interface CodeRejectPatternsValidation {
+  type: 'code_reject_patterns';
+  patterns: string[]; // Strings that must NOT be in code
   hints: string[];
 }
 
@@ -61,6 +68,7 @@ export type ValidationRule =
   | TerminalCommandValidation
   | CodeContainsValidation
   | CodeMatchesValidation
+  | CodeRejectPatternsValidation
   | CodeCompilesValidation
   | FunctionExistsValidation
   | StructExistsValidation

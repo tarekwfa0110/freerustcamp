@@ -5,8 +5,8 @@ export interface ChallengeProgress {
   timeSpent: number; // in seconds
   completedAt?: string; // ISO date string
   code?: string; // Last submitted code
-  completedSteps?: number[]; // Array of completed step numbers
-  terminalCommands?: Record<number, string[]>; // Terminal commands per step: step number -> commands array
+  completedSteps?: string[]; // Array of completed step ids
+  terminalCommands?: Record<string, string[]>; // Terminal commands per step: step id -> commands array
   createdDirectories?: string[]; // Directories created via cargo new (persists across terminal remounts)
 }
 

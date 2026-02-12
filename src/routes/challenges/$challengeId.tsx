@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { getChallenge, getSectionById } from '@/data/challenges';
+import { getChallengeByIdOrSlug, getChallengeSlug, getSectionById } from '@/data/challenges';
 import { ChallengeView } from '@/components/ChallengeView';
 import { StepGrid } from '@/components/StepGrid';
 import { SectionPreview } from '@/components/SectionPreview';
@@ -9,23 +9,29 @@ import { PracticeProject } from '@/types/challenge';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { cn } from '@/lib/utils';
-import { loadProgress, isStepAccessible, hasPreviewBeenSeen, markPreviewSeen } from '@/lib/progress';
+import { loadProgress, isStepAccessible, hasPreviewBeenSeen, markPreviewSeen, getOrderedSteps, getOrderedStepIds } from '@/lib/progress';
 
-// @ts-expect-error - TanStack Router file-based routing types
 export const Route = createFileRoute('/challenges/$challengeId')({
   component: ChallengePage,
   validateSearch: (search: Record<string, unknown>) => {
     return {
-      step: search.step ? Number(search.step) : undefined,
+      step: typeof search.step === 'string' ? search.step : undefined,
     };
   },
 });
 
+/**
+ * Render the challenge page for a given challengeId, handling section fallbacks, practice project previews, step grid interaction, and navigation to specific steps.
+ *
+ * Renders a SectionPreview when the route contains a numeric section id with available challenges, shows a ProjectPreviewModal for practice projects configured to preview on load, presents a StepGrid to select steps for practice projects before starting, and finally renders ChallengeView with an optional initial step when viewing or after starting a challenge.
+ *
+ * @returns A React element that displays the appropriate challenge-related UI (section preview, project preview modal, step grid, or challenge view) based on the current route, search parameters, and progress state.
+ */
 function ChallengePage() {
   const { challengeId } = Route.useParams();
   const search = Route.useSearch();
   const navigate = useNavigate();
-  const result = getChallenge(challengeId);
+  const result = getChallengeByIdOrSlug(challengeId);
   const [startedChallenge, setStartedChallenge] = useState(false);
   const [previewDismissed, setPreviewDismissed] = useState(false);
 
@@ -36,28 +42,29 @@ function ChallengePage() {
 
   // Validate step from URL - allow URL navigation even if locked (for direct links)
   // Returns the step number if it exists, regardless of lock status
-  const getValidatedStep = (stepNumber: number | undefined): number | undefined => {
-    if (stepNumber === undefined || !result) return undefined;
+  const getValidatedStep = (stepId: string | undefined): string | undefined => {
+    if (!stepId || !result) return undefined;
     
     const challenge = result.challenge;
-    if (challenge.type !== 'practice') return stepNumber;
+    if (challenge.type !== 'practice') return stepId;
     
     // Find step index
-    const stepIndex = challenge.steps.findIndex(s => s.step === stepNumber);
+    const stepIds = getOrderedStepIds(challenge);
+    const stepIndex = stepIds.indexOf(stepId);
     if (stepIndex < 0) return undefined; // Step doesn't exist
     
     // Allow URL navigation to any existing step, even if locked
     // The ChallengeView will handle showing the locked state
-    return stepNumber;
+    return stepId;
   };
   
-  const [initialStep, setInitialStep] = useState<number | undefined>(getValidatedStep(search.step));
+  const [initialStepId, setInitialStepId] = useState<string | undefined>(getValidatedStep(search.step));
 
   // Update initialStep when URL search param changes
   useEffect(() => {
     if (!result) return;
     const validatedStep = getValidatedStep(search.step);
-    setInitialStep(validatedStep);
+    setInitialStepId(validatedStep);
     if (validatedStep !== undefined) {
       setStartedChallenge(true);
     }
@@ -66,10 +73,10 @@ function ChallengePage() {
 
   // If step is specified in URL, start challenge at that step
   useEffect(() => {
-    if (initialStep !== undefined) {
+    if (initialStepId !== undefined) {
       setStartedChallenge(true);
     }
-  }, [initialStep]);
+  }, [initialStepId]);
 
   // Show section preview if it's a section ID
   const sectionNum = parseInt(challengeId, 10);
@@ -83,7 +90,7 @@ function ChallengePage() {
             // Navigate to first challenge
             navigate({
               to: '/challenges/$challengeId',
-              params: { challengeId: section.challenges[0].id },
+              params: { challengeId: getChallengeSlug(section.challenges[0]) },
               search: { step: undefined },
               replace: true,
             });
@@ -146,7 +153,7 @@ function ChallengePage() {
           <div>
             <h1 className="text-2xl font-bold text-foreground">{challenge.title}</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              {challenge.steps.length} steps • Click a step to begin
+              {getOrderedSteps(challenge as PracticeProject).length} steps • Click a step to begin
             </p>
           </div>
           <Link
@@ -169,13 +176,15 @@ function ChallengePage() {
             <StepGrid
               challenge={challenge as PracticeProject}
               currentStep={(() => {
-                if (initialStep === undefined) return 0;
-                const index = (challenge as PracticeProject).steps.findIndex(s => s.step === initialStep);
+                if (initialStepId === undefined) return 0;
+                const stepIds = getOrderedStepIds(challenge as PracticeProject);
+                const index = stepIds.indexOf(initialStepId);
                 return index >= 0 ? index : 0;
               })()}
               progressKey={progressKeyValue}
               onStepClick={(stepIndex) => {
-                const stepNumber = (challenge as PracticeProject).steps[stepIndex]?.step;
+                const stepIds = getOrderedStepIds(challenge as PracticeProject);
+                const stepId = stepIds[stepIndex];
                 
                 // Re-validate lock status before navigating
                 const currentProgress = loadProgress();
@@ -187,12 +196,12 @@ function ChallengePage() {
                   return;
                 }
                 
-                setInitialStep(stepNumber);
+                setInitialStepId(stepId);
                 setStartedChallenge(true);
                 navigate({
                   to: '/challenges/$challengeId',
-                  params: { challengeId },
-                  search: { step: stepNumber },
+                  params: { challengeId: getChallengeSlug(challenge) },
+                  search: { step: stepId },
                 });
               }}
             />
@@ -207,7 +216,7 @@ function ChallengePage() {
     <ChallengeView 
       challenge={challenge} 
       section={result.section}
-      initialStep={initialStep}
+      initialStepId={initialStepId}
     />
   );
 }
